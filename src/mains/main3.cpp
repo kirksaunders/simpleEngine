@@ -53,6 +53,7 @@ void main3() {
 			mY1 = y;
 		}
 	});
+	
 	float cX2, cY2;
 	cX2 = cY2 = 0;
 	bool rightMouseDown2 = false;
