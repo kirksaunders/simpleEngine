@@ -1,3 +1,7 @@
+#include <cmath>
+
+#include "math/constants.hpp"
+
 #include "render_base/shader.hpp"
 
 using namespace Render3D;
@@ -116,7 +120,7 @@ void Shader::setVariable(char const *variableName, float number) {
 		}
 	}
 	if (index < size) {
-		if (floatValues[index] == number) {
+		if (fabs(floatValues[index] == number) < EPSILON) {
 			return;
 		}
 		variableLocation = floatLocations[index];

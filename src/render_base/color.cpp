@@ -1,3 +1,7 @@
+#include <cmath>
+
+#include "math/constants.hpp"
+
 #include "render_base/color.hpp"
 
 using namespace Render3D;
@@ -61,10 +65,21 @@ Color Color::operator/(float a) const {
 }
 
 bool Color::operator==(const Color& b) const {
-	return (values[0] == b.values[0]
-			&& values[1] == b.values[1]
-			&& values[2] == b.values[2]
-			&& values[3] == b.values[3]);
+	for (unsigned int i = 0; i < 4; i++) {
+		if (fabs(values[i] - b.values[i]) > EPSILON) {
+			return false;
+		}
+	}
+	return true;
+}
+
+bool Color::operator!=(const Color& b) const {
+	for (unsigned int i = 0; i < 4; i++) {
+		if (fabs(values[i] - b.values[i]) > EPSILON) {
+			return true;
+		}
+	}
+	return false;
 }
 
 float& Color::operator[](int i) {

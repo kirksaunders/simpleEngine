@@ -34,6 +34,8 @@ namespace Render3D {
 
 		bool operator==(const Color&) const;
 
+		bool operator!=(const Color&) const;
+
 		float& operator[](int);
 		const float operator[](int) const;
 
