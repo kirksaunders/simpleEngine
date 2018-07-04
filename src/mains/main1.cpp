@@ -5,31 +5,31 @@ using namespace Render3D;
 using namespace Math3D;
 
 void main1() {
-    std::string meshPath;
-    std::cout << "Enter mesh file path: ";
-    std::getline(std::cin, meshPath);
+	std::string meshPath;
+	std::cout << "Enter mesh file path: ";
+	std::getline(std::cin, meshPath);
 
-    float r, g, b;
-    std::cout << "Enter color for mesh(rgb): ";
-    std::cin >> r >> g >> b;
+	float r, g, b;
+	std::cout << "Enter color for mesh(rgb): ";
+	std::cin >> r >> g >> b;
 
-    float sx, sy, sz;
-    std::cout << "Enter size for mesh(xyz): ";
-    std::cin >> sx >> sy >> sz;
+	float sx, sy, sz;
+	std::cout << "Enter size for mesh(xyz): ";
+	std::cin >> sx >> sy >> sz;
 
 	Window* window = new Window(WIDTH, HEIGHT, "Main 1 - Model Loading");
 
 	Context3D context = Context3D(window);
 
-    Camera* cam = context.getCamera();
-    cam->setCFrame(Matrix4x4(0, 4, 0));
+	Camera* cam = context.getCamera();
+	cam->setCFrame(Matrix4x4(0, 4, 0));
 
-    Model* ground = new Model("res/meshes/ground.obj");
-    ground->setSize(Vector4(1, 1, 1));
-    ground->setCFrame(Matrix4x4(0, -1.5, 0));
-    ground->setColor(Color(0, 1, 0));
+	Model* ground = new Model("res/meshes/ground.obj");
+	ground->setSize(Vector4(1, 1, 1));
+	ground->setCFrame(Matrix4x4(0, -1.5, 0));
+	ground->setColor(Color(0, 1, 0));
 
-    context.addObject(ground);
+	context.addObject(ground);
 
 	Model* model = new Model(meshPath.c_str());
 
@@ -70,40 +70,40 @@ void main1() {
 
 	context.addObject(cube2);
 
-    /*Shader testShader("res/test.vert", "res/test.frag");
-    shaderManager.addShader("test", testShader);
+	/*Shader testShader("res/test.vert", "res/test.frag");
+	shaderManager.addShader("test", testShader);
 
-    model->setShader("test");*/
+	model->setShader("test");*/
 
 	float x, y, z;
-    x = y = z = 0;
+	x = y = z = 0;
 
-    float cX, cY;
-    cX = 0;
-    cY = -100;
-    bool rightMouseDown = false;
-    double mX, mY;
-    window->setMouseDownCallback([&window, &rightMouseDown, &mX, &mY](int button) {
-        if (button == 1) { // right mouse button
-            window->setMouseLockEnabled(true);
-            rightMouseDown = true;
-            window->getMousePosition(mX, mY);
-        }
-    });
-    window->setMouseUpCallback([&window, &rightMouseDown](int button) {
-        if (button == 1) { // right mouse button
-            window->setMouseLockEnabled(false);
-            rightMouseDown = false;
-        }
-    });
-    window->setMouseMoveCallback([&rightMouseDown, &mX, &mY, &cX, &cY](double x, double y) {
-        if (rightMouseDown) {
-            cX -= (x - mX);
-            cY -= (y - mY);
-            mX = x;
-            mY = y;
-        }
-    });
+	float cX, cY;
+	cX = 0;
+	cY = -100;
+	bool rightMouseDown = false;
+	double mX, mY;
+	window->setMouseDownCallback([&window, &rightMouseDown, &mX, &mY](int button) {
+		if (button == 1) { // right mouse button
+			window->setMouseLockEnabled(true);
+			rightMouseDown = true;
+			window->getMousePosition(mX, mY);
+		}
+	});
+	window->setMouseUpCallback([&window, &rightMouseDown](int button) {
+		if (button == 1) { // right mouse button
+			window->setMouseLockEnabled(false);
+			rightMouseDown = false;
+		}
+	});
+	window->setMouseMoveCallback([&rightMouseDown, &mX, &mY, &cX, &cY](double x, double y) {
+		if (rightMouseDown) {
+			cX -= (x - mX);
+			cY -= (y - mY);
+			mX = x;
+			mY = y;
+		}
+	});
 
 	window->setVSyncEnabled(true);
 
@@ -118,9 +118,9 @@ void main1() {
 		cube2->setCFrame(cube->getCFrame() * Matrix4x4(0, cube->getSize()[1] / 2 + cube2->getSize()[1] / 2, 0));
 		model->setCFrame(Matrix4x4(model->getCFrame().position()) * Matrix4x4::fromEuler(x, y, z));
 		model2->setCFrame(Matrix4x4(model2->getCFrame().position()) * Matrix4x4::fromEuler(x, y, z));
-        sphere->setCFrame(Matrix4x4(sphere->getCFrame().position()) * Matrix4x4::fromEuler(x, y, z));
+		sphere->setCFrame(Matrix4x4(sphere->getCFrame().position()) * Matrix4x4::fromEuler(x, y, z));
 
-        updateCamera(cam, window, cX, cY);
+		updateCamera(cam, window, cX, cY);
 
 		context.render();
 
@@ -132,8 +132,8 @@ void main1() {
 	delete cube;
 	delete cube2;
 	delete sphere;
-    delete ground;
+	delete ground;
 	delete model;
 	delete model2;
-    glfwTerminate();
+	glfwTerminate();
 }

@@ -282,22 +282,22 @@ Matrix4x4 Matrix4x4::operator-(const Vector4& b) const {
 
 bool Matrix4x4::operator==(const Matrix4x4& b) const {
 	for (int row = 0; row < 4; row++) {
-        for (int column = 0; column < 4; column++) {
-            if (values[row][column] != b.values[row][column]) {
-                return false;
-            }
-        }
-    }
-    return true;
+		for (int column = 0; column < 4; column++) {
+			if (values[row][column] != b.values[row][column]) {
+				return false;
+			}
+		}
+	}
+	return true;
 }
 
 Matrix4x4& Matrix4x4::operator=(const Matrix4x4& b) {
 	for (int row = 0; row < 4; row++) {
-        for (int column = 0; column < 4; column++) {
-            values[row][column] = b.values[row][column];
-        }
-    }
-    return *this;
+		for (int column = 0; column < 4; column++) {
+			values[row][column] = b.values[row][column];
+		}
+	}
+	return *this;
 }
 
 float* Matrix4x4::operator[](int row) {
@@ -314,11 +314,11 @@ float* Matrix4x4::getValues() {
 
 std::ostream& Math3D::operator <<(std::ostream &outs, const Matrix4x4 &mat) {
 	for (int row = 0; row < 4; row++) {
-        for (int column = 0; column < 4; column++) {
-            outs << mat[row][column];
-            if (column < 3 || row < 3) {
-                outs << ", ";
-            }
-        }
-    }
+		for (int column = 0; column < 4; column++) {
+			outs << mat[row][column];
+			if (column < 3 || row < 3) {
+				outs << ", ";
+			}
+		}
+	}
 }

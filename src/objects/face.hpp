@@ -9,18 +9,18 @@
 #include "render_base/color.hpp"
 
 namespace Render3D {
-    class Face {
-     public:
-        Face(std::vector<Math3D::Vector4>& verts, const Color& clr);
+	class Face {
+	 public:
+		Face(std::vector<Math3D::Vector4>& verts, const Color& clr);
 
-        void update(std::vector<Math3D::Vector4>& verts, const Color& clr);
+		void update(std::vector<Math3D::Vector4>& verts, const Color& clr);
 
-        std::vector<Triangle> getTriangles() const;
+		std::vector<Triangle> getTriangles() const;
 
-     private:
-        std::vector<Triangle> triangles;
-        Color color;
-    };
+	 private:
+		std::vector<Triangle> triangles;
+		Color color;
+	};
 }
 
 #endif

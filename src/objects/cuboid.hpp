@@ -38,7 +38,7 @@ namespace Render3D {
 		GLuint VBO;
 		GLuint NBO;
 
-        std::map<Window*, GLuint> VAOs;
+		std::map<Window*, GLuint> VAOs;
 
 		//std::vector<Face> faces;
 
@@ -48,8 +48,8 @@ namespace Render3D {
 
 		void setVertices();
 
-        void generateBuffers();
-        GLuint getVertexArrayObject(Window* win);
+		void generateBuffers();
+		GLuint getVertexArrayObject(Window* win);
 	};
 }
 

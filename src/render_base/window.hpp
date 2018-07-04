@@ -11,76 +11,76 @@
 #include "render_base/color.hpp"
 
 namespace Render3D {
-    class Window {
-     public:
-        typedef std::function<void(int)> MouseButtonCallback;
-        typedef std::function<void(double, double)> MouseMoveCallback;
-        Window(int width, int height, const char* title, Window* parent = NULL);
+	class Window {
+	 public:
+		typedef std::function<void(int)> MouseButtonCallback;
+		typedef std::function<void(double, double)> MouseMoveCallback;
+		Window(int width, int height, const char* title, Window* parent = NULL);
 
-        ~Window();
+		~Window();
 
-        void activate();
+		void activate();
 
-        void close();
+		void close();
 
-        bool isActive() const;
+		bool isActive() const;
 
-        void pollEvents();
+		void pollEvents();
 
-        void clear();
+		void clear();
 
-        int getWidth() const;
+		int getWidth() const;
 
-        int getHeight() const;
+		int getHeight() const;
 
-        void drawTriangle(GLfloat[]);
+		void drawTriangle(GLfloat[]);
 
-        //void drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3, const Color color);
+		//void drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3, const Color color);
 
-        void update();
+		void update();
 
-        void destroy();
+		void destroy();
 
-        void setVSyncEnabled(bool enabled);
+		void setVSyncEnabled(bool enabled);
 
-        void setMouseLockEnabled(bool enabled);
+		void setMouseLockEnabled(bool enabled);
 
-        bool isVSyncEnabled() const;
+		bool isVSyncEnabled() const;
 
-        bool isMouseLockEnabled() const;
+		bool isMouseLockEnabled() const;
 
-        static Window* getCurrent();
+		static Window* getCurrent();
 
-        bool isKeyPressed(int key);
-        bool isMouseDown(int button);
+		bool isKeyPressed(int key);
+		bool isMouseDown(int button);
 
-        void getMousePosition(double& x, double& y);
+		void getMousePosition(double& x, double& y);
 
-        void setMouseDownCallback(MouseButtonCallback callback);
-        void setMouseUpCallback(MouseButtonCallback callback);
-        void setMouseMoveCallback(MouseMoveCallback callback);
+		void setMouseDownCallback(MouseButtonCallback callback);
+		void setMouseUpCallback(MouseButtonCallback callback);
+		void setMouseMoveCallback(MouseMoveCallback callback);
 
-     private:
-        GLFWwindow *window;
-        bool active;
-        bool destroyed;
-        int width;
-        int height;
-        bool vsyncEnabled;
-        bool mouseLockEnabled;
-        MouseButtonCallback mouseDownCallback;
-        MouseButtonCallback mouseUpCallback;
-        MouseMoveCallback mouseMoveCallback;
+	 private:
+		GLFWwindow *window;
+		bool active;
+		bool destroyed;
+		int width;
+		int height;
+		bool vsyncEnabled;
+		bool mouseLockEnabled;
+		MouseButtonCallback mouseDownCallback;
+		MouseButtonCallback mouseUpCallback;
+		MouseMoveCallback mouseMoveCallback;
 
-        static Window* curWindow;
-        static Window* firstWindow;
+		static Window* curWindow;
+		static Window* firstWindow;
 
-        static void closeCallback(GLFWwindow* window);
-        //static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
-        static void resizeCallback(GLFWwindow* glfwWin, int width, int height);
-        static void mouseButtonCallback(GLFWwindow* glfwWin, int button, int action, int mods);
-        static void cursorPositionCallback(GLFWwindow* glfwWin, double x, double y);
-    };
+		static void closeCallback(GLFWwindow* window);
+		//static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+		static void resizeCallback(GLFWwindow* glfwWin, int width, int height);
+		static void mouseButtonCallback(GLFWwindow* glfwWin, int button, int action, int mods);
+		static void cursorPositionCallback(GLFWwindow* glfwWin, double x, double y);
+	};
 }
 
 #endif

@@ -52,26 +52,26 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
 
 	for (GLuint i = 0; i < mesh->mNumVertices; i++) {
 		Vector4 vert;
-        aiVector3t<float> aiVec;
-        if (mesh->HasPositions()) {
-		    aiVec = mesh->mVertices[i];
-            vert[0] = aiVec.x;
-            vert[1] = aiVec.y;
-            vert[2] = aiVec.z;
-        } else {
-            // will throw exception eventually
-        }
+		aiVector3t<float> aiVec;
+		if (mesh->HasPositions()) {
+			aiVec = mesh->mVertices[i];
+			vert[0] = aiVec.x;
+			vert[1] = aiVec.y;
+			vert[2] = aiVec.z;
+		} else {
+			// will throw exception eventually
+		}
 		vertices.push_back(vert);
 
 		Vector4 norm;
-        if (mesh->HasNormals()) {
-            aiVec = mesh->mNormals[i];
-            norm[0] = aiVec.x;
-            norm[1] = aiVec.y;
-            norm[2] = aiVec.z;
-        } else {
-            // will throw exception eventually
-        }
+		if (mesh->HasNormals()) {
+			aiVec = mesh->mNormals[i];
+			norm[0] = aiVec.x;
+			norm[1] = aiVec.y;
+			norm[2] = aiVec.z;
+		} else {
+			// will throw exception eventually
+		}
 		normals.push_back(norm);
 
 		TextureCoord tex;
@@ -131,8 +131,8 @@ std::vector<TextureData> Model::loadMaterialTextures(aiMaterial* mat, aiTextureT
 			texture.fullPath = filePath;
 			texture.type = typeName;
 			texture.path = str;
-            Texture tex(filePath.c_str());
-            textureManager.addTexture(filePath.c_str(), tex);
+			Texture tex(filePath.c_str());
+			textureManager.addTexture(filePath.c_str(), tex);
 			textures.push_back(texture);
 			texturesLoaded.push_back(texture);
 		}

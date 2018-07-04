@@ -3,21 +3,21 @@
 using namespace Render3D;
 
 Color::Color() {
-    values[0] = values[1] = values[2] = values[3] = 0.0;
+	values[0] = values[1] = values[2] = values[3] = 0.0;
 }
 
 Color::Color(float r, float g, float b) {
-    values[0] = r;
-    values[1] = g;
-    values[2] = b;
-    values[3] = 1.0;
+	values[0] = r;
+	values[1] = g;
+	values[2] = b;
+	values[3] = 1.0;
 }
 
 Color::Color(float r, float g, float b, float a) {
-    values[0] = r;
-    values[1] = g;
-    values[2] = b;
-    values[3] = a;
+	values[0] = r;
+	values[1] = g;
+	values[2] = b;
+	values[3] = a;
 }
 
 void Color::setRed(float r) {
@@ -61,22 +61,22 @@ Color Color::operator/(float a) const {
 }
 
 bool Color::operator==(const Color& b) const {
-    return (values[0] == b.values[0]
-            && values[1] == b.values[1]
-            && values[2] == b.values[2]
-            && values[3] == b.values[3]);
+	return (values[0] == b.values[0]
+			&& values[1] == b.values[1]
+			&& values[2] == b.values[2]
+			&& values[3] == b.values[3]);
 }
 
 float& Color::operator[](int i) {
-    return values[i];
+	return values[i];
 }
 
 const float Color::operator[](int i) const {
-    return values[i];
+	return values[i];
 }
 
 float* Color::getValues() {
-    return values;
+	return values;
 }
 
 std::ostream& Render3D::operator <<(std::ostream &outs, const Color &col) {

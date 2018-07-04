@@ -108,10 +108,10 @@ Vector4 Vector4::operator-(const Vector4& b) const {
 }
 
 bool Vector4::operator==(const Vector4& b) const {
-    return (values[0] == b.values[0]
-            && values[1] == b.values[1]
-            && values[2] == b.values[2]
-            && values[3] == b.values[3]);
+	return (values[0] == b.values[0]
+			&& values[1] == b.values[1]
+			&& values[2] == b.values[2]
+			&& values[3] == b.values[3]);
 }
 
 float& Vector4::operator[](int i) {

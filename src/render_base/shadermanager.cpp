@@ -15,5 +15,5 @@ void ShaderManager::addShader(char const *shaderName, const Shader& shader) {
 }
 
 namespace Render3D {
-    ShaderManager shaderManager;
+	ShaderManager shaderManager;
 }

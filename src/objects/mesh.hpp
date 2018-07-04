@@ -59,7 +59,7 @@ namespace Render3D {
 		GLuint NBO;
 		GLuint TBO;
 
-        std::map<Window*, GLuint> VAOs;
+		std::map<Window*, GLuint> VAOs;
 
 		void updateVertices();
 
@@ -71,7 +71,7 @@ namespace Render3D {
 
 		void loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName);
 
-        void generateBuffers();
+		void generateBuffers();
 		GLuint getVertexArrayObject(Window* win);
 	};
 }

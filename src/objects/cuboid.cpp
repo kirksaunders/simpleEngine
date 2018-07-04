@@ -45,9 +45,9 @@ void Cuboid::setVertices() {
 }
 
 Cuboid::Cuboid() {
-    shaderName = "defaultPerspective";
+	shaderName = "defaultPerspective";
 
-    generateBuffers();
+	generateBuffers();
 }
 
 void Cuboid::generateBuffers() {
@@ -135,30 +135,30 @@ void Cuboid::generateBuffers() {
 	glBindBuffer(GL_ARRAY_BUFFER, NBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(normals), normals, GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 GLuint Cuboid::getVertexArrayObject(Window* win) {
-    std::map<Window*, GLuint>::iterator it = VAOs.find(win);
+	std::map<Window*, GLuint>::iterator it = VAOs.find(win);
 	if (it != VAOs.end()) {
 		return it->second;
-    }
+	}
 
-    GLuint VAO;
-    win->activate();
-    glGenVertexArrays(1, &VAO);
+	GLuint VAO;
+	win->activate();
+	glGenVertexArrays(1, &VAO);
 
-    glBindVertexArray(VAO);
+	glBindVertexArray(VAO);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, NBO);
-    glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glBindVertexArray(0);
 
@@ -222,12 +222,12 @@ void Cuboid::calculateFaces() {
 }*/
 
 /*GLuint Cuboid::getVertexArrayObject() {
-    GLuint VAO;
-    std::map<Window*, GLuint>::iterator it = VAOs.find(Window::getCurrent());
+	GLuint VAO;
+	std::map<Window*, GLuint>::iterator it = VAOs.find(Window::getCurrent());
 	if (it != VAOs.end()) {
 		VAO = it->second;
-    }
-    return VAO;
+	}
+	return VAO;
 }*/
 
 int Cuboid::getVertexCount() {
@@ -242,7 +242,7 @@ void Cuboid::render(Shader& shader) {
 	shader.setVariable("modelSize", size);
 	shader.setVariable("modelColor", color);
 
-    GLuint VAO = getVertexArrayObject(Window::getCurrent());
+	GLuint VAO = getVertexArrayObject(Window::getCurrent());
 	glBindVertexArray(VAO);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 }

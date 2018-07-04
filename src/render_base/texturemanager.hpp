@@ -8,31 +8,31 @@
 #include "render_base/window.hpp"
 
 namespace Render3D {
-    class Texture;
+	class Texture;
 
-    class TextureManager {
-     public:
-        TextureManager();
+	class TextureManager {
+	 public:
+		TextureManager();
 
-        bool textureDoesExist(char const *textureName);
+		bool textureDoesExist(char const *textureName);
 
-        void addWindow(Window* win);
+		void addWindow(Window* win);
 
-        Texture* getTexture(char const *textureName);
+		Texture* getTexture(char const *textureName);
 
-        int getNumberTextures();
+		int getNumberTextures();
 
-        void addTexture(char const *textureName, const Texture& texture);
+		void addTexture(char const *textureName, const Texture& texture);
 
-        GLuint getActiveTexture(int location);
+		GLuint getActiveTexture(int location);
 
-        void setActive(GLuint texID, int location);
-     private:
-        std::map<std::string, Texture> textures;
-        std::map<Window*, std::vector<GLuint> > activeTexturesByWindow;
-    };
+		void setActive(GLuint texID, int location);
+	 private:
+		std::map<std::string, Texture> textures;
+		std::map<Window*, std::vector<GLuint> > activeTexturesByWindow;
+	};
 
-    extern TextureManager textureManager;
+	extern TextureManager textureManager;
 }
 
 #endif

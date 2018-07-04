@@ -5,8 +5,8 @@ using namespace Render3D;
 std::map<Window*, GLuint> Texture::VAOs;
 
 Texture::Texture(int w, int h) {
-    width = w;
-    height = h;
+	width = w;
+	height = h;
 	textureName = "tex";
 	shaderName = "imageRender";
 	generateBuffers();
@@ -85,11 +85,11 @@ void Texture::loadFromArray(int w, int h, GLubyte* data) {
 }
 
 int Texture::getWidth() {
-    return width;
+	return width;
 }
 
 int Texture::getHeight() {
-    return height;
+	return height;
 }
 
 void Texture::generateBuffers() {
@@ -138,7 +138,7 @@ void Texture::generateBuffers() {
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    //glEnableVertexAttribArray(0);
+	//glEnableVertexAttribArray(0);
 	//glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, TBO);
@@ -146,36 +146,36 @@ void Texture::generateBuffers() {
 	//glEnableVertexAttribArray(1);
 	//glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)0);
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	//glBindVertexArray(0);
 }
 
 GLuint Texture::getVertexArrayObject(Window* win) {
-    std::map<Window*, GLuint>::iterator it = VAOs.find(win);
+	std::map<Window*, GLuint>::iterator it = VAOs.find(win);
 	if (it != VAOs.end()) {
 		return it->second;
-    }
-    
-    GLuint VAO;
-    win->activate();
-    glGenVertexArrays(1, &VAO);
+	}
+	
+	GLuint VAO;
+	win->activate();
+	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
 
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)0);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, TBO);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)0);
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glBindVertexArray(0);
 
-    VAOs.insert(std::pair<Window*, GLuint>(win, VAO));
-    return VAO;
+	VAOs.insert(std::pair<Window*, GLuint>(win, VAO));
+	return VAO;
 }
 
 void Texture::setName(char const* name) {
@@ -195,45 +195,45 @@ char const* Texture::getShader() {
 }
 
 void Texture::use(Shader& shader) {
-    int location = getLocation();
-    if (location == -1) {
-        location = useNextLocation();
-        std::cout << "using next location " << location << " for " << textureID << std::endl;
-    }
+	int location = getLocation();
+	if (location == -1) {
+		location = useNextLocation();
+		std::cout << "using next location " << location << " for " << textureID << std::endl;
+	}
 	shader.setVariable(textureName, location);
 }
 
 void Texture::use(Shader& shader, const char* name) {
-    int location = getLocation();
-    if (location == -1) {
-        location = useNextLocation();
-    }
+	int location = getLocation();
+	if (location == -1) {
+		location = useNextLocation();
+	}
 	shader.setVariable(name, location);
 }
 
 int Texture::getLocation() {
-    for (int i = 0; i < textureManager.getNumberTextures(); i++) {
-        if (textureManager.getActiveTexture(i) == textureID) {
-            return i;
-        }
-    }
+	for (int i = 0; i < textureManager.getNumberTextures(); i++) {
+		if (textureManager.getActiveTexture(i) == textureID) {
+			return i;
+		}
+	}
 
-    return -1;
+	return -1;
 }
 
 int Texture::useNextLocation() {
-    int location = textureManager.getNumberTextures();
-    glActiveTexture(GL_TEXTURE0 + location);
-    glBindTexture(GL_TEXTURE_2D, textureID);
-    textureManager.setActive(textureID, location);
-    glActiveTexture(GL_TEXTURE0);
-    return location;
+	int location = textureManager.getNumberTextures();
+	glActiveTexture(GL_TEXTURE0 + location);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+	textureManager.setActive(textureID, location);
+	glActiveTexture(GL_TEXTURE0);
+	return location;
 }
 
 void Texture::render(Shader& shader) {
 	use(shader);
 
-    GLuint VAO = getVertexArrayObject(Window::getCurrent());
+	GLuint VAO = getVertexArrayObject(Window::getCurrent());
 	glBindVertexArray(VAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);

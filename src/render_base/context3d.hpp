@@ -22,7 +22,7 @@
 namespace Render3D {
 	class Context3D {
 	 public:
-        Context3D();
+		Context3D();
 
 		Context3D(Window* win);
 

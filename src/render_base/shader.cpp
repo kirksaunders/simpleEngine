@@ -82,126 +82,126 @@ void Shader::use() {
 
 void Shader::setVariable(char const *variableName, int number) {
 	unsigned int index;
-    GLuint variableLocation;
-    std::string name(variableName);
-    unsigned int size = integerIndices.size();
-    for (index = 0; index < size; index++) {
-        if (integerIndices[index] == name) {
-            break;
-        }
-    }
+	GLuint variableLocation;
+	std::string name(variableName);
+	unsigned int size = integerIndices.size();
+	for (index = 0; index < size; index++) {
+		if (integerIndices[index] == name) {
+			break;
+		}
+	}
 	if (index < size) {
-        if (integerValues[index] == number) {
-            return;
-        }
-        variableLocation = integerLocations[index];
-        integerValues[index] = number;
+		if (integerValues[index] == number) {
+			return;
+		}
+		variableLocation = integerLocations[index];
+		integerValues[index] = number;
 	} else {
 		variableLocation = glGetUniformLocation(programID, variableName);
 		integerIndices.push_back(name);
-        integerLocations.push_back(variableLocation);
-        integerValues.push_back(number);
+		integerLocations.push_back(variableLocation);
+		integerValues.push_back(number);
 	}
 	glUniform1i(variableLocation, number);
 }
 
 void Shader::setVariable(char const *variableName, float number) {
 	unsigned int index;
-    GLuint variableLocation;
-    std::string name(variableName);
-    unsigned int size = floatIndices.size();
-    for (index = 0; index < size; index++) {
-        if (floatIndices[index] == name) {
-            break;
-        }
-    }
+	GLuint variableLocation;
+	std::string name(variableName);
+	unsigned int size = floatIndices.size();
+	for (index = 0; index < size; index++) {
+		if (floatIndices[index] == name) {
+			break;
+		}
+	}
 	if (index < size) {
-        if (floatValues[index] == number) {
-            return;
-        }
-        variableLocation = floatLocations[index];
-        floatValues[index] = number;
+		if (floatValues[index] == number) {
+			return;
+		}
+		variableLocation = floatLocations[index];
+		floatValues[index] = number;
 	} else {
 		variableLocation = glGetUniformLocation(programID, variableName);
 		floatIndices.push_back(name);
-        floatLocations.push_back(variableLocation);
-        floatValues.push_back(number);
+		floatLocations.push_back(variableLocation);
+		floatValues.push_back(number);
 	}
 	glUniform1f(variableLocation, number);
 }
 
 void Shader::setVariable(char const *variableName, Matrix4x4& matrix) {
-    unsigned int index;
-    GLuint variableLocation;
-    std::string name(variableName);
-    unsigned int size = matrixIndices.size();
-    for (index = 0; index < size; index++) {
-        if (matrixIndices[index] == name) {
-            break;
-        }
-    }
+	unsigned int index;
+	GLuint variableLocation;
+	std::string name(variableName);
+	unsigned int size = matrixIndices.size();
+	for (index = 0; index < size; index++) {
+		if (matrixIndices[index] == name) {
+			break;
+		}
+	}
 	if (index < size) {
-        if (matrixValues[index] == matrix) {
-            return;
-        }
-        variableLocation = matrixLocations[index];
-        matrixValues[index] = matrix;
+		if (matrixValues[index] == matrix) {
+			return;
+		}
+		variableLocation = matrixLocations[index];
+		matrixValues[index] = matrix;
 	} else {
 		variableLocation = glGetUniformLocation(programID, variableName);
 		matrixIndices.push_back(name);
-        matrixLocations.push_back(variableLocation);
-        matrixValues.push_back(matrix);
+		matrixLocations.push_back(variableLocation);
+		matrixValues.push_back(matrix);
 	}
 	glUniformMatrix4fv(variableLocation, 1, GL_TRUE, matrix.getValues());
 }
 
 void Shader::setVariable(char const *variableName, Vector4& vector) {
-    unsigned int index;
-    GLuint variableLocation;
-    std::string name(variableName);
-    unsigned int size = vectorIndices.size();
-    for (index = 0; index < size; index++) {
-        if (vectorIndices[index] == name) {
-            break;
-        }
-    }
+	unsigned int index;
+	GLuint variableLocation;
+	std::string name(variableName);
+	unsigned int size = vectorIndices.size();
+	for (index = 0; index < size; index++) {
+		if (vectorIndices[index] == name) {
+			break;
+		}
+	}
 	if (index < size) {
-        if (vectorValues[index] == vector) {
-            return;
-        }
-        variableLocation = vectorLocations[index];
-        vectorValues[index] = vector;
+		if (vectorValues[index] == vector) {
+			return;
+		}
+		variableLocation = vectorLocations[index];
+		vectorValues[index] = vector;
 	} else {
 		variableLocation = glGetUniformLocation(programID, variableName);
 		vectorIndices.push_back(name);
-        vectorLocations.push_back(variableLocation);
-        vectorValues.push_back(vector);
+		vectorLocations.push_back(variableLocation);
+		vectorValues.push_back(vector);
 	}
 	//glUniform4f(variableLocation, vector[0], vector[1], vector[2], vector[3]);
-    glUniform4fv(variableLocation, 1, vector.getValues());
+	glUniform4fv(variableLocation, 1, vector.getValues());
 }
 
 void Shader::setVariable(char const *variableName, Color& color) {
-    unsigned int index;
-    GLuint variableLocation;
-    std::string name(variableName);
-    unsigned int size = colorIndices.size();
-    for (index = 0; index < size; index++) {
-        if (colorIndices[index] == name) {
-            break;
-        }
-    }
+	unsigned int index;
+	GLuint variableLocation;
+	std::string name(variableName);
+	unsigned int size = colorIndices.size();
+	for (index = 0; index < size; index++) {
+		if (colorIndices[index] == name) {
+			break;
+		}
+	}
 	if (index < size) {
-        if (colorValues[index] == color) {
-            return;
-        }
-        variableLocation = colorLocations[index];
-        colorValues[index] = color;
+		if (colorValues[index] == color) {
+			return;
+		}
+		variableLocation = colorLocations[index];
+		colorValues[index] = color;
 	} else {
 		variableLocation = glGetUniformLocation(programID, variableName);
 		colorIndices.push_back(name);
-        colorLocations.push_back(variableLocation);
-        colorValues.push_back(color);
+		colorLocations.push_back(variableLocation);
+		colorValues.push_back(color);
 	}
 	glUniform4fv(variableLocation, 1, color.getValues());
 }
