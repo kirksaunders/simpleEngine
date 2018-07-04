@@ -11,7 +11,7 @@ namespace Render3D {
 	class Primitive3D { // Primitive3D is an abstract class
 	 public:
 		Primitive3D();
-        virtual ~Primitive3D() = 0;
+        virtual ~Primitive3D() {};
 
 		virtual void setSize(const Math3D::Vector4& value);
 
