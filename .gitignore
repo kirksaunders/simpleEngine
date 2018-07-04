@@ -2,4 +2,6 @@ bin/
 
 lib/*
 
+src/.vscode/
+
 !lib/.gitkeep
