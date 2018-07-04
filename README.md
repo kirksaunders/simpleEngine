@@ -1,2 +1,2 @@
 # simpleEngine
-Very incomplete
+Very incomplete and in progress.
