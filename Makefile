@@ -25,8 +25,6 @@ rwildcard = $(foreach d,$(wildcard $1*), \
 
 ifeq ($(OPTIMIZE),false)
 	SOURCE_FILES	:= $(call rwildcard, $(SOURCE_DIR), *.cpp *.cc)
-	#OBJ_FILES		:= $(join $(patsubst $(SOURCE_DIR)%,$(BIN_DIR)%, $(basename $(SOURCE_FILES))), \
-	#						  $(patsubst %,%.o, $(suffix $(SOURCE_FILES))))
 	OBJ_FILES		:= $(addsuffix .o,$(patsubst $(SOURCE_DIR)%,$(BIN_DIR)%, $(SOURCE_FILES)))
 	DEPENDENCIES	:= $(patsubst $(BIN_DIR)%.o,$(BIN_DIR)%.d, $(OBJ_FILES))
 	DIRECTORIES		:= $(BIN_DIR)
@@ -46,7 +44,6 @@ $(OUTPUT_FILE): $(OBJ_FILES) | $(BIN_DIR)
 -include $(DEPENDENCIES)
 
 .SECONDEXPANSION:
-#$(OBJ_FILES): $$(filter $$(patsubst $(BIN_DIR)%.o,$(SOURCE_DIR)%.%, $$@),$$(SOURCE_FILES)) | $$(dir $$@)
 $(OBJ_FILES): $$(patsubst $(BIN_DIR)%,$(SOURCE_DIR)%, $$(basename $$@)) | $$(dir $$@)
 	$(CXX) $(CXXFLAGS) -MMD -c $< -o $@
 
