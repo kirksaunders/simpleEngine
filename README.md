@@ -1,5 +1,5 @@
 # simpleEngine
-*** *Warning* ***: Very incomplete and in progress.
+***Warning***: Very incomplete and in progress.
 
 ## Dependencies (All cross-platform)
 - **GLEW**(GL Extension Wrangler) - Loads in all of the required OpenGL libraries for use
