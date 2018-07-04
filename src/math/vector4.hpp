@@ -56,6 +56,7 @@ namespace Math3D {
 		Vector4 operator-(const Vector4&) const;
 
 		bool operator==(const Vector4&) const;
+		bool operator!=(const Vector4&) const;
 		/*
 			Allows the vector's values to be indexed like Vector[row]
 		*/

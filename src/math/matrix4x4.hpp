@@ -71,6 +71,8 @@ namespace Math3D {
 
 		bool operator==(const Matrix4x4&) const;
 
+		bool operator!=(const Matrix4x4&) const;
+
 		Matrix4x4& operator=(const Matrix4x4&);
 		/*
 		Allows the matrix's values to be indexed like Matrix[row][column]

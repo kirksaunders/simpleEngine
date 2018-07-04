@@ -1,5 +1,6 @@
 #include <cmath>
 
+#include "math/constants.hpp"
 #include "math/matrix4x4.hpp"
 
 using namespace Math3D;
@@ -283,12 +284,23 @@ Matrix4x4 Matrix4x4::operator-(const Vector4& b) const {
 bool Matrix4x4::operator==(const Matrix4x4& b) const {
 	for (int row = 0; row < 4; row++) {
 		for (int column = 0; column < 4; column++) {
-			if (values[row][column] != b.values[row][column]) {
+			if (fabs(values[row][column] - b.values[row][column]) > EPSILON) {
 				return false;
 			}
 		}
 	}
 	return true;
+}
+
+bool Matrix4x4::operator!=(const Matrix4x4& b) const {
+	for (int row = 0; row < 4; row++) {
+		for (int column = 0; column < 4; column++) {
+			if (fabs(values[row][column] - b.values[row][column]) > EPSILON) {
+				return true;
+			}
+		}
+	}
+	return false;
 }
 
 Matrix4x4& Matrix4x4::operator=(const Matrix4x4& b) {

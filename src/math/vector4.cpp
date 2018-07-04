@@ -1,5 +1,6 @@
 #include <cmath>
 
+#include "math/constants.hpp"
 #include "math/vector4.hpp"
 
 using namespace Math3D;
@@ -108,10 +109,21 @@ Vector4 Vector4::operator-(const Vector4& b) const {
 }
 
 bool Vector4::operator==(const Vector4& b) const {
-	return (values[0] == b.values[0]
-			&& values[1] == b.values[1]
-			&& values[2] == b.values[2]
-			&& values[3] == b.values[3]);
+	for (unsigned int i = 0; i < 4; i++) {
+		if (fabs(values[i] - b.values[i]) > EPSILON) {
+			return false;
+		}
+	}
+	return true;
+}
+
+bool Vector4::operator!=(const Vector4& b) const {
+	for (unsigned int i = 0; i < 4; i++) {
+		if (fabs(values[i] - b.values[i]) > EPSILON) {
+			return true;
+		}
+	}
+	return false;
 }
 
 float& Vector4::operator[](int i) {
