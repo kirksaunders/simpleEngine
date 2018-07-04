@@ -8,32 +8,32 @@ bool sortTriangles(Triangle& a, Triangle& b) {
 }
 
 Context3D::Context3D() {
-    window = NULL;
+	window = NULL;
 }
 
 Context3D::Context3D(Window* win) {
 	window = win;
 
-    if (!shaderManager.shaderDoesExist("defaultPerspective")) {
-        Shader perspective("res/defaultPerspective.vert", "res/defaultPerspective.frag");
-        shaderManager.addShader("defaultPerspective", perspective);
-    }
+	if (!shaderManager.shaderDoesExist("defaultPerspective")) {
+		Shader perspective("res/defaultPerspective.vert", "res/defaultPerspective.frag");
+		shaderManager.addShader("defaultPerspective", perspective);
+	}
 
-    if (!shaderManager.shaderDoesExist("imageRender")) {
-        Shader imageRender("res/imageRender.vert", "res/imageRender.frag");
-        shaderManager.addShader("imageRender", imageRender);
-    }
+	if (!shaderManager.shaderDoesExist("imageRender")) {
+		Shader imageRender("res/imageRender.vert", "res/imageRender.frag");
+		shaderManager.addShader("imageRender", imageRender);
+	}
 
-    if (!textureManager.textureDoesExist("defaultTexture")) {
-        TextureBuffer buff(1, 1, 4);
-        buff.setPixel(0, 0, Color(0, 0, 0, 0));
+	if (!textureManager.textureDoesExist("defaultTexture")) {
+		TextureBuffer buff(1, 1, 4);
+		buff.setPixel(0, 0, Color(0, 0, 0, 0));
 
-        Texture defaultTexture(1, 1);
-        defaultTexture.loadFromArray(1, 1, buff.getAddress());
-        textureManager.addTexture("defaultTexture", defaultTexture);
-    }
+		Texture defaultTexture(1, 1);
+		defaultTexture.loadFromArray(1, 1, buff.getAddress());
+		textureManager.addTexture("defaultTexture", defaultTexture);
+	}
 
-    textureManager.addWindow(win);
+	textureManager.addWindow(win);
 }
 
 void Context3D::addObject(Triangle* triangle) {
@@ -53,7 +53,7 @@ Camera* Context3D::getCamera() {
 }
 
 void Context3D::render() {
-    window->activate();
+	window->activate();
 	float aspectRatio = (float) window->getWidth() / window->getHeight();
 
 	Matrix4x4 cameraCFrame = camera.getCFrame();
@@ -79,14 +79,14 @@ void Context3D::render() {
 			shaderObject->use();
 			currentShader = shader;
 
-            for (int i2 = 0; i2 < 5; i2++) { // reset textures
-                std::string name = "texture_diffuse";
-                name += std::to_string(i2 + 1);
-                defaultTex->use(*shaderObject, name.c_str());
-                name = "texture_specular";
-                name += std::to_string(i2 + 1);
-                defaultTex->use(*shaderObject, name.c_str());
-            }
+			for (int i2 = 0; i2 < 5; i2++) { // reset textures
+				std::string name = "texture_diffuse";
+				name += std::to_string(i2 + 1);
+				defaultTex->use(*shaderObject, name.c_str());
+				name = "texture_specular";
+				name += std::to_string(i2 + 1);
+				defaultTex->use(*shaderObject, name.c_str());
+			}
 
 			// Scene Lighting Data
 			shaderObject->setVariable("lightPos", lightPosition);
@@ -103,7 +103,7 @@ void Context3D::render() {
 		object->render(*shaderObject);
 	}
 
-    glBindVertexArray(0);
+	glBindVertexArray(0);
 	glUseProgram(0);
 
 	// Below is legacy rendering code. Might make this support legacy sometime for older computers(school computers).
@@ -146,7 +146,7 @@ void Context3D::render() {
 }
 
 void Context3D::renderTexture(Texture& tex) {
-    window->activate();
+	window->activate();
 	char const* shader = tex.getShader();
 	Shader* shaderObject = shaderManager.getShader(shader);
 	shaderObject->use();
