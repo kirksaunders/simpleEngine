@@ -33,7 +33,7 @@ namespace Render3D {
 
 	class Mesh {
 	 public:
-		Mesh(std::vector<Math3D::Vector4> vertices, std::vector<Math3D::Vector4> normals, std::vector<TextureCoord> texCoords, std::vector<TextureData> textures, std::vector<GLuint> indices);
+		Mesh(std::vector<Math3D::Vector4> verts, std::vector<Math3D::Vector4> norms, std::vector<TextureCoord> texCoors, std::vector<TextureData> texs, std::vector<GLuint> inds);
 
 		//std::vector<Face> getFaces();
 

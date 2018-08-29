@@ -3,12 +3,12 @@
 using namespace Render3D;
 using namespace Math3D;
 
-Mesh::Mesh(std::vector<Vector4> vertices, std::vector<Vector4> normals, std::vector<TextureCoord> texCoords, std::vector<TextureData> textures, std::vector<GLuint> indices) {
-	this->vertices = vertices;
-	this->normals = normals;
-	this->texCoords = texCoords;
-	this->textures = textures;
-	this->indices = indices;
+Mesh::Mesh(std::vector<Vector4> verts, std::vector<Vector4> norms, std::vector<TextureCoord> texCoors, std::vector<TextureData> texs, std::vector<GLuint> inds) {
+	vertices = verts;
+	normals = norms;
+	texCoords = texCoors;
+	textures = texs;
+	indices = inds;
 
 	generateBuffers();
 }
@@ -18,49 +18,47 @@ void Mesh::generateBuffers() {
 	glGenBuffers(1, &NBO);
 	glGenBuffers(1, &TBO);
 
-	{
-		GLfloat verticesNew[3 * indices.size()];
+    unsigned int numIndices = indices.size();
+    GLfloat* verticesNew = new GLfloat[3 * numIndices];
 
-		for (int i = 0; i < indices.size(); i++) {
-			Vector4 vert = vertices[indices[i]];
+    for (int i = 0; i < numIndices; i++) {
+        Vector4 vert = vertices[indices[i]];
 
-			verticesNew[i * 3] = vert[0];
-			verticesNew[i * 3 + 1] = vert[1];
-			verticesNew[i * 3 + 2] = vert[2];
-		}
+        verticesNew[i * 3] = vert[0];
+        verticesNew[i * 3 + 1] = vert[1];
+        verticesNew[i * 3 + 2] = vert[2];
+    }
 
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(verticesNew), verticesNew, GL_STATIC_DRAW);
-	}
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, 3 * sizeof(GLfloat) * numIndices, verticesNew, GL_STATIC_DRAW);
+    delete[] verticesNew;
 
-	{
-		GLfloat normalsNew[3 * indices.size()];
+    GLfloat* normalsNew = new GLfloat[3 * numIndices];
 
-		for (int i = 0; i < indices.size(); i++) {
-			Vector4 vert = normals[indices[i]];
+    for (int i = 0; i < numIndices; i++) {
+        Vector4 vert = normals[indices[i]];
 
-			normalsNew[i * 3] = vert[0];
-			normalsNew[i * 3 + 1] = vert[1];
-			normalsNew[i * 3 + 2] = vert[2];
-		}
+        normalsNew[i * 3] = vert[0];
+        normalsNew[i * 3 + 1] = vert[1];
+        normalsNew[i * 3 + 2] = vert[2];
+    }
 
-		glBindBuffer(GL_ARRAY_BUFFER, NBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(normalsNew), normalsNew, GL_STATIC_DRAW);
-	}
+    glBindBuffer(GL_ARRAY_BUFFER, NBO);
+    glBufferData(GL_ARRAY_BUFFER, 3 * sizeof(GLfloat) * numIndices, normalsNew, GL_STATIC_DRAW);
+    delete[] normalsNew;
 
-	{
-		GLfloat texCoordsNew[2 * indices.size()];
+    GLfloat* texCoordsNew = new GLfloat[2 * numIndices];
 
-		for (int i = 0; i < indices.size(); i++) {
-			TextureCoord tex = texCoords[indices[i]];
+    for (int i = 0; i < numIndices; i++) {
+        TextureCoord tex = texCoords[indices[i]];
 
-			texCoordsNew[i * 2] = tex.x;
-			texCoordsNew[i * 2 + 1] = tex.y;
-		}
+        texCoordsNew[i * 2] = tex.x;
+        texCoordsNew[i * 2 + 1] = tex.y;
+    }
 
-		glBindBuffer(GL_ARRAY_BUFFER, TBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(texCoordsNew), texCoordsNew, GL_STATIC_DRAW);
-	}
+    glBindBuffer(GL_ARRAY_BUFFER, TBO);
+    glBufferData(GL_ARRAY_BUFFER, 2 * sizeof(GLfloat) * numIndices, texCoordsNew, GL_STATIC_DRAW);
+    delete[] texCoordsNew;
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
