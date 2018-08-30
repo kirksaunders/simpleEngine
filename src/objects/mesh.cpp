@@ -3,17 +3,13 @@
 using namespace Render3D;
 using namespace Math3D;
 
-Mesh::Mesh(std::vector<Vector4> verts, std::vector<Vector4> norms, std::vector<TextureCoord> texCoors, std::vector<TextureData> texs, std::vector<GLuint> inds) {
-	vertices = verts;
-	normals = norms;
-	texCoords = texCoors;
-	textures = texs;
-	indices = inds;
+Mesh::Mesh(const std::vector<Vector4>& vertices, const std::vector<Vector4>& normals,
+            const std::vector<TextureCoord>& texCoords, const std::vector<TextureData>& textures,
+            const std::vector<GLuint>& indices) {
+    this->textures = textures; // creates copy of textures vector, which obeys the const qualifier of argument
+    numVertices = indices.size();
 
-	generateBuffers();
-}
-
-void Mesh::generateBuffers() {
+    // generate and load buffers
 	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &NBO);
 	glGenBuffers(1, &TBO);
@@ -60,7 +56,7 @@ void Mesh::generateBuffers() {
     glBufferData(GL_ARRAY_BUFFER, 2 * sizeof(GLfloat) * numIndices, texCoordsNew, GL_STATIC_DRAW);
     delete[] texCoordsNew;
 
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0); // make sure no buffer is bound
 }
 
 GLuint Mesh::getVertexArrayObject(Window* win) {
@@ -138,57 +134,11 @@ void Mesh::render(Shader& shader) {
 
 	GLuint VAO = getVertexArrayObject(Window::getCurrent());
 	glBindVertexArray(VAO);
-	glDrawArrays(GL_TRIANGLES, 0, indices.size());
+	glDrawArrays(GL_TRIANGLES, 0, numVertices);
 	
 	unbindTextures(shader);
 }
 
-/*void Mesh::updateVertices() {
-	GLfloat verticesNew[3 * indices.size()];
-
-	for (int i = 0; i < indices.size(); i++) {
-		Vector4 vert = vertices[indices[i]];
-
-		vert = vert * size;
-
-		verticesNew[i * 3] = vert[0];
-		verticesNew[i * 3 + 1] = vert[1];
-		verticesNew[i * 3 + 2] = vert[2];
-	}
-
-	glBindVertexArray(VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(verticesNew), verticesNew);
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);	
-}
-
-void Mesh::updateNormals() {
-	Matrix4x4 rotation = cframe.rotation();
-
-	GLfloat normalsNew[3 * indices.size()];
-
-	for (int i = 0; i < indices.size(); i++) {
-		Vector4 norm = normals[indices[i]];
-
-		norm = rotation * norm;
-
-		normalsNew[i * 3] = norm[0];
-		normalsNew[i * 3 + 1] = norm[1];
-		normalsNew[i * 3 + 2] = norm[2];
-	}
-
-	glBindVertexArray(VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, NBO);
-
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(normalsNew), normalsNew);
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);	
-}*/
-
 int Mesh::getVertexCount() {
-	return indices.size();
+	return numVertices;
 }

@@ -33,7 +33,9 @@ namespace Render3D {
 
 	class Mesh {
 	 public:
-		Mesh(std::vector<Math3D::Vector4> verts, std::vector<Math3D::Vector4> norms, std::vector<TextureCoord> texCoors, std::vector<TextureData> texs, std::vector<GLuint> inds);
+		Mesh(const std::vector<Math3D::Vector4>& vertices, const std::vector<Math3D::Vector4>& normals,
+                const std::vector<TextureCoord>& texCoords, const std::vector<TextureData>& textures,
+                const std::vector<GLuint>& indices);
 
 		//std::vector<Face> getFaces();
 
@@ -48,22 +50,16 @@ namespace Render3D {
 		void render(Shader& shader);
 
 	 private:
+        unsigned int numVertices;
 		std::string directory;
 
-		std::vector<Math3D::Vector4> vertices;
-		std::vector<Math3D::Vector4> normals;
-		std::vector<TextureCoord> texCoords;
 		std::vector<TextureData> textures;
-		std::vector<GLuint> indices;
+
 		GLuint VBO;
 		GLuint NBO;
 		GLuint TBO;
 
 		std::map<Window*, GLuint> VAOs;
-
-		void updateVertices();
-
-		void updateNormals();
 
 		void processNode(aiNode* node, const aiScene* scene);
 
@@ -71,7 +67,6 @@ namespace Render3D {
 
 		void loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName);
 
-		void generateBuffers();
 		GLuint getVertexArrayObject(Window* win);
 	};
 }
