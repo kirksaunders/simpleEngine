@@ -26,10 +26,6 @@ namespace Render3D {
 
 		Context3D(Window* win);
 
-		void addObject(Triangle* triangle);
-
-		void addObject(Face* face);
-
 		void addObject(Primitive3D* object);
 
 		Camera* getCamera();
@@ -41,15 +37,9 @@ namespace Render3D {
 	 private:
 		Window* window;
 
-		std::vector<Triangle*> triangles;
-		std::vector<Face*> faces;
 		std::vector<Primitive3D*> objects;
 
 		Camera camera;
-
-		std::vector<Triangle> getTriangles();
-
-		bool triangleSorter(Triangle& a, Triangle& b);
 	};
 }
 
