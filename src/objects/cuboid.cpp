@@ -165,6 +165,8 @@ GLuint Cuboid::getVertexArrayObject(Window* win) {
 	VAOs.insert(std::pair<Window*, GLuint>(win, VAO));
 }
 
+// old
+
 /*std::vector<Face> Cuboid::getFaces() {
 	return faces;
 }
