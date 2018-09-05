@@ -37,10 +37,6 @@ namespace Render3D {
                 const std::vector<TextureCoord>& texCoords, const std::vector<TextureData>& textures,
                 const std::vector<GLuint>& indices);
 
-		//std::vector<Face> getFaces();
-
-		//GLuint getVertexArrayObject();
-
 		void bindTextures(Shader& shader);
 
 		void unbindTextures(Shader& shader);
