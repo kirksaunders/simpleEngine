@@ -1,4 +1,13 @@
+#include <cstring>
+
+#include "math/vector4.hpp"
+#include "math/matrix4x4.hpp"
+
+#include "render_base/color.hpp"
 #include "render_base/context3d.hpp"
+#include "render_base/shadermanager.hpp"
+#include "render_base/texturemanager.hpp"
+#include "render_base/texturebuffer.hpp"
 
 using namespace Render3D;
 using namespace Math3D;

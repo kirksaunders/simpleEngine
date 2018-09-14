@@ -1,5 +1,7 @@
 #include "mains/mains.hpp"
 
+#include "render_base/texturebuffer.hpp"
+
 using std::size_t;
 using namespace Render3D;
 using namespace Math3D;
