@@ -38,6 +38,22 @@ void TextureBuffer::setPixel(size_t x, size_t y, Color col) {
 	data[index + 3] = col.getAlpha() * 255;
 }
 
+size_t TextureBuffer::getWidth() const {
+    return width;
+}
+
+size_t TextureBuffer::getHeight() const {
+    return height;
+}
+
+size_t TextureBuffer::getDepth() const {
+    return depth;
+}
+
 GLubyte* TextureBuffer::getAddress() {
 	return data;
+}
+
+const GLubyte* const TextureBuffer::getAddress() const {
+    return data;
 }

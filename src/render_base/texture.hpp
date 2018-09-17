@@ -9,15 +9,17 @@
 #include <GLEW/glew.h>
 #include <SOIL/SOIL.h>
 
-#include "shader.hpp"
-#include "texturemanager.hpp"
-#include "window.hpp"
+#include "render_base/shader.hpp"
+#include "render_base/texturemanager.hpp"
+#include "render_base/texturebuffer.hpp"
+#include "render_base/window.hpp"
 
 namespace Render3D {
 	class Texture {
 	 public:
 		Texture(int w = 0, int h = 0);
 		Texture(char const *filePath);
+        Texture(const TextureBuffer& buff);
 		
 		void loadFromArray(int w, int h, GLubyte* data);
 		void loadFromFile(char const *filePath);

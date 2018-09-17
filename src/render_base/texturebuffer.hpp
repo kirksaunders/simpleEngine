@@ -17,7 +17,12 @@ namespace Render3D {
 		void setValue(size_t x, size_t y, size_t z, GLubyte value);
 		void setPixel(size_t x, size_t y, Color col);
 
+        size_t getWidth() const;
+        size_t getHeight() const;
+        size_t getDepth() const;
+
 		GLubyte* getAddress();
+		const GLubyte* const getAddress() const;
 
 	 private:
 		size_t width;

@@ -50,6 +50,39 @@ Texture::Texture(char const *filePath) {
 	SOIL_free_image_data(image);
 }
 
+Texture::Texture(const TextureBuffer& buff) {
+    textureName = "tex";
+    shaderName = "imageRender";
+    generateBuffers();
+
+    width = buff.getWidth();
+    height = buff.getHeight();
+
+    int depth = buff.getDepth();
+    if (depth != 3 && depth != 4) {
+        // error
+        return;
+    }
+
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_2D, textureID);
+    if (depth == 3) {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, buff.getAddress());
+    } else {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buff.getAddress());
+    }
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    // Parameters
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 void Texture::loadFromFile(char const *filePath) {
 	int w, h;
 	unsigned char* image = SOIL_load_image(filePath, &w, &h, 0, SOIL_LOAD_RGBA);
@@ -93,10 +126,8 @@ int Texture::getHeight() {
 }
 
 void Texture::generateBuffers() {
-	//glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &TBO);
-	//glBindVertexArray(VAO);
 
 	GLfloat vertices[12];
 	vertices[0] = -1.0;
@@ -138,17 +169,11 @@ void Texture::generateBuffers() {
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	//glEnableVertexAttribArray(0);
-	//glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, TBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(texCoords), texCoords, GL_STATIC_DRAW);
-	//glEnableVertexAttribArray(1);
-	//glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	//glBindVertexArray(0);
 }
 
 GLuint Texture::getVertexArrayObject(Window* win) {

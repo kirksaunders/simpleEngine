@@ -33,8 +33,7 @@ Context3D::Context3D(Window* win) {
 		TextureBuffer buff(1, 1, 4);
 		buff.setPixel(0, 0, Color(0, 0, 0, 0));
 
-		Texture defaultTexture(1, 1);
-		defaultTexture.loadFromArray(1, 1, buff.getAddress());
+		Texture defaultTexture(buff);
 		textureManager.addTexture("defaultTexture", defaultTexture);
 	}
 
