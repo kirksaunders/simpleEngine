@@ -14,13 +14,13 @@ namespace Render3D {
 	 public:
 		TextureManager();
 
-		bool textureDoesExist(char const *textureName);
+		bool textureDoesExist(char const *textureName) const;
 
 		void addWindow(Window* win);
 
 		Texture* getTexture(char const *textureName);
 
-		int getNumberTextures();
+		int getNumberTextures() const;
 
 		void addTexture(char const *textureName, const Texture& texture);
 
