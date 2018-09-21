@@ -1,5 +1,7 @@
 #include "objects/mesh.hpp"
 
+#include "render_base/texturemanager.hpp"
+
 using namespace Render3D;
 using namespace Math3D;
 

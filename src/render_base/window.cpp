@@ -97,15 +97,6 @@ void Window::drawTriangle(GLfloat vertices[]) {
 	
 }
 
-/*void Window::drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3, const Color color) {
-	glColor4f(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
-	glBegin(GL_TRIANGLES);
-	glVertex2f(x1, y1);
-	glVertex2f(x2, y2);
-	glVertex2f(x3, y3);
-	glEnd();
-}*/
-
 int Window::getWidth() const {
 	return width;
 }

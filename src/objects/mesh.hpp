@@ -11,11 +11,9 @@
 #include <ASSIMP/scene.h>
 
 #include "math/vector4.hpp"
-#include "math/matrix4x4.hpp"
 
 #include "render_base/color.hpp"
 #include "render_base/shader.hpp"
-#include "render_base/texturemanager.hpp"
 #include "objects/primitive3d.hpp"
 #include "render_base/window.hpp"
 

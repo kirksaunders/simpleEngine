@@ -30,12 +30,18 @@ void TextureBuffer::setValue(size_t x, size_t y, size_t z, GLubyte value) {
 }
 
 void TextureBuffer::setPixel(size_t x, size_t y, Color col) {
+    if (depth != 3 && depth != 4) {
+        // error
+        return;
+    }
 	size_t index = y*width*depth + x*depth;
 
 	data[index] = col.getRed() *  255;
 	data[index + 1] = col.getGreen() *  255;
 	data[index + 2] = col.getBlue() * 255;
-	data[index + 3] = col.getAlpha() * 255;
+    if (depth == 4) {
+	    data[index + 3] = col.getAlpha() * 255;
+    }
 }
 
 size_t TextureBuffer::getWidth() const {

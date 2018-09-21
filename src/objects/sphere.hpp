@@ -11,7 +11,6 @@
 #include "math/matrix4x4.hpp"
 
 #include "render_base/color.hpp"
-#include "objects/face.hpp"
 #include "render_base/shader.hpp"
 #include "objects/primitive3d.hpp"
 #include "objects/model.hpp"

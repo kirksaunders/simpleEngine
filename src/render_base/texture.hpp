@@ -7,7 +7,6 @@
 #include <unordered_map>
 
 #include <GLEW/glew.h>
-#include <SOIL/SOIL.h>
 
 #include "render_base/shader.hpp"
 #include "render_base/texturebuffer.hpp"

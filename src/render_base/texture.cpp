@@ -1,3 +1,5 @@
+#include <SOIL/SOIL.h>
+
 #include "render_base/texture.hpp"
 #include "render_base/texturemanager.hpp"
 
