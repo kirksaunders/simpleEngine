@@ -11,7 +11,7 @@ bool TextureManager::textureDoesExist(char const* textureName) const {
 }
 
 void TextureManager::addWindow(Window* win) {
-	std::map<Window*, std::vector<GLuint> >::iterator it = activeTexturesByWindow.find(win);
+	std::unordered_map<Window*, std::vector<GLuint> >::iterator it = activeTexturesByWindow.find(win);
 	if (it != activeTexturesByWindow.end()) {
         // error
 		return; // i guess for now
@@ -26,7 +26,7 @@ Texture* TextureManager::getTexture(char const *textureName) {
 }
 
 int TextureManager::getNumberTextures() const {
-	std::map<Window*, std::vector<GLuint> >::const_iterator it = activeTexturesByWindow.find(Window::getCurrent());
+	std::unordered_map<Window*, std::vector<GLuint> >::const_iterator it = activeTexturesByWindow.find(Window::getCurrent());
 	if (it != activeTexturesByWindow.end()) {
 		return it->second.size();
 	} else {
@@ -36,7 +36,7 @@ int TextureManager::getNumberTextures() const {
 
 void TextureManager::addTexture(char const* textureName, const Texture& texture) {
 	std::string name(textureName);
-	std::map<std::string, Texture>::iterator it = textures.find(name);
+	std::unordered_map<std::string, Texture>::iterator it = textures.find(name);
 	if (it != textures.end()) {
 		// texture with that name already exists, replace it with this one
 		it->second = texture;
@@ -46,7 +46,7 @@ void TextureManager::addTexture(char const* textureName, const Texture& texture)
 }
 
 GLuint TextureManager::getActiveTexture(int location) {
-	std::map<Window*, std::vector<GLuint> >::iterator it = activeTexturesByWindow.find(Window::getCurrent());
+	std::unordered_map<Window*, std::vector<GLuint> >::iterator it = activeTexturesByWindow.find(Window::getCurrent());
 	if (it != activeTexturesByWindow.end()) {
 		return it->second[location];
 	} else {
@@ -55,7 +55,7 @@ GLuint TextureManager::getActiveTexture(int location) {
 }
 
 void TextureManager::setActive(GLuint texID, int location) {
-	std::map<Window*, std::vector<GLuint> >::iterator it = activeTexturesByWindow.find(Window::getCurrent());
+	std::unordered_map<Window*, std::vector<GLuint> >::iterator it = activeTexturesByWindow.find(Window::getCurrent());
 	if (it != activeTexturesByWindow.end()) {
 		if (location >= it->second.size()) {
 			it->second.push_back(texID);

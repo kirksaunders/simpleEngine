@@ -60,7 +60,7 @@ Mesh::Mesh(const std::vector<Vector4>& vertices, const std::vector<Vector4>& nor
 }
 
 GLuint Mesh::getVertexArrayObject(Window* win) {
-	std::map<Window*, GLuint>::iterator it = VAOs.find(win);
+	std::unordered_map<Window*, GLuint>::iterator it = VAOs.find(win);
 	if (it != VAOs.end()) {
 		return it->second;
 	}

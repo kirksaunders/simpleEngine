@@ -5,6 +5,7 @@
 
 #include <vector>
 #include <string>
+#include <unordered_map>
 
 #include <GLEW/glew.h>
 #include <ASSIMP/scene.h>
@@ -55,7 +56,7 @@ namespace Render3D {
 		GLuint NBO;
 		GLuint TBO;
 
-		std::map<Window*, GLuint> VAOs;
+		std::unordered_map<Window*, GLuint> VAOs;
 
 		void processNode(aiNode* node, const aiScene* scene);
 

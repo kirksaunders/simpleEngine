@@ -1,4 +1,6 @@
 #include <cmath>
+#include <fstream>
+#include <sstream>
 
 #include "math/constants.hpp"
 
@@ -85,128 +87,97 @@ void Shader::use() {
 }
 
 void Shader::setVariable(char const *variableName, int number) {
-	unsigned int index;
-	GLuint variableLocation;
-	std::string name(variableName);
-	unsigned int size = integerIndices.size();
-	for (index = 0; index < size; index++) {
-		if (integerIndices[index] == name) {
-			break;
-		}
-	}
-	if (index < size) {
-		if (integerValues[index] == number) {
-			return;
-		}
-		variableLocation = integerLocations[index];
-		integerValues[index] = number;
-	} else {
-		variableLocation = glGetUniformLocation(programID, variableName);
-		integerIndices.push_back(name);
-		integerLocations.push_back(variableLocation);
-		integerValues.push_back(number);
-	}
-	glUniform1i(variableLocation, number);
+    std::string name(variableName);
+    std::unordered_map<std::string, std::pair<GLuint, int> >::iterator it;
+    it = integers.find(name);
+    GLuint variableLocation;
+    if (it == integers.end()) {
+        variableLocation = glGetUniformLocation(programID, variableName);
+        std::pair<GLuint, int> values(variableLocation, number);
+        integers.insert(std::pair<std::string, std::pair<GLuint, int> >(name, values));
+    } else {
+        if (it->second.second == number) {
+            return;
+        }
+        variableLocation = it->second.first;
+        it->second.second = number;
+    }
+    glUniform1i(variableLocation, number);
 }
 
 void Shader::setVariable(char const *variableName, float number) {
-	unsigned int index;
-	GLuint variableLocation;
-	std::string name(variableName);
-	unsigned int size = floatIndices.size();
-	for (index = 0; index < size; index++) {
-		if (floatIndices[index] == name) {
-			break;
-		}
-	}
-	if (index < size) {
-		if (fabs(floatValues[index] == number) < EPSILON) {
-			return;
-		}
-		variableLocation = floatLocations[index];
-		floatValues[index] = number;
-	} else {
-		variableLocation = glGetUniformLocation(programID, variableName);
-		floatIndices.push_back(name);
-		floatLocations.push_back(variableLocation);
-		floatValues.push_back(number);
-	}
-	glUniform1f(variableLocation, number);
+    std::string name(variableName);
+    std::unordered_map<std::string, std::pair<GLuint, float> >::iterator it;
+    it = floats.find(name);
+    GLuint variableLocation;
+    if (it == floats.end()) {
+        variableLocation = glGetUniformLocation(programID, variableName);
+        std::pair<GLuint, float> values(variableLocation, number);
+        floats.insert(std::pair<std::string, std::pair<GLuint, float> >(name, values));
+    } else {
+        if (it->second.second == number) {
+            return;
+        }
+        variableLocation = it->second.first;
+        it->second.second = number;
+    }
+    glUniform1f(variableLocation, number);
 }
 
-void Shader::setVariable(char const *variableName, Matrix4x4& matrix) {
-	unsigned int index;
-	GLuint variableLocation;
-	std::string name(variableName);
-	unsigned int size = matrixIndices.size();
-	for (index = 0; index < size; index++) {
-		if (matrixIndices[index] == name) {
-			break;
-		}
-	}
-	if (index < size) {
-		if (matrixValues[index] == matrix) {
-			return;
-		}
-		variableLocation = matrixLocations[index];
-		matrixValues[index] = matrix;
-	} else {
-		variableLocation = glGetUniformLocation(programID, variableName);
-		matrixIndices.push_back(name);
-		matrixLocations.push_back(variableLocation);
-		matrixValues.push_back(matrix);
-	}
+void Shader::setVariable(char const *variableName, const Matrix4x4& matrix) {
+    std::string name(variableName);
+    std::unordered_map<std::string, std::pair<GLuint, Matrix4x4> >::iterator it;
+    it = matrices.find(name);
+    GLuint variableLocation;
+    if (it == matrices.end()) {
+        variableLocation = glGetUniformLocation(programID, variableName);
+        std::pair<GLuint, Matrix4x4> values(variableLocation, matrix);
+        matrices.insert(std::pair<std::string, std::pair<GLuint, Matrix4x4> >(name, values));
+    } else {
+        if (it->second.second == matrix) {
+            return;
+        }
+        variableLocation = it->second.first;
+        it->second.second = matrix;
+    }
 	glUniformMatrix4fv(variableLocation, 1, GL_TRUE, matrix.getValues());
 }
 
-void Shader::setVariable(char const *variableName, Vector4& vector) {
-	unsigned int index;
-	GLuint variableLocation;
-	std::string name(variableName);
-	unsigned int size = vectorIndices.size();
-	for (index = 0; index < size; index++) {
-		if (vectorIndices[index] == name) {
-			break;
-		}
-	}
-	if (index < size) {
-		if (vectorValues[index] == vector) {
-			return;
-		}
-		variableLocation = vectorLocations[index];
-		vectorValues[index] = vector;
-	} else {
-		variableLocation = glGetUniformLocation(programID, variableName);
-		vectorIndices.push_back(name);
-		vectorLocations.push_back(variableLocation);
-		vectorValues.push_back(vector);
-	}
-	//glUniform4f(variableLocation, vector[0], vector[1], vector[2], vector[3]);
+void Shader::setVariable(char const *variableName, const Vector4& vector) {
+    std::string name(variableName);
+    std::unordered_map<std::string, std::pair<GLuint, Vector4> >::iterator it;
+    it = vectors.find(name);
+    GLuint variableLocation;
+    if (it == vectors.end()) {
+        variableLocation = glGetUniformLocation(programID, variableName);
+        std::pair<GLuint, Vector4> values(variableLocation, vector);
+        vectors.insert(std::pair<std::string, std::pair<GLuint, Vector4> >(name, values));
+    } else {
+        if (it->second.second == vector) {
+            return;
+        }
+        variableLocation = it->second.first;
+        it->second.second = vector;
+    }
 	glUniform4fv(variableLocation, 1, vector.getValues());
 }
 
-void Shader::setVariable(char const *variableName, Color& color) {
-	unsigned int index;
-	GLuint variableLocation;
-	std::string name(variableName);
-	unsigned int size = colorIndices.size();
-	for (index = 0; index < size; index++) {
-		if (colorIndices[index] == name) {
-			break;
-		}
-	}
-	if (index < size) {
-		if (colorValues[index] == color) {
-			return;
-		}
-		variableLocation = colorLocations[index];
-		colorValues[index] = color;
-	} else {
-		variableLocation = glGetUniformLocation(programID, variableName);
-		colorIndices.push_back(name);
-		colorLocations.push_back(variableLocation);
-		colorValues.push_back(color);
-	}
+void Shader::setVariable(char const *variableName, const Color& color) {
+    std::string name(variableName);
+    std::unordered_map<std::string, std::pair<GLuint, Color> >::iterator it;
+    it = colors.find(name);
+    GLuint variableLocation;
+    if (it == colors.end()) {
+        variableLocation = glGetUniformLocation(programID, variableName);
+        std::pair<GLuint, Color> values(variableLocation, color);
+        colors.insert(std::pair<std::string, std::pair<GLuint, Color> >(name, values));
+    } else {
+        if (it->second.second == color) {
+            return;
+        }
+        variableLocation = it->second.first;
+        it->second.second = color;
+    }
 	glUniform4fv(variableLocation, 1, color.getValues());
 }
 

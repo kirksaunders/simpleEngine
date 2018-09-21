@@ -4,6 +4,8 @@
 #include <ASSIMP/postprocess.h>
 
 #include "objects/model.hpp"
+#include "render_base/texturemanager.hpp"
+#include "render_base/texture.hpp"
 
 using namespace Render3D;
 using namespace Math3D;
@@ -139,60 +141,6 @@ std::vector<TextureData> Model::loadMaterialTextures(aiMaterial* mat, aiTextureT
 	}
 
 	return textures;
-}
-
-void Model::updateVertices() {
-	/*GLfloat vertices[3 * indices.size()];
-
-	for (int i = 0; i < indices.size(); i++) {
-		Vector4 vert = originalVertices[indices[i]];
-
-		vert = vert * size;
-
-		vertices[i * 3] = vert[0];
-		vertices[i * 3 + 1] = vert[1];
-		vertices[i * 3 + 2] = vert[2];
-	}
-
-	glBindVertexArray(VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);*/
-}
-
-void Model::updateNormals() {
-	/*Matrix4x4 rotation = cframe.rotation();
-
-	GLfloat normals[3 * indices.size()];
-
-	for (int i = 0; i < indices.size(); i++) {
-		Vector4 norm = originalNormals[indices[i]];
-
-		norm = rotation * norm;
-
-		normals[i * 3] = norm[0];
-		normals[i * 3 + 1] = norm[1];
-		normals[i * 3 + 2] = norm[2];
-	}
-
-	glBindVertexArray(VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, NBO);
-
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(normals), normals);
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);	*/
-}
-
-/*int Model::getVertexCount() {
-	return indices.size();
-}*/
-
-void Model::bindTextures(Shader& shader, TextureManager& textureManager) {
-
 }
 
 void Model::render(Shader& shader) {

@@ -1,7 +1,7 @@
 #ifndef SHADERMANAGER_HPP
 #define SHADERMANAGER_HPP
 
-#include <map>
+#include <unordered_map>
 #include <string>
 
 #include "render_base/shader.hpp"
@@ -16,7 +16,7 @@ namespace Render3D {
 		void addShader(char const *shaderName, const Shader& shader);
 		
 	 private:
-		std::map<std::string, Shader> shaders;
+		std::unordered_map<std::string, Shader> shaders;
 	};
 
 	extern ShaderManager shaderManager;

@@ -4,13 +4,12 @@
 #define GLEW_STATIC
 
 #include <string>
-#include <map>
+#include <unordered_map>
 
 #include <GLEW/glew.h>
 #include <SOIL/SOIL.h>
 
 #include "render_base/shader.hpp"
-#include "render_base/texturemanager.hpp"
 #include "render_base/texturebuffer.hpp"
 #include "render_base/window.hpp"
 
@@ -47,7 +46,7 @@ namespace Render3D {
 		GLuint VBO;
 		GLuint TBO;
 
-		static std::map<Window*, GLuint> VAOs;
+		static std::unordered_map<Window*, GLuint> VAOs;
 
 		int useNextLocation();
 

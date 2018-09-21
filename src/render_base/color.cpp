@@ -94,6 +94,10 @@ float* Color::getValues() {
 	return values;
 }
 
+const float* Color::getValues() const {
+    return values;
+}
+
 std::ostream& Render3D::operator <<(std::ostream &outs, const Color &col) {
 	outs << col[0] << ", " << col[1] << ", " << col[2] << ", " << col[3];
 }

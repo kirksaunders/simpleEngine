@@ -12,13 +12,9 @@
 #include "math/vector4.hpp"
 #include "math/matrix4x4.hpp"
 
-#include "render_base/color.hpp"
 #include "render_base/shader.hpp"
-#include "objects/mesh.hpp"
 #include "objects/primitive3d.hpp"
-
-#include "render_base/texturemanager.hpp"
-#include "render_base/texture.hpp"
+#include "objects/mesh.hpp"
 
 namespace Render3D {
 	class Model : public Primitive3D {
@@ -26,10 +22,6 @@ namespace Render3D {
 		Model() {}
 
 		Model(char const *filePath);
-
-		//int getVertexCount();
-
-		void bindTextures(Shader& shader, TextureManager& textureManager);
 
 		void render(Shader& shader);
 

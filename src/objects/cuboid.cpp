@@ -1,5 +1,8 @@
 #include "objects/cuboid.hpp"
 
+#include "math/vector4.hpp"
+#include "math/matrix4x4.hpp"
+
 using namespace Render3D;
 using namespace Math3D;
 
@@ -139,7 +142,7 @@ void Cuboid::generateBuffers() {
 }
 
 GLuint Cuboid::getVertexArrayObject(Window* win) {
-	std::map<Window*, GLuint>::iterator it = VAOs.find(win);
+	std::unordered_map<Window*, GLuint>::iterator it = VAOs.find(win);
 	if (it != VAOs.end()) {
 		return it->second;
 	}

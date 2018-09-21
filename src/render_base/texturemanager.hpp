@@ -1,15 +1,14 @@
 #ifndef TEXTUREMANAGER_HPP
 #define TEXTUREMANAGER_HPP
 
-#include <map>
 #include <string>
+#include <vector>
+#include <unordered_map>
 
 #include "render_base/texture.hpp"
 #include "render_base/window.hpp"
 
 namespace Render3D {
-	class Texture;
-
 	class TextureManager {
 	 public:
 		TextureManager();
@@ -28,8 +27,8 @@ namespace Render3D {
 
 		void setActive(GLuint texID, int location);
 	 private:
-		std::map<std::string, Texture> textures;
-		std::map<Window*, std::vector<GLuint> > activeTexturesByWindow;
+		std::unordered_map<std::string, Texture> textures;
+		std::unordered_map<Window*, std::vector<GLuint> > activeTexturesByWindow;
 	};
 
 	extern TextureManager textureManager;

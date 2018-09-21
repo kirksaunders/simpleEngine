@@ -138,6 +138,10 @@ float* Vector4::getValues() {
 	return values;
 }
 
+const float* Vector4::getValues() const {
+    return values;
+}
+
 std::ostream& Math3D::operator <<(std::ostream &outs, const Vector4 &vec) {
 	outs << vec[0] << ", " << vec[1] << ", " << vec[2] << ", " << vec[3];
 }

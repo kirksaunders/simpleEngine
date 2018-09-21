@@ -324,6 +324,10 @@ float* Matrix4x4::getValues() {
 	return *values;
 }
 
+const float* Matrix4x4::getValues() const {
+	return *values;
+}
+
 std::ostream& Math3D::operator <<(std::ostream &outs, const Matrix4x4 &mat) {
 	for (int row = 0; row < 4; row++) {
 		for (int column = 0; column < 4; column++) {

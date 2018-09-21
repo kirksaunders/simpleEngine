@@ -4,15 +4,10 @@
 #define GLEW_STATIC
 
 #include <vector>
-#include <map>
+#include <unordered_map>
 
 #include <GLEW/glew.h>
 
-#include "math/vector4.hpp"
-#include "math/matrix4x4.hpp"
-
-#include "render_base/color.hpp"
-//#include "render_base/face.hpp"
 #include "render_base/shader.hpp"
 #include "objects/primitive3d.hpp"
 #include "render_base/window.hpp"
@@ -21,10 +16,6 @@ namespace Render3D {
 	class Cuboid : public Primitive3D {
 	 public:
 		Cuboid();
-
-		//std::vector<Face> getFaces();
-
-		//GLuint getVertexArrayObject();
 
 		int getVertexCount();
 
@@ -38,11 +29,7 @@ namespace Render3D {
 		GLuint VBO;
 		GLuint NBO;
 
-		std::map<Window*, GLuint> VAOs;
-
-		//std::vector<Face> faces;
-
-		//void calculateFaces();
+		std::unordered_map<Window*, GLuint> VAOs;
 
 		void setNormals();
 

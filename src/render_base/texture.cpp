@@ -1,8 +1,9 @@
 #include "render_base/texture.hpp"
+#include "render_base/texturemanager.hpp"
 
 using namespace Render3D;
 
-std::map<Window*, GLuint> Texture::VAOs;
+std::unordered_map<Window*, GLuint> Texture::VAOs;
 
 Texture::Texture(int w, int h) {
 	width = w;
@@ -177,7 +178,7 @@ void Texture::generateBuffers() {
 }
 
 GLuint Texture::getVertexArrayObject(Window* win) {
-	std::map<Window*, GLuint>::iterator it = VAOs.find(win);
+	std::unordered_map<Window*, GLuint>::iterator it = VAOs.find(win);
 	if (it != VAOs.end()) {
 		return it->second;
 	}

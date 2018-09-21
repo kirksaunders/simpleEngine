@@ -40,6 +40,7 @@ namespace Render3D {
 		const float operator[](int) const;
 
 		float* getValues();
+        const float* getValues() const;
 
 	 private:
 		float values[4];

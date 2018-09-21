@@ -83,6 +83,7 @@ namespace Math3D {
 		Returns pointer to the matrix's value array
 		*/
 		float* getValues();
+        const float* getValues() const;
 
 	 private:
 		float values[4][4];

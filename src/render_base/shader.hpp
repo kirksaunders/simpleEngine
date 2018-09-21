@@ -4,9 +4,7 @@
 #define GLEW_STATIC
 
 #include <string>
-#include <vector>
-#include <fstream>
-#include <sstream>
+#include <unordered_map>
 
 #include <GLEW/glew.h>
 
@@ -28,36 +26,26 @@ namespace Render3D {
 
 		void setVariable(char const *variableName, float number);
 
-		void setVariable(char const *variableName, Math3D::Matrix4x4& matrix);
+		void setVariable(char const *variableName, const Math3D::Matrix4x4& matrix);
 
-		void setVariable(char const *variableName, Math3D::Vector4& vector);
+		void setVariable(char const *variableName, const Math3D::Vector4& vector);
 
-		void setVariable(char const *variableName, Color& color);
+		void setVariable(char const *variableName, const Color& color);
 
 		GLuint getProgramID();
 
 	 private:
 		GLuint programID;
 
-		std::vector<std::string> integerIndices;
-		std::vector<GLuint> integerLocations;
-		std::vector<int> integerValues;
+        std::unordered_map<std::string, std::pair<GLuint, int> > integers;
 
-		std::vector<std::string> floatIndices;
-		std::vector<GLuint> floatLocations;
-		std::vector<float> floatValues;
+        std::unordered_map<std::string, std::pair<GLuint, float> > floats;
 
-		std::vector<std::string> matrixIndices;
-		std::vector<GLuint> matrixLocations;
-		std::vector<Math3D::Matrix4x4> matrixValues;
+        std::unordered_map<std::string, std::pair<GLuint, Math3D::Matrix4x4> > matrices;
 
-		std::vector<std::string> vectorIndices;
-		std::vector<GLuint> vectorLocations;
-		std::vector<Math3D::Vector4> vectorValues;
+        std::unordered_map<std::string, std::pair<GLuint, Math3D::Vector4> > vectors;
 
-		std::vector<std::string> colorIndices;
-		std::vector<GLuint> colorLocations;
-		std::vector<Color> colorValues;
+        std::unordered_map<std::string, std::pair<GLuint, Color> > colors;
 	};
 }
 
