@@ -4,15 +4,13 @@
 #include <ASSIMP/postprocess.h>
 
 #include "objects/model.hpp"
-#include "render_base/texturemanager.hpp"
-#include "render_base/texture.hpp"
+
+#include "render_base/shader.hpp"
 
 using namespace Render3D;
 using namespace Math3D;
 
-Model::Model(char const *filePath) {
-	shaderName = "defaultPerspective";
-
+Model::Model(const char *filePath) : Primitive3D() {
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(filePath, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals);
 	if (!scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
@@ -24,6 +22,8 @@ Model::Model(char const *filePath) {
 
 	directory = path.substr(0, path.find_last_of('/'));
 
+	TexturesMap textureCache;
+
 	processNode(scene->mRootNode, scene);
 }
 
@@ -33,8 +33,7 @@ void Model::processNode(aiNode* node, const aiScene* scene) {
 		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]]; 
 
 		// Process mesh
-		Mesh meshObject = processMesh(mesh, scene);
-		meshes.push_back(meshObject);
+		meshes.push_back(processMesh(mesh, scene));
 	}
 
 	// Then do the same for each of its children
@@ -47,7 +46,9 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
 	//Process vertices, normals, and texture coordinates
 
 	std::vector<Vector4> vertices;
+	vertices.reserve(mesh->mNumVertices);
 	std::vector<Vector4> normals;
+	normals.reserve(mesh->mNumVertices);
 	std::vector<TextureCoord> textureCoords;
 	std::vector<TextureData> textures;
 	std::vector<GLuint> indices;
@@ -99,59 +100,47 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
 	if (mesh->mMaterialIndex >= 0) {
 		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
-		std::vector<TextureData> diffuseTextures = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
-		textures.insert(textures.end(), diffuseTextures.begin(), diffuseTextures.end());
+		loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse", textures);
 
-		std::vector<TextureData> specularTextures = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
-		textures.insert(textures.end(), specularTextures.begin(), specularTextures.end());
+		loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular", textures);
 	}
 
 	return Mesh(vertices, normals, textureCoords, textures, indices);
 }
 
-std::vector<TextureData> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName) {
-	std::vector<TextureData> textures;
-
+void Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName, std::vector<TextureData>& textures) {
 	for (GLuint i = 0; i < mat->GetTextureCount(type); i++) {
 		aiString str;
 		mat->GetTexture(type, i, &str);
-		// Check if texture was loaded before and if so, continue to next iteration: skip loading a new texture
-		GLboolean skip = false;
-		for (GLuint j = 0; j < texturesLoaded.size(); j++) {
-			if (texturesLoaded[j].path == str) {
-				skip = true; // A texture with the same filepath has already been loaded, continue to next one. (optimization)
-				break;
-			}
-		}
+
+        std::string filePath = directory + "/" + std::string(str.C_Str());
+        TexturesMap::iterator it = textureCache.find(filePath);
+        if (it == textureCache.end()) {
+            std::pair<TexturesMap::iterator, bool> p = textureCache.insert(std::pair<std::string, Texture>(filePath, Texture(filePath.c_str())));
+			textures.push_back(TextureData(typeName, &(p.first->second)));
+        } else {
+			textures.push_back(TextureData(typeName, &(it->second)));
+        }
 
 		std::cout << typeName << ", " << str.C_Str() << ", " << i << std::endl;
-
-		if (!skip) {   // If texture hasn't been loaded already, load it
-			TextureData texture;
-			std::cout << str.C_Str() << "   " << directory << std::endl;
-			std::string filePath = directory + "/" + std::string(str.C_Str());
-			texture.fullPath = filePath;
-			texture.type = typeName;
-			texture.path = str;
-			Texture tex(filePath.c_str());
-			textureManager.addTexture(filePath.c_str(), tex);
-			textures.push_back(texture);
-			texturesLoaded.push_back(texture);
-		}
 	}
-
-	return textures;
 }
 
-void Model::render(Shader& shader) {
+void Model::render(Shader* const shader, Window* const win, TextureManager* const textureManager) {
 	Matrix4x4 rotation = cframe.rotation();
 
-	shader.setVariable("modelCFrame", cframe);
-	shader.setVariable("modelRotation", rotation);
-	shader.setVariable("modelSize", size);
-	shader.setVariable("modelColor", color);
+	shader->setVariable(win, "modelCFrame", cframe);
+	shader->setVariable(win, "modelRotation", rotation);
+	shader->setVariable(win, "modelSize", size);
+	shader->setVariable(win, "modelColor", color);
 
-	for (int i = 0; i < meshes.size(); i++) {
-		meshes[i].render(shader);
+	for (unsigned int i = 0; i < meshes.size(); i++) {
+		meshes[i].render(shader, win, textureManager);
+	}
+}
+
+void Model::prepareContent(Window* win, TextureManager* textureManager) {	
+    for (unsigned int i = 0; i < meshes.size(); i++) {
+		meshes[i].prepareContent(win, textureManager);
 	}
 }

@@ -1,13 +1,19 @@
 #ifndef PRIMITIVE3D_HPP
 #define PRIMITIVE3D_HPP
 
+#include <string>
+
 #include "math/vector4.hpp"
 #include "math/matrix4x4.hpp"
 
 #include "render_base/color.hpp"
-#include "render_base/shader.hpp"
 
 namespace Render3D {
+    // forward declarations
+    class Window;
+    class Shader;
+    class TextureManager;
+
 	class Primitive3D { // Primitive3D is an abstract class
 	 public:
 		Primitive3D();
@@ -25,14 +31,16 @@ namespace Render3D {
 
 		virtual Color getColor() const;
 
-		virtual void setShader(char const *name);
+		virtual void setShader(const std::string& name);
 
-		virtual char const* getShader() const;
+		virtual std::string getShader() const;
 
-		virtual void render(Shader& shader) = 0;
+		virtual void render(Shader* const shader, Window* const win, TextureManager* const textureManager) = 0;
+
+        virtual void prepareContent(Window* win, TextureManager* textureManager) = 0;
 
 	 protected:
-		char const *shaderName;
+		std::string shaderName;
 		Math3D::Vector4 size;
 		Math3D::Matrix4x4 cframe;
 		Color color;

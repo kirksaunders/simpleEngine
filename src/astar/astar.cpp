@@ -104,9 +104,9 @@ void pathfind() {
 
 	Window* window = new Window(WIDTH, HEIGHT, "A* Pathfinding");
 
-	Context3D context = Context3D(window);
+	Context3D* context = window->getContext();
 
-	Camera* cam = context.getCamera();
+	Camera* cam = context->getCamera();
 
 	std::vector<Cuboid*> walls;
 	Node* node;
@@ -119,7 +119,7 @@ void pathfind() {
 					cube->setSize(Vector4(GRID_SIZE, GRID_SIZE, GRID_SIZE));
 					cube->setCFrame(Matrix4x4(x * GRID_SIZE, y * GRID_SIZE, z * GRID_SIZE));
 					cube->setColor(Color(0.75, 0.75, 0.75));
-					context.addObject(cube);
+					context->addObject(cube);
 					walls.push_back(cube);
 				}
 			}
@@ -134,45 +134,43 @@ void pathfind() {
 		sphere->setSize(Vector4(GRID_SIZE, GRID_SIZE, GRID_SIZE));
 		sphere->setCFrame(Matrix4x4(path->getPosition() * GRID_SIZE));
 		sphere->setColor(Color(0, 0.8, 0));
-		context.addObject(sphere);
+		context->addObject(sphere);
 		path = path->getParent();
 	}
 
 	float cX, cY;
-	cX = 0;
-	cY = -100;
-	bool rightMouseDown = false;
-	double mX, mY;
-	window->setMouseDownCallback([&window, &rightMouseDown, &mX, &mY](int button) {
-		if (button == 1) { // right mouse button
+	cX = cY = 0;
+	window->setMouseDownCallback([&window](MOUSE_BUTTON button, int x, int y) {
+		if (button == MOUSE_BUTTON::RIGHT) { // right mouse button
 			window->setMouseLockEnabled(true);
-			rightMouseDown = true;
-			window->getMousePosition(mX, mY);
 		}
 	});
-	window->setMouseUpCallback([&window, &rightMouseDown](int button) {
-		if (button == 1) { // right mouse button
+	window->setMouseUpCallback([&window](MOUSE_BUTTON button, int x, int y) {
+		if (button == MOUSE_BUTTON::RIGHT) { // right mouse button
 			window->setMouseLockEnabled(false);
-			rightMouseDown = false;
 		}
 	});
-	window->setMouseMoveCallback([&rightMouseDown, &mX, &mY, &cX, &cY](double x, double y) {
-		if (rightMouseDown) {
-			cX -= (x - mX);
-			cY -= (y - mY);
-			mX = x;
-			mY = y;
+	window->setMouseMoveCallback([&window, &cX, &cY](int x, int y, int dx, int dy) {
+		if (window->isMouseDown(MOUSE_BUTTON::RIGHT)) {
+			cX -= dx * MOUSE_SENS;
+			cY = std::max(std::min(cY - dy * MOUSE_SENS, 90.0f), -90.0f);
 		}
 	});
+	window->setKeyUpCallback([&window](KEYCODE key) {
+        if (key == KEYCODE::F11) {
+            window->toggleFullscreen();
+        }
+    });
 
 	window->setVSyncEnabled(false);
 
 	while (window->isActive()) {
+		window->updateViewport();
 		window->clear();
 
 		updateCamera(cam, window, cX, cY);
 
-		context.render();
+		context->render();
 
 		window->update();
 		window->pollEvents();

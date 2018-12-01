@@ -6,16 +6,11 @@
 #include <vector>
 #include <string>
 #include <unordered_map>
+#include <tuple>
+#include <utility>
 
-#include <GLEW/glew.h>
-#include <ASSIMP/scene.h>
-
-#include "math/vector4.hpp"
-
-#include "render_base/color.hpp"
-#include "render_base/shader.hpp"
 #include "objects/primitive3d.hpp"
-#include "render_base/window.hpp"
+#include "render_base/texture.hpp"
 
 namespace Render3D {
 	struct TextureCoord {
@@ -24,44 +19,43 @@ namespace Render3D {
 	};
 
 	struct TextureData {
-		GLuint id;
 		std::string type;
-		aiString path;
-		std::string fullPath;
+        Texture* tex;
+
+		TextureData() : type(""), tex(NULL) {}
+		TextureData(const std::string& typ, Texture* t) : type(typ), tex(t) {}
 	};
 
 	class Mesh {
 	 public:
-		Mesh(const std::vector<Math3D::Vector4>& vertices, const std::vector<Math3D::Vector4>& normals,
-                const std::vector<TextureCoord>& texCoords, const std::vector<TextureData>& textures,
-                const std::vector<GLuint>& indices);
+		Mesh(const std::vector<Math3D::Vector4>& verts, const std::vector<Math3D::Vector4>& norms,
+             const std::vector<TextureCoord>& texCs, const std::vector<TextureData>& texs,
+             const std::vector<GLuint>& inds);
 
-		void bindTextures(Shader& shader);
+		void bindTextures(Shader* shader, Window* win, TextureManager* textureManager);
 
-		void unbindTextures(Shader& shader);
+		void unbindTextures(Shader* shader, Window* win, TextureManager* textureManager);
 
 		int getVertexCount();
 
-		void render(Shader& shader);
+		void render(Shader* const shader, Window* const win, TextureManager* const textureManager);
+        void prepareContent(Window* win, TextureManager* textureManager);
 
 	 private:
+        std::vector<Math3D::Vector4> vertices;
+        std::vector<Math3D::Vector4> normals;
+        std::vector<TextureCoord> texCoords;
+        std::vector<TextureData> textures;
+        std::vector<GLuint> indices;
+
         unsigned int numVertices;
-		std::string directory;
 
-		std::vector<TextureData> textures;
-
-		GLuint VBO;
-		GLuint NBO;
-		GLuint TBO;
-
+        typedef std::tuple<GLuint, GLuint, GLuint> BufferTriple;
+        std::unordered_map<GLuint, BufferTriple> BufferObjects;
 		std::unordered_map<Window*, GLuint> VAOs;
 
-		void processNode(aiNode* node, const aiScene* scene);
-
-		void processMesh(aiMesh* mesh, const aiScene* scene);
-
-		void loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName);
-
+        void generateBuffers(GLuint clusterID);
+        void generateVertexArrayObject(GLuint clusterID, Window* win);
 		GLuint getVertexArrayObject(Window* win);
 	};
 }

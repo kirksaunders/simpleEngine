@@ -337,4 +337,6 @@ std::ostream& Math3D::operator <<(std::ostream &outs, const Matrix4x4 &mat) {
 			}
 		}
 	}
+
+    return outs;
 }

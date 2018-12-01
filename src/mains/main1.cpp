@@ -19,9 +19,9 @@ void main1() {
 
 	Window* window = new Window(WIDTH, HEIGHT, "Main 1 - Model Loading");
 
-	Context3D context = Context3D(window);
+	Context3D* context = window->getContext();
 
-	Camera* cam = context.getCamera();
+	Camera* cam = context->getCamera();
 	cam->setCFrame(Matrix4x4(0, 4, 0));
 
 	Model* ground = new Model("res/meshes/ground.obj");
@@ -29,7 +29,7 @@ void main1() {
 	ground->setCFrame(Matrix4x4(0, -1.5, 0));
 	ground->setColor(Color(0, 1, 0));
 
-	context.addObject(ground);
+	context->addObject(ground);
 
 	Model* model = new Model(meshPath.c_str());
 
@@ -37,7 +37,7 @@ void main1() {
 	model->setCFrame(Matrix4x4(0, 3, -8) * Matrix4x4::fromEuler(0.75, 0.75, 0));
 	model->setColor(Color(r, g, b));
 
-	context.addObject(model);
+	context->addObject(model);
 
 	Model* model2 = new Model("res/meshes/blade_thinner.obj");
 
@@ -45,7 +45,7 @@ void main1() {
 	model2->setCFrame(Matrix4x4(8, 3, 0) * Matrix4x4::fromEuler(0.75, 0.75, 0));
 	model2->setColor(Color(0.2, 0.2, 0.2));
 
-	context.addObject(model2);
+	context->addObject(model2);
 
 	Cuboid* cube = new Cuboid();
 
@@ -53,7 +53,7 @@ void main1() {
 	cube->setCFrame(Matrix4x4(-8, 3, 0));
 	cube->setColor(Color(0.2, 0.2, 0.85));
 
-	context.addObject(cube);
+	context->addObject(cube);
 
 	Sphere* sphere = new Sphere();
 
@@ -61,14 +61,14 @@ void main1() {
 	sphere->setCFrame(Matrix4x4(0, 3, 8));
 	sphere->setColor(Color(0.2, 0.2, 0.85));
 
-	context.addObject(sphere);
+	context->addObject(sphere);
 
 	Cuboid* cube2 = new Cuboid();
 
 	cube2->setSize(Vector4(0.25, 0.5, 0.25));
 	cube2->setColor(Color(0.85, 0.2, 0.2));
 
-	context.addObject(cube2);
+	context->addObject(cube2);
 
 	/*Shader testShader("res/test.vert", "res/test.frag");
 	shaderManager.addShader("test", testShader);
@@ -79,35 +79,33 @@ void main1() {
 	x = y = z = 0;
 
 	float cX, cY;
-	cX = 0;
-	cY = -100;
-	bool rightMouseDown = false;
-	double mX, mY;
-	window->setMouseDownCallback([&window, &rightMouseDown, &mX, &mY](int button) {
-		if (button == 1) { // right mouse button
+	cX = cY = 0;
+	window->setMouseDownCallback([&window](MOUSE_BUTTON button, int x, int y) {
+		if (button == MOUSE_BUTTON::RIGHT) { // right mouse button
 			window->setMouseLockEnabled(true);
-			rightMouseDown = true;
-			window->getMousePosition(mX, mY);
 		}
 	});
-	window->setMouseUpCallback([&window, &rightMouseDown](int button) {
-		if (button == 1) { // right mouse button
+	window->setMouseUpCallback([&window](MOUSE_BUTTON button, int x, int y) {
+		if (button == MOUSE_BUTTON::RIGHT) { // right mouse button
 			window->setMouseLockEnabled(false);
-			rightMouseDown = false;
 		}
 	});
-	window->setMouseMoveCallback([&rightMouseDown, &mX, &mY, &cX, &cY](double x, double y) {
-		if (rightMouseDown) {
-			cX -= (x - mX);
-			cY -= (y - mY);
-			mX = x;
-			mY = y;
+	window->setMouseMoveCallback([&window, &cX, &cY](int x, int y, int dx, int dy) {
+		if (window->isMouseDown(MOUSE_BUTTON::RIGHT)) {
+			cX -= dx * MOUSE_SENS;
+			cY = std::max(std::min(cY - dy * MOUSE_SENS, 90.0f), -90.0f);
 		}
 	});
+	window->setKeyUpCallback([&window](KEYCODE key) {
+        if (key == KEYCODE::F11) {
+            window->toggleFullscreen();
+        }
+    });
 
 	window->setVSyncEnabled(true);
 
 	while (window->isActive()) {
+		window->updateViewport();
 		window->clear();
 
 		x = x + 0.01;
@@ -122,18 +120,19 @@ void main1() {
 
 		updateCamera(cam, window, cX, cY);
 
-		context.render();
+		context->render();
 
 		window->update();
 		window->pollEvents();
 	}
 
-	delete window;
 	delete cube;
 	delete cube2;
 	delete sphere;
 	delete ground;
 	delete model;
 	delete model2;
-	glfwTerminate();
+	delete window;
+
+	SDL_Quit();
 }

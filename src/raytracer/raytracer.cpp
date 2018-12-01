@@ -10,8 +10,8 @@ void raytracer() {
 	using namespace std;
 
 	Window* window = new Window(WIDTH, HEIGHT, "Testing");
-	Context3D context(window);
-	Camera* camera = context.getCamera();
+	Context3D* context = window->getContext();
+	Camera* camera = context->getCamera();
 	Matrix4x4 camCFr = camera->getCFrame();
 	//Matrix4x4 camInverse = camCFr.inverse();
 	Matrix4x4 proj = camera->getPerspective(static_cast<float>(WIDTH) / HEIGHT);
@@ -46,18 +46,19 @@ void raytracer() {
 		}
 	}
 
-	Texture tex(WIDTH, HEIGHT);
-	tex.loadFromArray(WIDTH, HEIGHT, buffer.getAddress());
+	Texture tex(buffer);
 
 	while (window->isActive()) {
+		window->updateViewport();
 		window->clear();
 
-		context.renderTexture(tex);
+		context->renderTexture(tex);
 
 		window->update();
 		window->pollEvents();
 	}
 
 	delete window;
-	glfwTerminate();
+
+	SDL_Quit();
 }

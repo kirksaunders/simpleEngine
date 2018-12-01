@@ -4,11 +4,7 @@ using std::size_t;
 using namespace Render3D;
 using namespace Math3D;
 
-static const float DELTA = 0.1;
-static const float MOUSE_SENS = 0.15;
-static const float RAD = PI / 180.0;
-
-int main() {
+int main(int arc, char** arcv) {
 	int option;
 	std::cout << "1.) Model loading" << std::endl
 			  << "2.) Texture loading (multiple windows)" << std::endl
@@ -49,12 +45,12 @@ int main() {
 
 void updateCamera(Camera* cam, Window* window, float cX, float cY) {
 	bool w, a, s, d, q, e;
-	w = window->isKeyPressed('W');
-	a = window->isKeyPressed('A');
-	s = window->isKeyPressed('S');
-	d = window->isKeyPressed('D');
-	q = window->isKeyPressed('Q');
-	e = window->isKeyPressed('E');
+	w = window->isKeyPressed(KEYCODE::W);
+	a = window->isKeyPressed(KEYCODE::A);
+	s = window->isKeyPressed(KEYCODE::S);
+	d = window->isKeyPressed(KEYCODE::D);
+	q = window->isKeyPressed(KEYCODE::Q);
+	e = window->isKeyPressed(KEYCODE::E);
 
 	Matrix4x4 offset(0, 0, 0);
 	if (w) {
@@ -77,6 +73,6 @@ void updateCamera(Camera* cam, Window* window, float cX, float cY) {
 	}
 	Matrix4x4 newCFr = cam->getCFrame() * offset;
 	cam->setCFrame(Matrix4x4(newCFr.position())
-					* Matrix4x4::fromEuler(0, RAD*MOUSE_SENS*cX, 0)
-					* Matrix4x4::fromEuler(RAD*MOUSE_SENS*cY, 0, 0));
+					* Matrix4x4::fromEuler(0, RAD*cX, 0)
+					* Matrix4x4::fromEuler(RAD*cY, 0, 0));
 }

@@ -5,9 +5,9 @@
 
 #include <GLEW/glew.h>
 
-#include "render_base/color.hpp"
-
 namespace Render3D {
+    class Color; // forward declaration
+
 	class TextureBuffer {
 	 public:
 		TextureBuffer(size_t w, size_t h, size_t d);
@@ -15,7 +15,7 @@ namespace Render3D {
 		~TextureBuffer();
 
 		void setValue(size_t x, size_t y, size_t z, GLubyte value);
-		void setPixel(size_t x, size_t y, Color col);
+		void setPixel(size_t x, size_t y, const Color& col);
 
         size_t getWidth() const;
         size_t getHeight() const;

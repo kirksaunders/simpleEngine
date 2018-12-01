@@ -1,6 +1,7 @@
 #include <algorithm>
 
 #include "render_base/texturebuffer.hpp"
+#include "render_base/color.hpp"
 
 using namespace Render3D;
 
@@ -29,7 +30,7 @@ void TextureBuffer::setValue(size_t x, size_t y, size_t z, GLubyte value) {
 	data[y*width*depth + x*depth + z] = value;  //  x*height*depth + y*depth + z
 }
 
-void TextureBuffer::setPixel(size_t x, size_t y, Color col) {
+void TextureBuffer::setPixel(size_t x, size_t y, const Color& col) {
     if (depth != 3 && depth != 4) {
         // error
         return;

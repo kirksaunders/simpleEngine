@@ -6,14 +6,18 @@ INCLUDE_DIR		:= include/
 LIBRARY_DIR		:= lib/
 
 CXX				:= g++
-CXXFLAGS		:= -std=c++11 -I$(INCLUDE_DIR) -I$(SOURCE_DIR) -D__USE_MINGW_ANSI_STDIO=0
-LDFLAGS			:= -static -L$(LIBRARY_DIR)
-LDLIBS			:= -lSOIL -lassimp -lz -lglew32 -lglfw3 -lwinmm -lopengl32 -lgdi32
+CXXFLAGS		:= -std=c++11 -I$(INCLUDE_DIR) -I$(SOURCE_DIR) -g
+LDFLAGS			:= -L$(LIBRARY_DIR)
+LDLIBS			:= -lmingw32 -lSOIL -lassimp -lz -lglew32 -lSDL2main -lSDL2 -lopengl32
 
 OPTIMIZE = false
 ifeq ($(firstword $(MAKECMDGOALS)),run)
 	OPTIMIZE = true
 else ifeq ($(firstword $(MAKECMDGOALS)),clean)
+	OPTIMIZE = true
+else ifeq ($(firstword $(MAKECMDGOALS)),all)
+	OPTIMIZE = true
+else ifeq ($(firstword $(MAKECMDGOALS)),)
 	OPTIMIZE = true
 endif
 
@@ -25,6 +29,8 @@ rwildcard = $(foreach d,$(wildcard $1*), \
 
 ifeq ($(OPTIMIZE),false)
 	SOURCE_FILES	:= $(call rwildcard, $(SOURCE_DIR), *.cpp *.cc)
+	DLLS			:= $(call rwildcard, $(LIBRARY_DIR), *.dll)
+	DLLS_OUT		:= $(addprefix $(BIN_DIR),$(notdir $(DLLS)))
 	OBJ_FILES		:= $(addsuffix .o,$(patsubst $(SOURCE_DIR)%,$(BIN_DIR)%, $(SOURCE_FILES)))
 	DEPENDENCIES	:= $(patsubst $(BIN_DIR)%.o,$(BIN_DIR)%.d, $(OBJ_FILES))
 	DIRECTORIES		:= $(BIN_DIR)
@@ -34,9 +40,11 @@ endif
 
 OUTPUT_FILE		:= $(BIN_DIR)$(PROJECT_NAME)
 
-all: build run
+all:
+	+make build
+	+make run
 
-build: $(OUTPUT_FILE)
+build: $(OUTPUT_FILE) $(DLLS_OUT)
 
 $(OUTPUT_FILE): $(OBJ_FILES) | $(BIN_DIR)
 	$(CXX) $(OBJ_FILES) -o $@ $(LDFLAGS) $(LDLIBS)
@@ -46,6 +54,10 @@ $(OUTPUT_FILE): $(OBJ_FILES) | $(BIN_DIR)
 .SECONDEXPANSION:
 $(OBJ_FILES): $$(patsubst $(BIN_DIR)%,$(SOURCE_DIR)%, $$(basename $$@)) | $$(dir $$@)
 	$(CXX) $(CXXFLAGS) -MMD -c $< -o $@
+
+.SECONDEXPANSION:
+$(DLLS_OUT): $$(filter %$$(notdir $$@),$(DLLS))
+	cp $< $@
 
 $(DIRECTORIES):
 	mkdir -p $@
@@ -65,6 +77,8 @@ ifneq ($(wildcard $(BIN_DIR)),)
 	rm -r $(BIN_DIR)
 endif
 
-rebuild: clean build
+rebuild:
+	+make clean
+	+make build
 
 .PHONY: all build run clean rebuild

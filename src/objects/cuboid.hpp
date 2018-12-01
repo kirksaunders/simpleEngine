@@ -3,14 +3,13 @@
 
 #define GLEW_STATIC
 
-#include <vector>
 #include <unordered_map>
 
 #include <GLEW/glew.h>
 
-#include "render_base/shader.hpp"
+#include "math/vector4.hpp"
+
 #include "objects/primitive3d.hpp"
-#include "render_base/window.hpp"
 
 namespace Render3D {
 	class Cuboid : public Primitive3D {
@@ -19,23 +18,26 @@ namespace Render3D {
 
 		int getVertexCount();
 
-		void render(Shader& shader);
+		void render(Shader* const shader, Window* const win, TextureManager* const textureManager);
+
+        void prepareContent(Window* win, TextureManager* textureManager);
 
 	 private:
-		GLfloat vertices[108];
-		GLfloat normals[108];
-		GLushort vertexIndices[36];
-		GLushort normalIndices[36];
-		GLuint VBO;
-		GLuint NBO;
-
+        typedef std::pair<GLuint, GLuint> BufferPair;
+        std::unordered_map<GLuint, BufferPair> BufferObjects;
 		std::unordered_map<Window*, GLuint> VAOs;
 
+        Math3D::Vector4 vertices[8];
+        Math3D::Vector4 normals[6];
+        GLushort vertexIndices[36];
+        GLushort normalIndices[36];
+
 		void setNormals();
-
 		void setVertices();
+        void loadData();
 
-		void generateBuffers();
+		void generateBuffers(GLuint clusterID);
+        void generateVertexArrayObject(GLuint clusterID, Window* win);
 		GLuint getVertexArrayObject(Window* win);
 	};
 }

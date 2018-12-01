@@ -100,4 +100,6 @@ const float* Color::getValues() const {
 
 std::ostream& Render3D::operator <<(std::ostream &outs, const Color &col) {
 	outs << col[0] << ", " << col[1] << ", " << col[2] << ", " << col[3];
+
+    return outs;
 }

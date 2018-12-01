@@ -9,17 +9,15 @@
 namespace Render3D {
 	class ShaderManager {
 	 public:
-		bool shaderDoesExist(char const *shaderName) const;
+		bool shaderDoesExist(const std::string& shaderName) const;
 
-		Shader* getShader(char const *shaderName);
+		Shader* getShader(const std::string& shaderName);
 
-		void addShader(char const *shaderName, const Shader& shader);
-		
+		void addShader(const std::string& shaderName, const Shader& shader);
+        
 	 private:
 		std::unordered_map<std::string, Shader> shaders;
 	};
-
-	extern ShaderManager shaderManager;
 }
 
 #endif

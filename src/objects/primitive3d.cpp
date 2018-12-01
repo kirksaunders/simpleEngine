@@ -31,10 +31,10 @@ Color Primitive3D::getColor() const {
 	return color;
 }
 
-void Primitive3D::setShader(char const *name) {
+void Primitive3D::setShader(const std::string& name) {
 	shaderName = name;
 }
 
-char const* Primitive3D::getShader() const {
+std::string Primitive3D::getShader() const {
 	return shaderName;
 }

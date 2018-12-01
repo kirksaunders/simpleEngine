@@ -8,49 +8,68 @@
 
 #include <GLEW/glew.h>
 
-#include "render_base/shader.hpp"
-#include "render_base/texturebuffer.hpp"
-#include "render_base/window.hpp"
-
 namespace Render3D {
+    // forward declarations
+    class Window;
+    class Shader;
+    class TextureManager;
+    class TextureBuffer;
+
 	class Texture {
 	 public:
 		Texture(int w = 0, int h = 0);
-		Texture(char const *filePath);
+		Texture(const char *filePath);
         Texture(const TextureBuffer& buff);
+        Texture(const Texture& other);
+        Texture(Texture&& other);
+        ~Texture();
+
+        Texture& operator=(const Texture& other);
+        Texture& operator=(Texture&& other);
 		
-		void loadFromArray(int w, int h, GLubyte* data);
-		void loadFromFile(char const *filePath);
+		/*void loadFromArray(int w, int h, GLubyte* data);
+		void loadFromFile(const char *filePath);*/
 
 		int getWidth();
 		int getHeight();
 
-		void setName(char const* name);
-		char const* getName();
+		void setName(const std::string& name);
+		const char* getName();
 
-		void setShader(char const *name);
-		char const* getShader();
+		void setShader(const std::string& name);
+		const char* getShader();
 
-		void use(Shader& shader);
-		void use(Shader& shader, const char* name);
-		int getLocation();
-		void render(Shader& shader);
+		void use(Shader* shader, Window* win, TextureManager* textureManager);
+		void use(Shader* shader, Window* win, TextureManager* textureManager, const char* name);
+		void render(Shader* const shader, Window* const win, TextureManager* const textureManager);
+        void prepareContent(Window* win, TextureManager* textureManager);
 
 	 private:
-		char const *textureName;
+        GLubyte* image;
+		std::string textureName;
 		int width;
 		int height;
-		GLuint textureID;
-		char const *shaderName;
-		GLuint VBO;
-		GLuint TBO;
+        int depth;
+		std::string shaderName;
 
-		static std::unordered_map<Window*, GLuint> VAOs;
+        typedef std::pair<GLuint, GLuint> BufferPair;
+        std::unordered_map<GLuint, BufferPair> bufferObjects;
+		std::unordered_map<Window*, GLuint> VAOs;
+        std::unordered_map<GLuint, GLuint> IDs;
 
-		int useNextLocation();
+		int getLocation(GLuint textureID, Window* win, TextureManager* textureManager);
+		int useNextLocation(GLuint textureID, Window* win, TextureManager* textureManager);
 
-		void generateBuffers();
+		void generateBuffers(GLuint clusterID);
+		void generateTexture(GLuint clusterID);
+        void generateVertexArrayObject(GLuint clusterID, Window* win);
+		GLuint getTextureID(GLuint clusterID);
 		GLuint getVertexArrayObject(Window* win);
+
+        void copy(const Texture& other);
+        void move(Texture& other);
+        void initialize();
+        void destroy();
 	};
 }
 

@@ -5,30 +5,31 @@
 
 #include <vector>
 #include <string>
+#include <unordered_map>
 
 #include <GLEW/glew.h>
 #include <ASSIMP/scene.h>
 
-#include "math/vector4.hpp"
-#include "math/matrix4x4.hpp"
-
-#include "render_base/shader.hpp"
 #include "objects/primitive3d.hpp"
 #include "objects/mesh.hpp"
+
+#include "render_base/texture.hpp"
 
 namespace Render3D {
 	class Model : public Primitive3D {
 	 public:
-		Model() {}
+		Model() : Primitive3D() {}
 
-		Model(char const *filePath);
+		Model(const char *filePath);
 
-		void render(Shader& shader);
+		void render(Shader* const shader, Window* const win, TextureManager* const textureManager);
+
+        void prepareContent(Window* win, TextureManager* textureManager);
 
 	 private:
 		std::string directory;
-
-		std::vector<TextureData> texturesLoaded;
+        typedef std::unordered_map<std::string, Texture> TexturesMap;
+        TexturesMap textureCache;
 
 		std::vector<Mesh> meshes;
 
@@ -40,7 +41,7 @@ namespace Render3D {
 
 		Mesh processMesh(aiMesh* mesh, const aiScene* scene);
 
-		std::vector<TextureData> loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName);
+		void loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName, std::vector<TextureData>& textures);
 	};
 }
 
