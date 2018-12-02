@@ -95,42 +95,42 @@ void Context3D::render() {
 	Color lightColor = Color(1, 1, 1);
 	Color ambient = Color(0.15, 0.15, 0.15);
 
-	std::string currentShader = "";
-	Shader* shaderObject;
+	Shader* currentShader = NULL;
+    Shader* defaultShader = shaderManager->getShader("defaultPerspective");
 
 	Texture* defaultTex = textureManager->getTexture("defaultTexture");
  
 	for (int i = 0; i < objects.size(); i++) {
 		Primitive3D* object = objects[i];
 
-		std::string shader = object->getShader();
-		if (currentShader != shader) {
-			shaderObject = shaderManager->getShader(shader);
-			shaderObject->use(window);
+        Shader* shader = object->getShader() == NULL ? defaultShader : object->getShader();
+
+		if (shader != currentShader) {
 			currentShader = shader;
+			currentShader->use(window);
 
 			for (int i2 = 0; i2 < 5; i2++) { // reset textures
 				std::string name = "texture_diffuse";
 				name += std::to_string(i2 + 1);
-				defaultTex->use(shaderObject, window, textureManager.get(), name.c_str());
+				defaultTex->use(currentShader, window, textureManager.get(), name.c_str());
 				name = "texture_specular";
 				name += std::to_string(i2 + 1);
-				defaultTex->use(shaderObject, window, textureManager.get(), name.c_str());
+				defaultTex->use(currentShader, window, textureManager.get(), name.c_str());
 			}
 
 			// Scene Lighting Data
-			shaderObject->setVariable(window, "lightPos", lightPosition);
-			shaderObject->setVariable(window, "lightColor", lightColor);
-			shaderObject->setVariable(window, "ambientColor", ambient);
+			currentShader->setVariable(window, "lightPos", lightPosition);
+			currentShader->setVariable(window, "lightColor", lightColor);
+			currentShader->setVariable(window, "ambientColor", ambient);
 
 			// Camera Data
-			shaderObject->setVariable(window, "cameraPos", cameraPosition);
-			shaderObject->setVariable(window, "cameraInverse", cameraInverse);
+			currentShader->setVariable(window, "cameraPos", cameraPosition);
+			currentShader->setVariable(window, "cameraInverse", cameraInverse);
 
 			// Projection Matrix
-			shaderObject->setVariable(window, "projection", projection);
+			currentShader->setVariable(window, "projection", projection);
 		}
-		object->render(shaderObject, window, textureManager.get());
+		object->render(currentShader, window, textureManager.get());
 	}
 
 	glBindVertexArray(0);
@@ -140,9 +140,8 @@ void Context3D::render() {
 void Context3D::renderTexture(Texture& tex) {
 	//window->makeCurrent();
     tex.prepareContent(window, textureManager.get());
-	const char* shader = tex.getShader();
-	Shader* shaderObject = shaderManager->getShader(shader);
-	shaderObject->use(window);
-	tex.render(shaderObject, window, textureManager.get());
+	Shader* shader = tex.getShader() == NULL ? shaderManager->getShader("imageRender") : tex.getShader();
+	shader->use(window);
+	tex.render(shader, window, textureManager.get());
 	glUseProgram(0);
 }

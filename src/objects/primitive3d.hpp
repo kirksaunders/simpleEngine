@@ -31,16 +31,16 @@ namespace Render3D {
 
 		virtual Color getColor() const;
 
-		virtual void setShader(const std::string& name);
+		virtual void setShader(Shader* s);
 
-		virtual std::string getShader() const;
+		virtual Shader* const getShader() const;
 
 		virtual void render(Shader* const shader, Window* const win, TextureManager* const textureManager) = 0;
 
         virtual void prepareContent(Window* win, TextureManager* textureManager) = 0;
 
 	 protected:
-		std::string shaderName;
+		Shader* shader;
 		Math3D::Vector4 size;
 		Math3D::Matrix4x4 cframe;
 		Color color;

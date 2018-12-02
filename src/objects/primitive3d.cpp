@@ -4,7 +4,7 @@ using namespace Render3D;
 using namespace Math3D;
 
 Primitive3D::Primitive3D() {
-	shaderName = "defaultPerspective"; // default shader used to render 3d objects
+	shader = NULL;
 }
 
 void Primitive3D::setSize(const Vector4& value) {
@@ -31,10 +31,10 @@ Color Primitive3D::getColor() const {
 	return color;
 }
 
-void Primitive3D::setShader(const std::string& name) {
-	shaderName = name;
+void Primitive3D::setShader(Shader* s) {
+	shader = s;
 }
 
-std::string Primitive3D::getShader() const {
-	return shaderName;
+Shader* const Primitive3D::getShader() const {
+	return shader;
 }

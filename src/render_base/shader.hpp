@@ -63,7 +63,7 @@ namespace Render3D {
         VectorMap vectors;
         ColorMap colors;
 
-        void compileProgram(GLuint clusterID);
+        GLuint compileProgram(GLuint clusterID);
 		GLuint getProgramID(GLuint clusterID);
 	};
 }

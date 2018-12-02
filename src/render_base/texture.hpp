@@ -36,8 +36,8 @@ namespace Render3D {
 		void setName(const std::string& name);
 		const char* getName();
 
-		void setShader(const std::string& name);
-		const char* getShader();
+		void setShader(Shader* s);
+		Shader* const getShader();
 
 		void use(Shader* shader, Window* win, TextureManager* textureManager);
 		void use(Shader* shader, Window* win, TextureManager* textureManager, const char* name);
@@ -50,7 +50,7 @@ namespace Render3D {
 		int width;
 		int height;
         int depth;
-		std::string shaderName;
+		Shader* shader;
 
         typedef std::pair<GLuint, GLuint> BufferPair;
         std::unordered_map<GLuint, BufferPair> bufferObjects;

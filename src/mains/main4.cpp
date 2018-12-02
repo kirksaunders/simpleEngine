@@ -47,10 +47,9 @@ void main4() {
 	context1->addObject(model);
 	context2->addObject(model);
 
-	/*Shader testShader("res/test.vert", "res/test.frag");
-	shaderManager.addShader("test", testShader);
+	Shader testShader("res/test.vert", "res/test.frag");
 
-	model->setShader("test");*/
+	model->setShader(&testShader);
 
 	window1->setVSyncEnabled(true);
 	window2->setVSyncEnabled(true);

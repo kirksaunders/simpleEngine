@@ -43,12 +43,12 @@ void Shader::use(Window* win) {
 	glUseProgram(getProgramID(win->getClusterID()));
 }
 
-void Shader::compileProgram(GLuint clusterID) {
+GLuint Shader::compileProgram(GLuint clusterID) {
     std::unordered_map<GLuint, GLuint>::iterator it = programIDs.find(clusterID);
     if (it != programIDs.end()) {
         glUseProgram(it->second);
         glUseProgram(0);
-        return;
+        return it->second;
     }
 
     GLuint programID;
@@ -104,15 +104,17 @@ void Shader::compileProgram(GLuint clusterID) {
 	glDeleteShader(fragment);
 
     programIDs.insert(std::pair<GLuint, GLuint>(clusterID, programID));
+
+    return programID;
 }
 
 GLuint Shader::getProgramID(GLuint clusterID) {
     std::unordered_map<GLuint, GLuint>::iterator it = programIDs.find(clusterID);
     if (it != programIDs.end()) {
         return it->second;
+    } else {
+        return compileProgram(clusterID);
     }
-
-	return 0;
 }
 
 void Shader::setVariable(Window* win, const char *variableName, int number) {

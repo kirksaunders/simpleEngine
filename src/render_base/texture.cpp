@@ -16,13 +16,13 @@ Texture::Texture(int w, int h) {
 	height = h;
     depth = 4;
 	textureName = "tex";
-	shaderName = "imageRender";
+	shader = NULL;
     image = NULL;
 }
 
 Texture::Texture(const char *filePath) {
 	textureName = "tex";
-	shaderName = "imageRender";
+	shader = NULL;
 
 	image = SOIL_load_image(filePath, &width, &height, 0, SOIL_LOAD_RGBA);
     depth = 4;
@@ -33,7 +33,7 @@ Texture::Texture(const char *filePath) {
 
 Texture::Texture(const TextureBuffer& buff) {
     textureName = "tex";
-    shaderName = "imageRender";
+    shader = NULL;
 
     width = buff.getWidth();
     height = buff.getHeight();
@@ -130,12 +130,12 @@ const char* Texture::getName() {
 	return textureName.c_str();
 }
 
-void Texture::setShader(const std::string& name) {
-    shaderName = name;
+void Texture::setShader(Shader* s) {
+    shader = s;
 }
 
-const char* Texture::getShader() {
-	return shaderName.c_str();
+Shader* const Texture::getShader() {
+	return shader;
 }
 
 void Texture::use(Shader* shader, Window* win, TextureManager* textureManager) {
@@ -334,7 +334,7 @@ void Texture::copy(const Texture& other) {
     height = other.height;
     depth = other.depth;
     textureName = other.textureName;
-    shaderName = other.shaderName;
+    shader = other.shader;
     bufferObjects = other.bufferObjects;
     VAOs = other.VAOs;
     IDs = other.IDs;
@@ -350,8 +350,8 @@ void Texture::move(Texture& other) {
     width = other.width;
     height = other.height;
     depth = other.depth;
+    shader = other.shader;
     textureName = std::move(other.textureName);
-    shaderName = std::move(other.shaderName);
     bufferObjects = std::move(other.bufferObjects);
     VAOs = std::move(other.VAOs);
     IDs = std::move(other.IDs);
@@ -363,7 +363,7 @@ void Texture::initialize() {
 	height = 0;
 	depth = 4;
 	textureName = "tex";
-	shaderName = "imageRender";
+	shader = NULL;
 	bufferObjects.clear();
 	VAOs.clear();
 	IDs.clear();
