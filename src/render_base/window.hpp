@@ -5,7 +5,7 @@
 
 #include <functional>
 #include <atomic>
-#include <unordered_map>
+#include <vector>
 
 #include <GLEW/glew.h>
 #include <SDL2/sdl.h>
@@ -117,8 +117,8 @@ namespace Render3D {
         KeyCallback keyUpCallback;
         WindowResizeCallback windowResizeCallback;
 
-        std::unordered_map<int, bool> mouseState;
-        std::unordered_map<int, bool> keyboardState;
+        std::vector<int> mouseState;
+        std::vector<int> keyboardState;
 
         int mouseX;
         int mouseY;

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <algorithm>
 
 #include "render_base/exception.hpp"
 #include "render_base/window.hpp"
@@ -229,7 +230,12 @@ int Window::eventWatcher(void* data, SDL_Event* event) {
         window->active = false;
     } else if (event->type == SDL_MOUSEBUTTONDOWN) {
         if (event->button.windowID == SDL_GetWindowID(window->window)) {
-            window->mouseState[event->button.button] = true;
+            for (unsigned int i = 0; i < window->mouseState.size(); ++i) {
+                if (window->mouseState[i] == event->button.button) {
+                    return 0;
+                }
+            }
+            window->mouseState.push_back(event->button.button);
             if (!window->mouseLockEnabled) {
                 window->mouseX = event->button.x;
                 window->mouseY = event->button.y;
@@ -240,7 +246,13 @@ int Window::eventWatcher(void* data, SDL_Event* event) {
         }
     } else if (event->type == SDL_MOUSEBUTTONUP) {
         if (event->button.windowID == SDL_GetWindowID(window->window)) {
-            window->mouseState[event->button.button] = false;
+            for (unsigned int i = 0; i < window->mouseState.size(); ++i) {
+                if (window->mouseState[i] == event->button.button) {
+                    std::swap(window->mouseState[i], window->mouseState.back());
+                    window->mouseState.pop_back();
+                    break;
+                }
+            }
             if (!window->mouseLockEnabled) {
                 window->mouseX = event->button.x;
                 window->mouseY = event->button.y;
@@ -264,14 +276,25 @@ int Window::eventWatcher(void* data, SDL_Event* event) {
         }
     } else if (event->type == SDL_KEYDOWN) {
         if (event->key.windowID == SDL_GetWindowID(window->window)) {
-            window->keyboardState[event->key.keysym.scancode] = true;
+            for (unsigned int i = 0; i < window->keyboardState.size(); ++i) {
+                if (window->keyboardState[i] == event->key.keysym.scancode) {
+                    return 0;
+                }
+            }
+            window->keyboardState.push_back(event->key.keysym.scancode);
             if (window->keyDownCallback != nullptr) {
                 window->keyDownCallback(static_cast<KEYCODE>(event->key.keysym.scancode));
             }
         }
     } else if (event->type == SDL_KEYUP) {
         if (event->key.windowID == SDL_GetWindowID(window->window)) {
-            window->keyboardState[event->key.keysym.scancode] = false;
+            for (unsigned int i = 0; i < window->keyboardState.size(); ++i) {
+                if (window->keyboardState[i] == event->key.keysym.scancode) {
+                    std::swap(window->keyboardState[i], window->keyboardState.back());
+                    window->keyboardState.pop_back();
+                    break;
+                }
+            }
             if (window->keyUpCallback != nullptr) {
                 window->keyUpCallback(static_cast<KEYCODE>(event->key.keysym.scancode));
             }
@@ -293,6 +316,7 @@ int Window::eventWatcher(void* data, SDL_Event* event) {
             }
         }
     }
+    
     return 0;
 }
 
@@ -305,21 +329,23 @@ std::string Window::getKeyNameFromCode(KEYCODE key) {
 }
 
 bool Window::isKeyPressed(KEYCODE key) {
-    std::unordered_map<int, bool>::iterator it = keyboardState.find(static_cast<int>(key));
-    if (it != keyboardState.end()) {
-        return it->second;
-    } else {
-        return false;
+    for (unsigned int i = 0; i < keyboardState.size(); ++i) {
+        if (keyboardState[i] == static_cast<int>(key)) {
+            return true;
+        }
     }
+
+    return false;
 }
 
 bool Window::isMouseDown(MOUSE_BUTTON button) {
-	std::unordered_map<int, bool>::iterator it = mouseState.find(static_cast<int>(button));
-    if (it != mouseState.end()) {
-        return it->second;
-    } else {
-        return false;
+	for (unsigned int i = 0; i < mouseState.size(); ++i) {
+        if (mouseState[i] == static_cast<int>(button)) {
+            return true;
+        }
     }
+
+    return false;
 }
 
 void Window::getMousePosition(double& x, double& y) {
