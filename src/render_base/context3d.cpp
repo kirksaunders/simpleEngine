@@ -4,6 +4,7 @@
 
 #include "objects/primitive3d.hpp"
 
+#include "render_base/exception.hpp"
 #include "render_base/context3d.hpp"
 #include "render_base/window.hpp"
 #include "render_base/texture.hpp"
@@ -14,7 +15,7 @@ using namespace Render3D;
 using namespace Math3D;
 
 Context3D::Context3D() {
-	window = NULL;
+	window = nullptr;
 }
 
 Context3D::Context3D(Window* win) {
@@ -23,67 +24,110 @@ Context3D::Context3D(Window* win) {
     window->makeCurrent();
 
     if (window->isChild()) {
-        std::cout << "Using existing managers of window " << window->parentWindow << " for child window " << win << std::endl;
+        std::cout << "Using existing manager of window " << window->parentWindow << " for child window " << win << std::endl;
         // use existing shader and texture managers
-        shaderManager = window->parentWindow->context->shaderManager;
         textureManager = window->parentWindow->context->textureManager;
-        std::cout << "Used managers successfully, use_count is " << shaderManager.use_count() << std::endl;
+        std::cout << "Used manager successfully, use_count is " << textureManager.use_count() << std::endl;
     } else {
-        std::cout << "Creating managers for window " << win << std::endl;
+        std::cout << "Creating manager for window " << win << std::endl;
         // create shader and texture managers
-        shaderManager = std::make_shared<ShaderManager>();
         textureManager = std::make_shared<TextureManager>();
-        std::cout << "Created managers successfully, use_count is " << shaderManager.use_count() << std::endl;
+        std::cout << "Created manager successfully, use_count is " << textureManager.use_count() << std::endl;
     }
 
-	if (!shaderManager->shaderDoesExist("defaultPerspective")) {
-		Shader perspective("res/defaultPerspective.vert", "res/defaultPerspective.frag");
-        perspective.prepareContent(window);
-		shaderManager->addShader("defaultPerspective", perspective);
-	} else {
-        shaderManager->getShader("defaultPerspective")->prepareContent(window);
-    }
-
-	if (!shaderManager->shaderDoesExist("imageRender")) {
-		Shader imageRender("res/imageRender.vert", "res/imageRender.frag");
-        imageRender.prepareContent(window);
-		shaderManager->addShader("imageRender", imageRender);
-	} else {
-        shaderManager->getShader("imageRender")->prepareContent(window);
-    }
-
-	if (!textureManager->textureDoesExist("defaultTexture")) {
-		TextureBuffer buff(1, 1, 4);
-		buff.setPixel(0, 0, Color(0, 0, 0, 0));
-
-		Texture defaultTexture(buff);
-        defaultTexture.prepareContent(win, textureManager.get());
-		textureManager->addTexture("defaultTexture", std::move(defaultTexture));
-	} else {
-        textureManager->getTexture("defaultTexture")->prepareContent(win, textureManager.get());
-    }
-    textureManager->addWindow(window);
+    textureManager->addWindow(*window);
+	textureManager->getDefaultTexture().prepareContent(*window, *textureManager.get());
 }
 
 Context3D::~Context3D() {
-    textureManager->removeWindow(window);
+	if (textureManager.use_count() == 1) {
+		textureManager->getDefaultTexture().destroyContent(*window, *textureManager.get());
+	}
+    textureManager->removeWindow(*window);
 }
 
 void Context3D::addObject(Primitive3D* object) {
-	objects.push_back(object);
-    object->prepareContent(window, textureManager.get());
+	std::pair<std::set<Primitive3D*>::iterator, bool> p = objects.insert(object);
+    if (p.second) {
+		window->makeCurrent();
+		object->prepareContent(*window, *textureManager.get());
+	}
 }
 
-Camera* Context3D::getCamera() {
+void Context3D::removeObject(Primitive3D* object) {
+	window->makeCurrent();
+	unsigned int numRemoved = objects.erase(object);
+    if (numRemoved > 0) {
+		object->destroyContent(*window, *textureManager.get());
+	}
+}
+
+void Context3D::clearObjects() {
+	window->makeCurrent();
+	for (std::set<Primitive3D*>::iterator it = objects.begin(); it != objects.end(); it++) {
+		(*it)->destroyContent(*window, *textureManager.get());
+	}
+	objects.clear();
+}
+
+void Context3D::addShader(Shader* shader) {
+	std::pair<std::set<Shader*>::iterator, bool> p = shaders.insert(shader);
+    if (p.second) {
+		window->makeCurrent();
+		shader->prepareContent(*window);
+	}
+}
+
+void Context3D::removeShader(Shader* shader) {
+	unsigned int numRemoved = shaders.erase(shader);
+    if (numRemoved > 0) {
+	    window->makeCurrent();
+		shader->destroyContent(*window);
+	}
+}
+
+void Context3D::clearShaders() {
+	window->makeCurrent();
+	for (std::set<Shader*>::iterator it = shaders.begin(); it != shaders.end(); it++) {
+		(*it)->destroyContent(*window);
+	}
+	shaders.clear();
+}
+
+void Context3D::addTexture(Texture* texture) {
+	std::pair<std::set<Texture*>::iterator, bool> p = textures.insert(texture);
+    if (p.second) {
+		window->makeCurrent();
+		texture->prepareContent(*window, *textureManager.get());
+	}
+}
+
+void Context3D::removeTexture(Texture* texture) {
+	unsigned int numRemoved = textures.erase(texture);
+    if (numRemoved > 0) {
+	    window->makeCurrent();
+		texture->destroyContent(*window, *textureManager.get());
+	}
+}
+
+void Context3D::clearTextures() {
+	window->makeCurrent();
+	for (std::set<Texture*>::iterator it = textures.begin(); it != textures.end(); it++) {
+		(*it)->destroyContent(*window, *textureManager.get());
+	}
+	textures.clear();
+}
+
+Camera* const Context3D::getCamera() {
 	return &camera;
 }
 
-TextureManager* Context3D::getTextureManager() {
+TextureManager* const Context3D::getTextureManager() {
 	return textureManager.get();
 }
 
 void Context3D::render() {
-	//window->makeCurrent();
+	window->makeCurrent();
 	float aspectRatio = (float) window->getWidth() / window->getHeight();
 
 	Matrix4x4 cameraCFrame = camera.getCFrame();
@@ -95,42 +139,36 @@ void Context3D::render() {
 	Color lightColor = Color(1, 1, 1);
 	Color ambient = Color(0.15, 0.15, 0.15);
 
-	Shader* currentShader = NULL;
-    Shader* defaultShader = shaderManager->getShader("defaultPerspective");
+	Shader* currentShader = nullptr;
 
-	Texture* defaultTex = textureManager->getTexture("defaultTexture");
+	Texture& defaultTex = textureManager->getDefaultTexture();
  
-	for (int i = 0; i < objects.size(); i++) {
-		Primitive3D* object = objects[i];
+	for (std::set<Primitive3D*>::iterator it = objects.begin(); it != objects.end(); it++) {
+		Primitive3D* object = *it;
 
-        Shader* shader = object->getShader() == NULL ? defaultShader : object->getShader();
+		if (object->getShader() == nullptr) {
+			throw Exception("Tried to render object with no shader set");
+		}
 
-		if (shader != currentShader) {
-			currentShader = shader;
-			currentShader->use(window);
+		if (object->getShader() != currentShader) {
+			currentShader = object->getShader();
+			currentShader->use(*window);
 
-			for (int i2 = 0; i2 < 5; i2++) { // reset textures
-				std::string name = "texture_diffuse";
-				name += std::to_string(i2 + 1);
-				defaultTex->use(currentShader, window, textureManager.get(), name.c_str());
-				name = "texture_specular";
-				name += std::to_string(i2 + 1);
-				defaultTex->use(currentShader, window, textureManager.get(), name.c_str());
-			}
+			defaultTex.resetDiffAndSpec(*currentShader, *window, *textureManager.get()); // reset textures
 
 			// Scene Lighting Data
-			currentShader->setVariable(window, "lightPos", lightPosition);
-			currentShader->setVariable(window, "lightColor", lightColor);
-			currentShader->setVariable(window, "ambientColor", ambient);
+            currentShader->getVariable<Vector4>("lightPos")->setValue(*window, lightPosition);
+            currentShader->getVariable<Color>("lightColor")->setValue(*window, lightColor);
+            currentShader->getVariable<Color>("ambientColor")->setValue(*window, ambient);
 
 			// Camera Data
-			currentShader->setVariable(window, "cameraPos", cameraPosition);
-			currentShader->setVariable(window, "cameraInverse", cameraInverse);
+            currentShader->getVariable<Vector4>("cameraPos")->setValue(*window, cameraPosition);
+            currentShader->getVariable<Matrix4x4>("cameraInverse")->setValue(*window, cameraInverse);
 
 			// Projection Matrix
-			currentShader->setVariable(window, "projection", projection);
+            currentShader->getVariable<Matrix4x4>("projection")->setValue(*window, projection);
 		}
-		object->render(currentShader, window, textureManager.get());
+		object->render(*window, *textureManager.get());
 	}
 
 	glBindVertexArray(0);
@@ -138,10 +176,12 @@ void Context3D::render() {
 }
 
 void Context3D::renderTexture(Texture& tex) {
-	//window->makeCurrent();
-    tex.prepareContent(window, textureManager.get());
-	Shader* shader = tex.getShader() == NULL ? shaderManager->getShader("imageRender") : tex.getShader();
-	shader->use(window);
-	tex.render(shader, window, textureManager.get());
+	window->makeCurrent();
+	if (tex.getShader() == nullptr) {
+		throw Exception("Tried to render texture with no shader set");
+	}
+	tex.getShader()->use(*window);
+	tex.render(*window, *textureManager.get());
+	glBindVertexArray(0);
 	glUseProgram(0);
 }

@@ -7,6 +7,7 @@
 #include "math/matrix4x4.hpp"
 
 #include "render_base/color.hpp"
+#include "render_base/shadervariable.hpp"
 
 namespace Render3D {
     // forward declarations
@@ -31,19 +32,25 @@ namespace Render3D {
 
 		virtual Color getColor() const;
 
-		virtual void setShader(Shader* s);
+		virtual void setShader(Shader* const s);
 
 		virtual Shader* const getShader() const;
 
-		virtual void render(Shader* const shader, Window* const win, TextureManager* const textureManager) = 0;
+		virtual void render(const Window& win, TextureManager& textureManager) = 0;
 
-        virtual void prepareContent(Window* win, TextureManager* textureManager) = 0;
+        virtual void prepareContent(const Window& win, TextureManager& textureManager) = 0;
+        virtual void destroyContent(const Window& win, TextureManager& textureManager) = 0;
 
 	 protected:
 		Shader* shader;
 		Math3D::Vector4 size;
 		Math3D::Matrix4x4 cframe;
 		Color color;
+
+        ShaderVariable<Math3D::Matrix4x4>* modelCFrameVariable;
+        ShaderVariable<Math3D::Matrix4x4>* modelRotationVariable;
+        ShaderVariable<Math3D::Vector4>* modelSizeVariable;
+        ShaderVariable<Color>* modelColorVariable;
 	};
 }
 

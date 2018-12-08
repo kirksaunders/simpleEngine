@@ -97,10 +97,12 @@ Cuboid::Cuboid() : Primitive3D() {
 
 }
 
-void Cuboid::generateBuffers(GLuint clusterID) {
-    std::unordered_map<GLuint, BufferPair>::iterator it = BufferObjects.find(clusterID);
-	if (it != BufferObjects.end()) {
-		return;
+BufferPair Cuboid::generateBuffers(GLuint clusterID) {
+	for (unsigned int i = 0; i < bufferObjects.size(); ++i) {
+		if (bufferObjects[i].first == clusterID) {
+			++(bufferObjects[i].second.useCount);
+			return bufferObjects[i].second;
+		}
 	}
 
     GLfloat verts[108];
@@ -121,29 +123,47 @@ void Cuboid::generateBuffers(GLuint clusterID) {
 	}
 
     // Generate GL Buffers
-    GLuint VBO, NBO;
+	BufferPair pair;
 
-	glGenBuffers(1, &VBO);
-	glGenBuffers(1, &NBO);
+	glGenBuffers(1, &pair.first);
+	glGenBuffers(1, &pair.second);
 
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, pair.first);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
 
-	glBindBuffer(GL_ARRAY_BUFFER, NBO);
+	glBindBuffer(GL_ARRAY_BUFFER, pair.second);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(norms), norms, GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    BufferObjects.insert(std::pair<GLuint, BufferPair>(clusterID, BufferPair(VBO, NBO)));
+	pair.useCount = 1;
+    bufferObjects.push_back(std::pair<GLuint, BufferPair>(clusterID, pair));
+
+	return pair;
 }
 
-void Cuboid::generateVertexArrayObject(GLuint clusterID, Window* win) {
-    std::unordered_map<Window*, GLuint>::iterator it = VAOs.find(win);
-	if (it != VAOs.end()) {
-		return;
+void Cuboid::destroyBuffers(GLuint clusterID) {
+	for (unsigned int i = 0; i < bufferObjects.size(); ++i) {
+		if (bufferObjects[i].first == clusterID) {
+			if (--(bufferObjects[i].second.useCount) == 0) {
+				glDeleteBuffers(1, &bufferObjects[i].second.first);
+				glDeleteBuffers(1, &bufferObjects[i].second.second);
+				std::swap(bufferObjects[i], bufferObjects.back());
+				bufferObjects.pop_back();
+			}
+			return;
+		}
+	}
+}
+
+void Cuboid::generateVertexArrayObject(const Window& win) {
+	for (unsigned int i = 0; i < VAOs.size(); ++i) {
+		if (VAOs[i].first == &win) {
+			return;
+		}
 	}
 
-    std::unordered_map<GLuint, BufferPair>::iterator it2 = BufferObjects.find(clusterID);
+    BufferPair buffers = generateBuffers(win.getClusterID());
 
 	GLuint VAO;
 	glGenVertexArrays(1, &VAO);
@@ -151,12 +171,12 @@ void Cuboid::generateVertexArrayObject(GLuint clusterID, Window* win) {
 	glBindVertexArray(VAO);
 
     // Bind VBO
-	glBindBuffer(GL_ARRAY_BUFFER, it2->second.first);
+	glBindBuffer(GL_ARRAY_BUFFER, buffers.first);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
 
     // Bind NBO
-	glBindBuffer(GL_ARRAY_BUFFER, it2->second.second);
+	glBindBuffer(GL_ARRAY_BUFFER, buffers.second);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
 
@@ -164,13 +184,25 @@ void Cuboid::generateVertexArrayObject(GLuint clusterID, Window* win) {
 
 	glBindVertexArray(0);
 
-	VAOs.insert(std::pair<Window*, GLuint>(win, VAO));
+	VAOs.push_back(std::pair<const Window*, GLuint>(&win, VAO));
 }
 
-GLuint Cuboid::getVertexArrayObject(Window* win) {
-	std::unordered_map<Window*, GLuint>::iterator it = VAOs.find(win);
-	if (it != VAOs.end()) {
-		return it->second;
+void Cuboid::destroyVertexArrayObject(const Window& win) {
+	for (unsigned int i = 0; i < VAOs.size(); ++i) {
+		if (VAOs[i].first == &win) {
+			glDeleteVertexArrays(1, &VAOs[i].second);
+			std::swap(VAOs[i], VAOs.back());
+			VAOs.pop_back();
+			return;
+		}
+	}
+}
+
+GLuint Cuboid::getVertexArrayObject(const Window& win) {
+	for (unsigned int i = 0; i < VAOs.size(); ++i) {
+		if (VAOs[i].first == &win) {
+			return VAOs[i].second;
+		}
 	}
 
     return 0;
@@ -180,23 +212,23 @@ int Cuboid::getVertexCount() {
 	return 36;
 }
 
-void Cuboid::render(Shader* const shader, Window* const win, TextureManager* const textureManager) {
+void Cuboid::render(const Window& win, TextureManager& textureManager) {
 	Matrix4x4 rotation = cframe.rotation();
 
-	shader->setVariable(win, "modelCFrame", cframe);
-	shader->setVariable(win, "modelRotation", rotation);
-	shader->setVariable(win, "modelSize", size);
-	shader->setVariable(win, "modelColor", color);
+	modelCFrameVariable->setValue(win, cframe);
+	modelRotationVariable->setValue(win, rotation);
+	modelSizeVariable->setValue(win, size);
+	modelColorVariable->setValue(win, color);
 
-	GLuint VAO = getVertexArrayObject(win);
-	glBindVertexArray(VAO);
+	glBindVertexArray(getVertexArrayObject(win));
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 }
 
-void Cuboid::prepareContent(Window* win, TextureManager* textureManager) {
-    win->makeCurrent();
+void Cuboid::prepareContent(const Window& win, TextureManager& textureManager) {
+    generateVertexArrayObject(win);
+}
 
-    GLuint clusterID = win->getClusterID();
-    generateBuffers(clusterID);
-    generateVertexArrayObject(clusterID, win);
+void Cuboid::destroyContent(const Window& win, TextureManager& textureManager) {
+	destroyVertexArrayObject(win);
+	destroyBuffers(win.getClusterID());
 }

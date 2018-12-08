@@ -17,18 +17,20 @@ Mesh::Mesh(const std::vector<Vector4>& verts, const std::vector<Vector4>& norms,
     numVertices = indices.size();
 }
 
-void Mesh::generateBuffers(GLuint clusterID) {
-    std::unordered_map<GLuint, BufferTriple>::iterator it = BufferObjects.find(clusterID);
-	if (it != BufferObjects.end()) {
-		return;
+BufferTriple Mesh::generateBuffers(GLuint clusterID) {
+	for (unsigned int i = 0; i < bufferObjects.size(); ++i) {
+		if (bufferObjects[i].first == clusterID) {
+			++(bufferObjects[i].second.useCount);
+			return bufferObjects[i].second;
+		}
 	}
 
-    GLuint VBO, NBO, TBO;
+	BufferTriple triple;
 
     // generate and load buffers
-	glGenBuffers(1, &VBO);
-	glGenBuffers(1, &NBO);
-	glGenBuffers(1, &TBO);
+	glGenBuffers(1, &triple.first);
+	glGenBuffers(1, &triple.second);
+	glGenBuffers(1, &triple.third);
 
     GLfloat* verticesNew = new GLfloat[3 * numVertices];
 
@@ -40,7 +42,7 @@ void Mesh::generateBuffers(GLuint clusterID) {
         verticesNew[i * 3 + 2] = vert[2];
     }
 
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, triple.first);
     glBufferData(GL_ARRAY_BUFFER, 3 * sizeof(GLfloat) * numVertices, verticesNew, GL_STATIC_DRAW);
     delete[] verticesNew;
 
@@ -54,7 +56,7 @@ void Mesh::generateBuffers(GLuint clusterID) {
         normalsNew[i * 3 + 2] = vert[2];
     }
 
-    glBindBuffer(GL_ARRAY_BUFFER, NBO);
+    glBindBuffer(GL_ARRAY_BUFFER, triple.second);
     glBufferData(GL_ARRAY_BUFFER, 3 * sizeof(GLfloat) * numVertices, normalsNew, GL_STATIC_DRAW);
     delete[] normalsNew;
 
@@ -67,22 +69,41 @@ void Mesh::generateBuffers(GLuint clusterID) {
         texCoordsNew[i * 2 + 1] = tex.y;
     }
 
-    glBindBuffer(GL_ARRAY_BUFFER, TBO);
+    glBindBuffer(GL_ARRAY_BUFFER, triple.third);
     glBufferData(GL_ARRAY_BUFFER, 2 * sizeof(GLfloat) * numVertices, texCoordsNew, GL_STATIC_DRAW);
     delete[] texCoordsNew;
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0); // make sure no buffer is bound
 
-    BufferObjects.insert(std::pair<GLuint, BufferTriple>(clusterID, BufferTriple(VBO, NBO, TBO)));
+	triple.useCount = 1;
+    bufferObjects.push_back(std::pair<GLuint, BufferTriple>(clusterID, triple));
+
+	return triple;
 }
 
-void Mesh::generateVertexArrayObject(GLuint clusterID, Window* win) {
-    std::unordered_map<Window*, GLuint>::iterator it = VAOs.find(win);
-	if (it != VAOs.end()) {
-		return;
+void Mesh::destroyBuffers(GLuint clusterID) {
+	for (unsigned int i = 0; i < bufferObjects.size(); ++i) {
+		if (bufferObjects[i].first == clusterID) {
+			if (--(bufferObjects[i].second.useCount) == 0) {
+				glDeleteBuffers(1, &bufferObjects[i].second.first);
+				glDeleteBuffers(1, &bufferObjects[i].second.second);
+				glDeleteBuffers(1, &bufferObjects[i].second.third);
+				std::swap(bufferObjects[i], bufferObjects.back());
+				bufferObjects.pop_back();
+			}
+			return;
+		}
+	}
+}
+
+void Mesh::generateVertexArrayObject(const Window& win) {
+    for (unsigned int i = 0; i < VAOs.size(); ++i) {
+		if (VAOs[i].first == &win) {
+			return;
+		}
 	}
 
-    std::unordered_map<GLuint, BufferTriple>::iterator it2 = BufferObjects.find(clusterID);
+    BufferTriple buffers = generateBuffers(win.getClusterID());
 
 	GLuint VAO;
 	glGenVertexArrays(1, &VAO);
@@ -90,17 +111,17 @@ void Mesh::generateVertexArrayObject(GLuint clusterID, Window* win) {
 	glBindVertexArray(VAO);
 
     // Bind VBO
-	glBindBuffer(GL_ARRAY_BUFFER, std::get<0>(it2->second));
+	glBindBuffer(GL_ARRAY_BUFFER, buffers.first);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
 
     // Bind NBO
-	glBindBuffer(GL_ARRAY_BUFFER, std::get<1>(it2->second));
+	glBindBuffer(GL_ARRAY_BUFFER, buffers.second);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
 
     // Bind TBO
-	glBindBuffer(GL_ARRAY_BUFFER, std::get<2>(it2->second));
+	glBindBuffer(GL_ARRAY_BUFFER, buffers.third);
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)0);
 
@@ -108,75 +129,81 @@ void Mesh::generateVertexArrayObject(GLuint clusterID, Window* win) {
 
 	glBindVertexArray(0);
 
-	VAOs.insert(std::pair<Window*, GLuint>(win, VAO));
+	VAOs.push_back(std::pair<const Window*, GLuint>(&win, VAO));
 }
 
-GLuint Mesh::getVertexArrayObject(Window* win) {
-	std::unordered_map<Window*, GLuint>::iterator it = VAOs.find(win);
-	if (it != VAOs.end()) {
-		return it->second;
+void Mesh::destroyVertexArrayObject(const Window& win) {
+	for (unsigned int i = 0; i < VAOs.size(); ++i) {
+		if (VAOs[i].first == &win) {
+			glDeleteVertexArrays(1, &VAOs[i].second);
+			std::swap(VAOs[i], VAOs.back());
+			VAOs.pop_back();
+			return;
+		}
+	}
+}
+
+GLuint Mesh::getVertexArrayObject(const Window& win) {
+	for (unsigned int i = 0; i < VAOs.size(); ++i) {
+		if (VAOs[i].first == &win) {
+			return VAOs[i].second;
+		}
 	}
 
-    return -1;
+    return 0;
 }
 
 int Mesh::getVertexCount() {
 	return numVertices;
 }
 
-void Mesh::bindTextures(Shader* shader, Window* win, TextureManager* textureManager) {
-	GLuint diffuseNr = 0;
-	GLuint specularNr = 0;
+void Mesh::bindTextures(Shader& shader, const Window& win, TextureManager& textureManager) {
+	unsigned int diffuseNr = 0;
+	unsigned int specularNr = 0;
     TextureData* tex;
-	for (GLuint i = 0; i < textures.size(); i++) {
+	for (unsigned int i = 0; i < textures.size(); i++) {
 		tex = &textures[i];
-		std::string number;
-		std::string name = tex->type;
-		if (name == "texture_diffuse") {
-			number = std::to_string(++diffuseNr);
-		} else if (name == "texture_specular") {
-			number = std::to_string(++specularNr);
+		if (tex->type == "texture_diffuse") {
+			tex->tex->useDiffuse(shader, win, textureManager, diffuseNr);
+			diffuseNr++;
+		} else if (tex->type == "texture_specular") {
+			tex->tex->useSpecular(shader, win, textureManager, specularNr);
+			specularNr++;
 		}
-		tex->tex->use(shader, win, textureManager, (name + number).c_str());
 	}
 }
 
-void Mesh::unbindTextures(Shader* shader, Window* win, TextureManager* textureManager) {
-	Texture* defaultTex = textureManager->getTexture("defaultTexture");
-	GLuint diffuseNr = 0;
-	GLuint specularNr = 0;
+void Mesh::unbindTextures(Shader& shader, const Window& win, TextureManager& textureManager) {
+	Texture& defaultTex = textureManager.getDefaultTexture();
+	unsigned int diffuseNr = 0;
+	unsigned int specularNr = 0;
     TextureData* tex;
-	for (GLuint i = 0; i < textures.size(); i++) {
+	for (unsigned int i = 0; i < textures.size(); i++) {
 		tex = &textures[i];
-		std::string number;
-		std::string name = tex->type;
-		if (name == "texture_diffuse") {
-			number = std::to_string(++diffuseNr);
-		} else if (name == "texture_specular") {
-			number = std::to_string(++specularNr);
+		if (tex->type == "texture_diffuse") {
+			defaultTex.useDiffuse(shader, win, textureManager, diffuseNr);
+			diffuseNr++;
+		} else if (tex->type == "texture_specular") {
+			defaultTex.useSpecular(shader, win, textureManager, specularNr);
+			specularNr++;
 		}
-		defaultTex->use(shader, win, textureManager, (name + number).c_str());
 	}
 }
 
-void Mesh::render(Shader* const shader, Window* const win, TextureManager* const textureManager) {
+void Mesh::render(Shader& shader, const Window& win, TextureManager& textureManager) {
 	bindTextures(shader, win, textureManager);
 
-	GLuint VAO = getVertexArrayObject(win);
-	glBindVertexArray(VAO);
+	glBindVertexArray(getVertexArrayObject(win));
 	glDrawArrays(GL_TRIANGLES, 0, numVertices);
 	
 	unbindTextures(shader, win, textureManager);
 }
 
-void Mesh::prepareContent(Window* win, TextureManager* textureManager) {
-    win->makeCurrent();
+void Mesh::prepareContent(const Window& win, TextureManager& textureManager) {
+    generateVertexArrayObject(win);
+}
 
-    GLuint clusterID = win->getClusterID();
-    generateBuffers(clusterID);
-    generateVertexArrayObject(clusterID, win);
-
-    for (unsigned int i = 0; i < textures.size(); i++) {
-        textures[i].tex->prepareContent(win, textureManager);
-    }
+void Mesh::destroyContent(const Window& win, TextureManager& textureManager) {
+	destroyVertexArrayObject(win);
+	destroyBuffers(win.getClusterID());
 }

@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <utility>
+#include <iostream>
 
 #include <SOIL/SOIL.h>
 
@@ -16,13 +17,15 @@ Texture::Texture(int w, int h) {
 	height = h;
     depth = 4;
 	textureName = "tex";
-	shader = NULL;
-    image = NULL;
+	shader = nullptr;
+    image = nullptr;
+	textureVariable = nullptr;
 }
 
 Texture::Texture(const char *filePath) {
 	textureName = "tex";
-	shader = NULL;
+	shader = nullptr;
+	textureVariable = nullptr;
 
 	image = SOIL_load_image(filePath, &width, &height, 0, SOIL_LOAD_RGBA);
     depth = 4;
@@ -33,7 +36,8 @@ Texture::Texture(const char *filePath) {
 
 Texture::Texture(const TextureBuffer& buff) {
     textureName = "tex";
-    shader = NULL;
+    shader = nullptr;
+	textureVariable = nullptr;
 
     width = buff.getWidth();
     height = buff.getHeight();
@@ -132,58 +136,84 @@ const char* Texture::getName() {
 
 void Texture::setShader(Shader* s) {
     shader = s;
+
+	if (shader != nullptr) {
+		textureVariable = shader->getVariable<int>(textureName);
+	} else {
+		textureVariable = nullptr;
+	}
 }
 
 Shader* const Texture::getShader() {
 	return shader;
 }
 
-void Texture::use(Shader* shader, Window* win, TextureManager* textureManager) {
-    GLuint clusterID = win->getClusterID();
+void Texture::use(const Window& win, TextureManager& textureManager) {
+    GLuint clusterID = win.getClusterID();
     GLuint textureID = getTextureID(clusterID);
 
-	int location = getLocation(textureID, win, textureManager);
+	int location = textureManager.getTextureLocation(textureID, win);
 	if (location == -1) {
 		location = useNextLocation(textureID, win, textureManager);
 	}
-	shader->setVariable(win, textureName.c_str(), location);
+    textureVariable->setValue(win, location);
 }
 
-void Texture::use(Shader* shader, Window* win, TextureManager* textureManager, const char* name) {
-    GLuint clusterID = win->getClusterID();
+void Texture::useDiffuse(Shader& shader, const Window& win, TextureManager& textureManager, unsigned int num) {
+	GLuint clusterID = win.getClusterID();
     GLuint textureID = getTextureID(clusterID);
 
-	int location = getLocation(textureID, win, textureManager);
+	int location = textureManager.getTextureLocation(textureID, win);
 	if (location == -1) {
 		location = useNextLocation(textureID, win, textureManager);
 	}
-	shader->setVariable(win, name, location);
+	
+    shader.getDiffuseVariable(num)->setValue(win, location);
 }
 
-int Texture::getLocation(GLuint textureID, Window* win, TextureManager* textureManager) {
-	for (int i = 0; i < textureManager->getNumberTextures(win); i++) {
-		if (textureManager->getActiveTexture(i, win) == textureID) {
-			return i;
-		}
+void Texture::useSpecular(Shader& shader, const Window& win, TextureManager& textureManager, unsigned int num) {
+	GLuint clusterID = win.getClusterID();
+    GLuint textureID = getTextureID(clusterID);
+
+	int location = textureManager.getTextureLocation(textureID, win);
+	if (location == -1) {
+		location = useNextLocation(textureID, win, textureManager);
 	}
 
-	return -1;
+    shader.getSpecularVariable(num)->setValue(win, location);
 }
 
-int Texture::useNextLocation(GLuint textureID, Window* win, TextureManager* textureManager) {
-	int location = textureManager->getNumberTextures(win);
+void Texture::resetDiffAndSpec(Shader& shader, const Window& win, TextureManager& textureManager) {
+	GLuint clusterID = win.getClusterID();
+    GLuint textureID = getTextureID(clusterID);
+
+	int location = textureManager.getTextureLocation(textureID, win);
+	if (location == -1) {
+		location = useNextLocation(textureID, win, textureManager);
+	}
+
+	for (unsigned int i = 0; i < TextureManager::MAX_MATERIAL_TEXTURES; i++) {
+    	shader.getDiffuseVariable(i)->setValue(win, location);
+    	shader.getSpecularVariable(i)->setValue(win, location);
+	}
+}
+
+int Texture::useNextLocation(GLuint textureID, const Window& win, TextureManager& textureManager) {
+	int location = textureManager.makeTextureActive(textureID, win);
 	glActiveTexture(GL_TEXTURE0 + location);
 	glBindTexture(GL_TEXTURE_2D, textureID);
-	textureManager->setActive(textureID, location, win);
 	glActiveTexture(GL_TEXTURE0);
+
 	return location;
 }
 
-void Texture::generateBuffers(GLuint clusterID) {
-    std::unordered_map<GLuint, BufferPair>::iterator it = bufferObjects.find(clusterID);
-    if (it != bufferObjects.end()) {
-        return;
-    }
+BufferPair Texture::generateBuffers(GLuint clusterID) {
+	for (unsigned int i = 0; i < bufferObjects.size(); ++i) {
+		if (bufferObjects[i].first == clusterID) {
+			++(bufferObjects[i].second.useCount);
+			return bufferObjects[i].second;
+		}
+	}
 
 	GLfloat vertices[12];
 	vertices[0] = -1.0;
@@ -223,31 +253,51 @@ void Texture::generateBuffers(GLuint clusterID) {
 	texCoords[10] = 0.0;
 	texCoords[11] = 1.0;
 
-    GLuint VBO, TBO;
+    BufferPair pair;
 
-    glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glGenBuffers(1, &pair.first);
+	glBindBuffer(GL_ARRAY_BUFFER, pair.first);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-	glGenBuffers(1, &TBO);
-	glBindBuffer(GL_ARRAY_BUFFER, TBO);
+	glGenBuffers(1, &pair.second);
+	glBindBuffer(GL_ARRAY_BUFFER, pair.second);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(texCoords), texCoords, GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    bufferObjects.insert(std::pair<GLuint, BufferPair>(clusterID, BufferPair(VBO, TBO)));
+	pair.useCount = 1;
+    bufferObjects.push_back(std::pair<GLuint, BufferPair>(clusterID, pair));
+
+    return pair;
+}
+
+void Texture::destroyBuffers(GLuint clusterID) {
+	for (unsigned int i = 0; i < bufferObjects.size(); ++i) {
+		if (bufferObjects[i].first == clusterID) {
+			if (--(bufferObjects[i].second.useCount) == 0) {
+				glDeleteBuffers(1, &bufferObjects[i].second.first);
+				glDeleteBuffers(1, &bufferObjects[i].second.second);
+				std::swap(bufferObjects[i], bufferObjects.back());
+				bufferObjects.pop_back();
+			}
+			return;
+		}
+	}
 }
 
 void Texture::generateTexture(GLuint clusterID) {
-    std::unordered_map<GLuint, GLuint>::iterator it = IDs.find(clusterID);
-    if (it != IDs.end()) {
-        return;
-    }
+	for (unsigned int i = 0; i < IDs.size(); ++i) {
+		if (IDs[i].first == clusterID) {
+			++(IDs[i].second.useCount);
+			
+			return;
+		}
+	}
 
-    GLuint textureID;
+    TextureID textureID;
 
-    glGenTextures(1, &textureID);
-    glBindTexture(GL_TEXTURE_2D, textureID);
+    glGenTextures(1, &textureID.id);
+    glBindTexture(GL_TEXTURE_2D, textureID.id);
     if (depth == 3) {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
     } else {
@@ -262,27 +312,42 @@ void Texture::generateTexture(GLuint clusterID) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-    IDs.insert(std::pair<GLuint, GLuint>(clusterID, textureID));
+    textureID.useCount = 1;
+    IDs.push_back(std::pair<GLuint, TextureID>(clusterID, std::move(textureID)));
 }
 
-void Texture::generateVertexArrayObject(GLuint clusterID, Window* win) {
-    std::unordered_map<Window*, GLuint>::iterator it = VAOs.find(win);
-    if (it != VAOs.end()) {
-        return;
-    }
+void Texture::destroyTexture(GLuint clusterID) {
+	for (unsigned int i = 0; i < IDs.size(); ++i) {
+		if (IDs[i].first == clusterID) {
+			if (--(IDs[i].second.useCount) == 0) {
+				glDeleteTextures(1, &IDs[i].second.id);
+				std::swap(IDs[i], IDs.back());
+				IDs.pop_back();
+			}
+			return;
+		}
+	}
+}
 
-    std::unordered_map<GLuint, BufferPair>::iterator it2 = bufferObjects.find(clusterID);
+void Texture::generateVertexArrayObject(const Window& win) {
+	for (unsigned int i = 0; i < VAOs.size(); ++i) {
+		if (VAOs[i].first == &win) {
+			return;
+		}
+	}
+
+    BufferPair pair = generateBuffers(win.getClusterID());
 
     GLuint VAO;
 
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
 
-	glBindBuffer(GL_ARRAY_BUFFER, it2->second.first);
+	glBindBuffer(GL_ARRAY_BUFFER, pair.first);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)0);
 
-	glBindBuffer(GL_ARRAY_BUFFER, it2->second.second);
+	glBindBuffer(GL_ARRAY_BUFFER, pair.second);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)0);
 
@@ -290,43 +355,58 @@ void Texture::generateVertexArrayObject(GLuint clusterID, Window* win) {
 
 	glBindVertexArray(0);
 
-	VAOs.insert(std::pair<Window*, GLuint>(win, VAO));
+	VAOs.push_back(std::pair<const Window*, GLuint>(&win, VAO));
+}
+
+void Texture::destroyVertexArrayObject(const Window& win) {
+	for (unsigned int i = 0; i < VAOs.size(); ++i) {
+		if (VAOs[i].first == &win) {
+			glDeleteVertexArrays(1, &VAOs[i].second);
+			std::swap(VAOs[i], VAOs.back());
+			VAOs.pop_back();
+			return;
+		}
+	}
 }
 
 GLuint Texture::getTextureID(GLuint clusterID) {
-	std::unordered_map<GLuint, GLuint>::iterator it = IDs.find(clusterID);
-	if (it != IDs.end()) {
-		return it->second;
+	for (unsigned int i = 0; i < IDs.size(); ++i) {
+		if (IDs[i].first == clusterID) {
+			return IDs[i].second.id;
+		}
 	}
 	
 	return 0;
 }
 
-GLuint Texture::getVertexArrayObject(Window* win) {
-	std::unordered_map<Window*, GLuint>::iterator it = VAOs.find(win);
-	if (it != VAOs.end()) {
-		return it->second;
+GLuint Texture::getVertexArrayObject(const Window& win) {
+	for (unsigned int i = 0; i < VAOs.size(); ++i) {
+		if (VAOs[i].first == &win) {
+			return VAOs[i].second;
+		}
 	}
 	
 	return 0;
 }
 
-void Texture::render(Shader* shader, Window* window, TextureManager* textureManager) {
-	use(shader, window, textureManager);
+void Texture::render(const Window& win, TextureManager& textureManager) {
+	use(win, textureManager);
 
-	GLuint VAO = getVertexArrayObject(window);
-	glBindVertexArray(VAO);
+	glBindVertexArray(getVertexArrayObject(win));
 	glDrawArrays(GL_TRIANGLES, 0, 6);
-	glBindVertexArray(0);
 }
 
-void Texture::prepareContent(Window* win, TextureManager* textureManager) {
-    win->makeCurrent();
+void Texture::prepareContent(const Window& win, TextureManager& textureManager) {
+    generateTexture(win.getClusterID());
+    generateVertexArrayObject(win);
+}
 
-    GLuint clusterID = win->getClusterID();
-    generateBuffers(clusterID);
-    generateTexture(clusterID);
-    generateVertexArrayObject(clusterID, win);
+void Texture::destroyContent(const Window& win, TextureManager& textureManager) {
+    GLuint clusterID = win.getClusterID();
+    textureManager.makeTextureInactive(getTextureID(clusterID), win);
+    destroyVertexArrayObject(win);
+	destroyBuffers(clusterID);
+    destroyTexture(clusterID);
 }
 
 void Texture::copy(const Texture& other) {
@@ -335,14 +415,15 @@ void Texture::copy(const Texture& other) {
     depth = other.depth;
     textureName = other.textureName;
     shader = other.shader;
+	textureVariable = other.textureVariable;
     bufferObjects = other.bufferObjects;
     VAOs = other.VAOs;
     IDs = other.IDs;
-    if (other.image != NULL) {
+    if (other.image != nullptr) {
         image = new GLubyte[width * height * depth];
         std::copy(other.image, other.image + (width * height * depth), image);
     } else {
-        image = NULL;
+        image = nullptr;
     }
 }
 
@@ -351,6 +432,7 @@ void Texture::move(Texture& other) {
     height = other.height;
     depth = other.depth;
     shader = other.shader;
+	textureVariable = other.textureVariable;
     textureName = std::move(other.textureName);
     bufferObjects = std::move(other.bufferObjects);
     VAOs = std::move(other.VAOs);
@@ -363,15 +445,16 @@ void Texture::initialize() {
 	height = 0;
 	depth = 4;
 	textureName = "tex";
-	shader = NULL;
+	shader = nullptr;
+	textureVariable = nullptr;
 	bufferObjects.clear();
 	VAOs.clear();
 	IDs.clear();
-	image = NULL;
+	image = nullptr;
 }
 
 void Texture::destroy() {
-    if (image != NULL) {
+    if (image != nullptr) {
         delete[] image;
     }
 }

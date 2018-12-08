@@ -31,11 +31,12 @@ namespace Render3D {
 		typedef std::function<void(KEYCODE)> KeyCallback;
 		typedef std::function<void(int, int, int, int)> MouseMoveCallback;
 		typedef std::function<void(int, int)> WindowResizeCallback;
-		Window(int width, int height, const char* title, Window* parent = NULL);
+
+		Window() = delete;
+		Window(int width, int height, const char* title, Window* parent = nullptr);
 
 		~Window();
 
-		void activate();
 		void makeCurrent(bool isCurrent = true);
 		void updateViewport();
 

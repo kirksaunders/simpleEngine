@@ -1,7 +1,7 @@
 #ifndef CONTEXT3D_HPP
 #define CONTEXT3D_HPP
 
-#include <vector>
+#include <set>
 #include <memory>
 
 #include "render_base/camera.hpp"
@@ -13,6 +13,7 @@ namespace Render3D {
     class Window;
     class Texture;
     class Primitive3D;
+    class Shader;
 
 	class Context3D {
 	 public:
@@ -21,9 +22,19 @@ namespace Render3D {
         ~Context3D();
 
 		void addObject(Primitive3D* object);
+		void removeObject(Primitive3D* object);
+		void clearObjects();
 
-		Camera* getCamera();
-		TextureManager* getTextureManager();
+		void addShader(Shader* shader);
+		void removeShader(Shader* Shader);
+		void clearShaders();
+
+        void addTexture(Texture* texture);
+		void removeTexture(Texture* texture);
+		void clearTextures();
+
+		Camera* const getCamera();
+		TextureManager* const getTextureManager();
 
 		void render();
 
@@ -31,10 +42,11 @@ namespace Render3D {
 
 	 private:
 		Window* window;
-        std::shared_ptr<ShaderManager> shaderManager;
         std::shared_ptr<TextureManager> textureManager;
 
-		std::vector<Primitive3D*> objects;
+		std::set<Primitive3D*> objects;
+		std::set<Shader*> shaders;
+		std::set<Texture*> textures;
 
 		Camera camera;
 	};

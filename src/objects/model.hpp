@@ -22,9 +22,10 @@ namespace Render3D {
 
 		Model(const char *filePath);
 
-		void render(Shader* const shader, Window* const win, TextureManager* const textureManager);
+		void render(const Window& win, TextureManager& textureManager);
 
-        void prepareContent(Window* win, TextureManager* textureManager);
+        void prepareContent(const Window& win, TextureManager& textureManager);
+        void destroyContent(const Window& win, TextureManager& textureManager);
 
 	 private:
 		std::string directory;

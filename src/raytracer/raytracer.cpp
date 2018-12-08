@@ -9,8 +9,8 @@ using namespace Math3D;
 void raytracer() {
 	using namespace std;
 
-	Window* window = new Window(WIDTH, HEIGHT, "Testing");
-	Context3D* context = window->getContext();
+	Window window(WIDTH, HEIGHT, "Testing");
+	Context3D* context = window.getContext();
 	Camera* camera = context->getCamera();
 	Matrix4x4 camCFr = camera->getCFrame();
 	//Matrix4x4 camInverse = camCFr.inverse();
@@ -46,19 +46,28 @@ void raytracer() {
 		}
 	}
 
-	Texture tex(buffer);
+	Shader defaultShader = Shader::defaultImage();
+	context->addShader(&defaultShader);
 
-	while (window->isActive()) {
-		window->updateViewport();
-		window->clear();
+	Texture tex(buffer);
+	context->addTexture(&tex);
+	tex.setShader(&defaultShader);
+
+	while (window.isActive()) {
+		window.updateViewport();
+		window.clear();
 
 		context->renderTexture(tex);
 
-		window->update();
-		window->pollEvents();
+		window.update();
+		window.pollEvents();
 	}
 
-	delete window;
+	window.close(); // window must be closed to clean up resources it uses
+    /* WARNING: closing a window requires the objects it currently uses to still exist,
+                so do NOT delete an object or let it go out of scope until it has been removed
+                from all contexts or all windows that use it have been closed. in the future I will
+                likely implement the Context3D to use shared_ptrs instead of raw c pointers */
 
 	SDL_Quit();
 }

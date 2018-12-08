@@ -9,21 +9,10 @@
 #include "objects/model.hpp"
 
 namespace Render3D {
-	class Sphere : public Primitive3D {
+	class Sphere : public Model {
 	 public:
-		Sphere();
-
-		void setSize(const Math3D::Vector4& value);
-
-		void setCFrame(const Math3D::Matrix4x4& value);
-
-		void setColor(const Color& value);
-
-		void render(Shader* const shader, Window* const win, TextureManager* const textureManager);
-        void prepareContent(Window* win, TextureManager* textureManager);
-	 private:
-		Model model;
+		Sphere() : Model("res/meshes/sphere.obj") {}
 	};
-}
+};
 
 #endif

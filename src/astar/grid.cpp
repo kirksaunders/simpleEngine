@@ -5,15 +5,26 @@
 using namespace Math3D;
 
 Grid::Grid() {
-	grid = NULL;
+	grid = nullptr;
 	width = height = depth = 0;
 }
 
 Grid::Grid(int x, int y, int z) {
+	int halfW, halfH, halfD;
+	halfW = x;
+	halfH = y;
+	halfD = z;
 	width = x * 2;
 	height = y * 2;
 	depth = z * 2;
 	grid = new Node*[(width + 1) * (height + 1) * (depth + 1)];
+	for (x = -halfW; x <= halfW; x++) {
+		for (y = -halfH; y <= halfH ; y++) {
+			for (z = -halfD; z <= halfD; z++) {
+				grid[(y + halfH)*(width+1)*(depth+1) + (x + halfW)*(depth+1) + z + halfD] = nullptr;
+			}
+		}
+	}
 }
 
 Grid::~Grid() {
@@ -21,24 +32,24 @@ Grid::~Grid() {
 }
 
 void Grid::destroy() {
-	if (grid != NULL) {
+	if (grid != nullptr) {
 		int halfW, halfH, halfD;
 		halfW = width / 2;
 		halfH = height / 2;
 		halfD = depth / 2;
 		Node* node;
-		for (int x = -halfW; x < halfW; x++) {
-			for (int y = -halfH; y < halfH ; y++) {
-				for (int z = -halfD; z < halfD; z++) {
+		for (int x = -halfW; x <= halfW; x++) {
+			for (int y = -halfH; y <= halfH ; y++) {
+				for (int z = -halfD; z <= halfD; z++) {
 					node = getNode(x, y, z);
-					if (node != NULL) {
+					if (node != nullptr) {
 						delete node;
 					}
 				}
 			}
 		}
+		delete[] grid;
 	}
-	delete[] grid;
 }
 
 void Grid::setNode(int x, int y, int z, Node* node) {
@@ -58,7 +69,7 @@ Node* Grid::getNode(int x, int y, int z) const {
 	halfH = height / 2;
 	halfD = depth / 2;
 	if (x < -halfW || x > halfW || y < -halfH || y > halfH || z < -halfD || z > halfD) {
-		return NULL;
+		return nullptr;
 	}
 	x = x + halfW;
 	y = y + halfH;
@@ -76,7 +87,7 @@ Node* Grid::getNode(const Vector4 pos) const {
 	halfH = height / 2;
 	halfD = depth / 2;
 	if (x < -halfW || x > halfW || y < -halfH || y > halfH || z < -halfD || z > halfD) {
-		return NULL;
+		return nullptr;
 	}
 	x = x + halfW;
 	y = y + halfH;
@@ -85,7 +96,7 @@ Node* Grid::getNode(const Vector4 pos) const {
 }
 
 void Grid::load(std::istream& ins) {
-	if (grid != NULL) {
+	if (grid != nullptr) {
 		destroy();
 	}
 	ins >> width >> height >> depth;
@@ -104,7 +115,7 @@ void Grid::load(std::istream& ins) {
 			for (int z = -halfD; z <= halfD; z++) {
 				ins >> b;
 				if (b) {
-					setNode(x, y, z, NULL);
+					setNode(x, y, z, nullptr);
 				} else {
 					setNode(x, y, z, new Node(Vector4(x, y, z)));
 				}
@@ -119,14 +130,14 @@ void Grid::save(std::ostream& outs) {
 	halfH = height / 2;
 	halfD = depth / 2; 
 	outs << halfW << std::endl << halfH << std::endl << halfD << std::endl;
-	if (grid == NULL) {
+	if (grid == nullptr) {
 		return;
 	}
 
 	for (int x = -halfW; x <= halfW; x++) {
 		for (int y = -halfH; y <= halfH ; y++) {
 			for (int z = -halfD; z <= halfD; z++) {
-				outs << (getNode(x, y, z) == NULL);
+				outs << (getNode(x, y, z) == nullptr);
 				if (halfH == halfH - 1 && halfD == halfD - 1) {
 					outs << std::endl;
 				} else {

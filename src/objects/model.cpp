@@ -10,7 +10,7 @@
 using namespace Render3D;
 using namespace Math3D;
 
-Model::Model(const char *filePath) : Primitive3D() {
+Model::Model(const char* filePath) : Primitive3D() {
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(filePath, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals);
 	if (!scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
@@ -24,6 +24,7 @@ Model::Model(const char *filePath) : Primitive3D() {
 
 	TexturesMap textureCache;
 
+	meshes.reserve(scene->mNumMeshes);
 	processNode(scene->mRootNode, scene);
 }
 
@@ -126,21 +127,35 @@ void Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::strin
 	}
 }
 
-void Model::render(Shader* const shader, Window* const win, TextureManager* const textureManager) {
+void Model::render(const Window& win, TextureManager& textureManager) {
 	Matrix4x4 rotation = cframe.rotation();
 
-	shader->setVariable(win, "modelCFrame", cframe);
-	shader->setVariable(win, "modelRotation", rotation);
-	shader->setVariable(win, "modelSize", size);
-	shader->setVariable(win, "modelColor", color);
-
+	modelCFrameVariable->setValue(win, cframe);
+	modelRotationVariable->setValue(win, rotation);
+	modelSizeVariable->setValue(win, size);
+	modelColorVariable->setValue(win, color);
+    
 	for (unsigned int i = 0; i < meshes.size(); i++) {
-		meshes[i].render(shader, win, textureManager);
+		meshes[i].render(*shader, win, textureManager);
 	}
 }
 
-void Model::prepareContent(Window* win, TextureManager* textureManager) {	
+void Model::prepareContent(const Window& win, TextureManager& textureManager) {	
     for (unsigned int i = 0; i < meshes.size(); i++) {
 		meshes[i].prepareContent(win, textureManager);
 	}
+
+    for (TexturesMap::iterator it = textureCache.begin(); it != textureCache.end(); ++it) {
+        it->second.prepareContent(win, textureManager);
+    }
+}
+
+void Model::destroyContent(const Window& win, TextureManager& textureManager) {
+	for (unsigned int i = 0; i < meshes.size(); i++) {
+		meshes[i].destroyContent(win, textureManager);
+	}
+
+    for (TexturesMap::iterator it = textureCache.begin(); it != textureCache.end(); ++it) {
+        it->second.destroyContent(win, textureManager);
+    }
 }

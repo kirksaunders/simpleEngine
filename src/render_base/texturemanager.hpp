@@ -5,7 +5,7 @@
 
 #include <string>
 #include <vector>
-#include <unordered_map>
+#include <utility>
 
 #include <GLEW/glew.h>
 
@@ -16,26 +16,28 @@ namespace Render3D {
 
 	class TextureManager {
 	 public:
+		static const unsigned int MAX_MATERIAL_TEXTURES = 5;
+
 		TextureManager();
 
-		bool textureDoesExist(const std::string& textureName) const;
+		void addWindow(const Window& win);
+		void removeWindow(const Window& win);
 
-		void addWindow(Window* win);
-		void removeWindow(Window* win);
+		int getTextureLocation(GLuint texID, const Window& win);
 
-		Texture* getTexture(const std::string& textureName);
+		int makeTextureActive(GLuint texID, const Window& win);
+		int makeTextureInactive(GLuint texID, const Window& win);
 
-		int getNumberTextures(Window* win) const;
+		static const std::string& getDiffuseName(unsigned int num);
+		static const std::string& getSpecularName(unsigned int num);
 
-		void addTexture(const std::string& textureName, Texture&& texture);
-		void addTexture(const std::string& textureName, const Texture& texture);
-
-		GLuint getActiveTexture(int location, Window* win);
-
-		void setActive(GLuint texID, int location, Window* win);
+		Texture& getDefaultTexture();
 	 private:
-		std::unordered_map<std::string, Texture> textures;
-		std::unordered_map<Window*, std::vector<GLuint> > activeTexturesByWindow;
+	 	static const std::string diffNames[MAX_MATERIAL_TEXTURES];
+		static const std::string specNames[MAX_MATERIAL_TEXTURES];
+
+	 	Texture defaultTexture;
+		std::vector<std::pair<const Window*, std::vector<GLuint> > > activeTexturesByWindow;
 	};
 }
 

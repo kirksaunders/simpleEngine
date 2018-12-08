@@ -1,12 +1,21 @@
 #include <cmath>
 #include <fstream>
 #include <sstream>
+#include <algorithm>
 
+#include "render_base/exception.hpp"
 #include "render_base/shader.hpp"
 #include "render_base/window.hpp"
 
 using namespace Render3D;
 using namespace Math3D;
+
+Shader::Shader(const Shader& other) : vertexSource(other.vertexSource), fragmentSource(other.fragmentSource) {
+	for (unsigned int i = 0; i < TextureManager::MAX_MATERIAL_TEXTURES; i++) {
+		diffTextureVariables[i] = getVariable<int>(TextureManager::getDiffuseName(i));
+		specTextureVariables[i] = getVariable<int>(TextureManager::getSpecularName(i));
+	}
+}
 
 Shader::Shader(const GLchar* vertexPath, const GLchar* fragmentPath) {
 	// 1. Retrieve the vertex/fragment source code from filePath
@@ -30,28 +39,55 @@ Shader::Shader(const GLchar* vertexPath, const GLchar* fragmentPath) {
 		vertexSource = vShaderStream.str();
 		fragmentSource = fShaderStream.str();		
 	} catch(std::ifstream::failure e) {
-		std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
+		throw Exception("Shader file loading failed");
+	}
+
+	for (unsigned int i = 0; i < TextureManager::MAX_MATERIAL_TEXTURES; i++) {
+		diffTextureVariables[i] = getVariable<int>(TextureManager::getDiffuseName(i));
+		specTextureVariables[i] = getVariable<int>(TextureManager::getSpecularName(i));
 	}
 }
 
-void Shader::prepareContent(Window* win) {
-    win->makeCurrent();
-    compileProgram(win->getClusterID());
-}
+Shader& Shader::operator=(const Shader& other) {
+    if (this != &other) {
+        vertexSource = other.vertexSource;
+        fragmentSource = other.fragmentSource;
+        programIDs.clear();
+        variables.clear();
 
-void Shader::use(Window* win) {
-	glUseProgram(getProgramID(win->getClusterID()));
-}
-
-GLuint Shader::compileProgram(GLuint clusterID) {
-    std::unordered_map<GLuint, GLuint>::iterator it = programIDs.find(clusterID);
-    if (it != programIDs.end()) {
-        glUseProgram(it->second);
-        glUseProgram(0);
-        return it->second;
+		for (unsigned int i = 0; i < TextureManager::MAX_MATERIAL_TEXTURES; i++) {
+			diffTextureVariables[i] = getVariable<int>(TextureManager::getDiffuseName(i));
+			specTextureVariables[i] = getVariable<int>(TextureManager::getSpecularName(i));
+		}
     }
 
-    GLuint programID;
+    return *this;
+}
+
+void Shader::prepareContent(const Window& win) {
+    compileProgram(win.getClusterID());
+}
+
+void Shader::destroyContent(const Window& win) {
+    destroyProgram(win.getClusterID());
+}
+
+void Shader::use(const Window& win) {
+	glUseProgram(getProgramID(win.getClusterID()));
+}
+
+void Shader::compileProgram(GLuint clusterID) {
+	for (unsigned int i = 0; i < programIDs.size(); ++i) {
+		if (programIDs[i].first == clusterID) {
+			glUseProgram(programIDs[i].second.id);
+			glUseProgram(0);
+			++(programIDs[i].second.useCount);
+
+			return;
+		}
+	}
+
+    ProgramID programID;
 
 	const GLchar* vShaderCode = vertexSource.c_str();	
 	const GLchar* fShaderCode = fragmentSource.c_str();
@@ -63,156 +99,85 @@ GLuint Shader::compileProgram(GLuint clusterID) {
 	   
 	// Vertex Shader
 	vertex = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertex, 1, &vShaderCode, NULL);
+	glShaderSource(vertex, 1, &vShaderCode, nullptr);
 	glCompileShader(vertex);
 	// Print compile errors if any
 	glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
 	if (!success) {
-		glGetShaderInfoLog(vertex, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+		glGetShaderInfoLog(vertex, 512, nullptr, infoLog);
+		throw Exception(std::string("Shader vertex code compilation failed: ") + infoLog);
 	}
 	  
 	// Fragment Shader
 	fragment = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragment, 1, &fShaderCode, NULL);
+	glShaderSource(fragment, 1, &fShaderCode, nullptr);
 	glCompileShader(fragment);
 	// Print compile errors if any
 	glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
 	if (!success) {
-		glGetShaderInfoLog(fragment, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+		glGetShaderInfoLog(fragment, 512, nullptr, infoLog);
+		throw Exception(std::string("Shader fragment code compilation failed: ") + infoLog);
 	}
 	  
 	// Shader Program
-	programID = glCreateProgram();
-	glAttachShader(programID, vertex);
-	glAttachShader(programID, fragment);
-	glLinkProgram(programID);
+	programID.id = glCreateProgram();
+	glAttachShader(programID.id, vertex);
+	glAttachShader(programID.id, fragment);
+	glLinkProgram(programID.id);
 
 	// Print linking errors if any
-	glGetProgramiv(programID, GL_LINK_STATUS, &success);
+	glGetProgramiv(programID.id, GL_LINK_STATUS, &success);
 	if (!success) {
-		glGetProgramInfoLog(programID, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+		glGetProgramInfoLog(programID.id, 512, nullptr, infoLog);
+		throw Exception(std::string("Shader linking failed: ") + infoLog);
 	}
 
     // Now that the shaders have been linked to the shader program, we can detach them
-    glDetachShader(programID, vertex);
-    glDetachShader(programID, fragment);
+    glDetachShader(programID.id, vertex);
+    glDetachShader(programID.id, fragment);
 	// Delete the shaders as they're linked into our program now and no longer necessery
 	glDeleteShader(vertex);
 	glDeleteShader(fragment);
 
-    programIDs.insert(std::pair<GLuint, GLuint>(clusterID, programID));
+    programID.useCount = 1;
+    programIDs.push_back(std::pair<GLuint, ProgramID>(clusterID, std::move(programID)));
+}
 
-    return programID;
+void Shader::destroyProgram(GLuint clusterID) {
+	for (unsigned int i = 0; i < programIDs.size(); ++i) {
+		if (programIDs[i].first == clusterID) {
+			if (--(programIDs[i].second.useCount) == 0) {
+				glDeleteShader(programIDs[i].second.id);
+				std::swap(programIDs[i], programIDs.back());
+				programIDs.pop_back();
+			}
+			return;
+		}
+	}
 }
 
 GLuint Shader::getProgramID(GLuint clusterID) {
-    std::unordered_map<GLuint, GLuint>::iterator it = programIDs.find(clusterID);
-    if (it != programIDs.end()) {
-        return it->second;
-    } else {
-        return compileProgram(clusterID);
-    }
+	for (unsigned int i = 0; i < programIDs.size(); ++i) {
+		if (programIDs[i].first == clusterID) {
+			return programIDs[i].second.id;
+		}
+	}
+
+    throw Exception("Unable to use shader, it hasn't been added to the context");
 }
 
-void Shader::setVariable(Window* win, const char *variableName, int number) {
-    GLuint clusterID = win->getClusterID();
-    GLuint programID = getProgramID(clusterID);
-    std::string name(variableName);
-    IntegerMap::iterator it = integers.find(KeyPair(name, clusterID));
-    GLuint variableLocation;
-    if (it == integers.end()) {
-        variableLocation = glGetUniformLocation(programID, variableName);
-        std::pair<GLuint, int> values(variableLocation, number);
-        integers.insert(std::pair<KeyPair, std::pair<GLuint, int> >(KeyPair(name, clusterID), values));
-    } else {
-        if (it->second.second == number) {
-            return;
-        }
-        variableLocation = it->second.first;
-        it->second.second = number;
-    }
-    glUniform1i(variableLocation, number);
+ShaderVariable<int>* Shader::getDiffuseVariable(unsigned int num) {
+	return diffTextureVariables[num];
 }
 
-void Shader::setVariable(Window* win, const char *variableName, float number) {
-    GLuint clusterID = win->getClusterID();
-    GLuint programID = getProgramID(clusterID);
-    std::string name(variableName);
-    FloatMap::iterator it = floats.find(KeyPair(name, clusterID));
-    GLuint variableLocation;
-    if (it == floats.end()) {
-        variableLocation = glGetUniformLocation(programID, variableName);
-        std::pair<GLuint, float> values(variableLocation, number);
-        floats.insert(std::pair<KeyPair, std::pair<GLuint, float> >(KeyPair(name, clusterID), values));
-    } else {
-        if (it->second.second == number) {
-            return;
-        }
-        variableLocation = it->second.first;
-        it->second.second = number;
-    }
-    glUniform1f(variableLocation, number);
+ShaderVariable<int>* Shader::getSpecularVariable(unsigned int num) {
+	return specTextureVariables[num];
 }
 
-void Shader::setVariable(Window* win, const char *variableName, const Matrix4x4& matrix) {
-    GLuint clusterID = win->getClusterID();
-    GLuint programID = getProgramID(clusterID);
-    std::string name(variableName);
-    MatrixMap::iterator it = matrices.find(KeyPair(name, clusterID));
-    GLuint variableLocation;
-    if (it == matrices.end()) {
-        variableLocation = glGetUniformLocation(programID, variableName);
-        std::pair<GLuint, Matrix4x4> values(variableLocation, matrix);
-        matrices.insert(std::pair<KeyPair, std::pair<GLuint, Matrix4x4> >(KeyPair(name, clusterID), values));
-    } else {
-        if (it->second.second == matrix) {
-            return;
-        }
-        variableLocation = it->second.first;
-        it->second.second = matrix;
-    }
-	glUniformMatrix4fv(variableLocation, 1, GL_TRUE, matrix.getValues());
+Shader Shader::defaultPerspective() {
+    return Shader("res/defaultPerspective.vert", "res/defaultPerspective.frag");
 }
 
-void Shader::setVariable(Window* win, const char *variableName, const Vector4& vector) {
-    GLuint clusterID = win->getClusterID();
-    GLuint programID = getProgramID(clusterID);
-    std::string name(variableName);
-    VectorMap::iterator it = vectors.find(KeyPair(name, clusterID));
-    GLuint variableLocation;
-    if (it == vectors.end()) {
-        variableLocation = glGetUniformLocation(programID, variableName);
-        std::pair<GLuint, Vector4> values(variableLocation, vector);
-        vectors.insert(std::pair<KeyPair, std::pair<GLuint, Vector4> >(KeyPair(name, clusterID), values));
-    } else {
-        if (it->second.second == vector) {
-            return;
-        }
-        variableLocation = it->second.first;
-        it->second.second = vector;
-    }
-	glUniform4fv(variableLocation, 1, vector.getValues());
-}
-
-void Shader::setVariable(Window* win, const char *variableName, const Color& color) {
-    GLuint clusterID = win->getClusterID();
-    GLuint programID = getProgramID(clusterID);
-    std::string name(variableName);
-    ColorMap::iterator it = colors.find(KeyPair(name, clusterID));
-    GLuint variableLocation;
-    if (it == colors.end()) {
-        variableLocation = glGetUniformLocation(programID, variableName);
-        std::pair<GLuint, Color> values(variableLocation, color);
-        colors.insert(std::pair<KeyPair, std::pair<GLuint, Color> >(KeyPair(name, clusterID), values));
-    } else {
-        if (it->second.second == color) {
-            return;
-        }
-        variableLocation = it->second.first;
-        it->second.second = color;
-    }
-	glUniform4fv(variableLocation, 1, color.getValues());
+Shader Shader::defaultImage() {
+    return Shader("res/imageRender.vert", "res/imageRender.frag");
 }

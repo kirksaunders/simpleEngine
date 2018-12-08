@@ -4,9 +4,14 @@
 #define GLEW_STATIC
 
 #include <string>
-#include <unordered_map>
+#include <vector>
+#include <utility>
 
 #include <GLEW/glew.h>
+
+#include "objects/buffercontainers.hpp"
+
+#include "render_base/shadervariable.hpp"
 
 namespace Render3D {
     // forward declarations
@@ -14,6 +19,14 @@ namespace Render3D {
     class Shader;
     class TextureManager;
     class TextureBuffer;
+
+    struct TextureID {
+        GLuint id;
+        GLuint useCount;
+
+        TextureID() : id(), useCount(0) {}
+        TextureID(GLuint i) : id(i), useCount(0) {}
+    };
 
 	class Texture {
 	 public:
@@ -39,10 +52,13 @@ namespace Render3D {
 		void setShader(Shader* s);
 		Shader* const getShader();
 
-		void use(Shader* shader, Window* win, TextureManager* textureManager);
-		void use(Shader* shader, Window* win, TextureManager* textureManager, const char* name);
-		void render(Shader* const shader, Window* const win, TextureManager* const textureManager);
-        void prepareContent(Window* win, TextureManager* textureManager);
+		void use(const Window& win, TextureManager& textureManager);
+		void useDiffuse(Shader& shader, const Window& win, TextureManager& textureManager, unsigned int num);
+		void useSpecular(Shader& shader, const Window& win, TextureManager& textureManager, unsigned int num);
+		void resetDiffAndSpec(Shader& shader, const Window& win, TextureManager& textureManager);
+		void render(const Window& win, TextureManager& textureManager);
+        void prepareContent(const Window& win, TextureManager& textureManager);
+        void destroyContent(const Window& win, TextureManager& textureManager);
 
 	 private:
         GLubyte* image;
@@ -51,20 +67,22 @@ namespace Render3D {
 		int height;
         int depth;
 		Shader* shader;
+		ShaderVariable<int>* textureVariable;
 
-        typedef std::pair<GLuint, GLuint> BufferPair;
-        std::unordered_map<GLuint, BufferPair> bufferObjects;
-		std::unordered_map<Window*, GLuint> VAOs;
-        std::unordered_map<GLuint, GLuint> IDs;
+        std::vector<std::pair<GLuint, BufferPair> > bufferObjects;
+		std::vector<std::pair<const Window*, GLuint> > VAOs;
+        std::vector<std::pair<GLuint, TextureID> > IDs;
 
-		int getLocation(GLuint textureID, Window* win, TextureManager* textureManager);
-		int useNextLocation(GLuint textureID, Window* win, TextureManager* textureManager);
+		int useNextLocation(GLuint textureID, const Window& win, TextureManager& textureManager);
 
-		void generateBuffers(GLuint clusterID);
+		BufferPair generateBuffers(GLuint clusterID);
+        void destroyBuffers(GLuint clusterID);
 		void generateTexture(GLuint clusterID);
-        void generateVertexArrayObject(GLuint clusterID, Window* win);
+		void destroyTexture(GLuint clusterID);
+        void generateVertexArrayObject(const Window& win);
+        void destroyVertexArrayObject(const Window& win);
 		GLuint getTextureID(GLuint clusterID);
-		GLuint getVertexArrayObject(Window* win);
+		GLuint getVertexArrayObject(const Window& win);
 
         void copy(const Texture& other);
         void move(Texture& other);

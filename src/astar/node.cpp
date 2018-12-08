@@ -3,13 +3,13 @@
 using namespace Math3D;
 
 Node::Node() {
-	parent = NULL;
+	parent = nullptr;
 	h = 0.0;
 	g = 0.0;
 }
 
 Node::Node(const Vector4 pos) {
-	parent = NULL;
+	parent = nullptr;
 	position = pos;
 	h = 0.0;
 	g = 0.0;
@@ -43,7 +43,7 @@ void Node::updateH(const Node* end) {
 }
 
 void Node::updateParent(Node* par) {
-	if (parent == NULL) {
+	if (parent == nullptr) {
 		parent = par;
 		g = par->getPathDistance(position);
 	} else {

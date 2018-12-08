@@ -5,10 +5,9 @@
 
 #include <vector>
 #include <string>
-#include <unordered_map>
-#include <tuple>
 #include <utility>
 
+#include "objects/buffercontainers.hpp"
 #include "objects/primitive3d.hpp"
 #include "render_base/texture.hpp"
 
@@ -22,7 +21,7 @@ namespace Render3D {
 		std::string type;
         Texture* tex;
 
-		TextureData() : type(""), tex(NULL) {}
+		TextureData() : type(""), tex(nullptr) {}
 		TextureData(const std::string& typ, Texture* t) : type(typ), tex(t) {}
 	};
 
@@ -32,14 +31,15 @@ namespace Render3D {
              const std::vector<TextureCoord>& texCs, const std::vector<TextureData>& texs,
              const std::vector<GLuint>& inds);
 
-		void bindTextures(Shader* shader, Window* win, TextureManager* textureManager);
+		void bindTextures(Shader& shader, const Window& win, TextureManager& textureManager);
 
-		void unbindTextures(Shader* shader, Window* win, TextureManager* textureManager);
+		void unbindTextures(Shader& shader, const Window& win, TextureManager& textureManager);
 
 		int getVertexCount();
 
-		void render(Shader* const shader, Window* const win, TextureManager* const textureManager);
-        void prepareContent(Window* win, TextureManager* textureManager);
+		void render(Shader& shader, const Window& win, TextureManager& textureManager);
+        void prepareContent(const Window& win, TextureManager& textureManager);
+        void destroyContent(const Window& win, TextureManager& textureManager);
 
 	 private:
         std::vector<Math3D::Vector4> vertices;
@@ -50,13 +50,14 @@ namespace Render3D {
 
         unsigned int numVertices;
 
-        typedef std::tuple<GLuint, GLuint, GLuint> BufferTriple;
-        std::unordered_map<GLuint, BufferTriple> BufferObjects;
-		std::unordered_map<Window*, GLuint> VAOs;
+        std::vector<std::pair<GLuint, BufferTriple> > bufferObjects;
+		std::vector<std::pair<const Window*, GLuint> > VAOs;
 
-        void generateBuffers(GLuint clusterID);
-        void generateVertexArrayObject(GLuint clusterID, Window* win);
-		GLuint getVertexArrayObject(Window* win);
+        BufferTriple generateBuffers(GLuint clusterID);
+        void destroyBuffers(GLuint clusterID);
+        void generateVertexArrayObject(const Window& win);
+        void destroyVertexArrayObject(const Window& win);
+		GLuint getVertexArrayObject(const Window& win);
 	};
 }
 

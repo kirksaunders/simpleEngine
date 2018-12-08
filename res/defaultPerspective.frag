@@ -73,5 +73,5 @@ void main() {
 	specColor = mix(vec4(specColor.xyz, 1.0f), lightColor, pow(opacity, 4.0f)) * specular * 0.25f;
 
 	color = vec4(difColor.xyz, 1.0f) + vec4(specColor.xyz, 1.0f);
-    //color = vec4(0.0f, 0.0f, 1.0f, 1.0f);
+    //color = vec4(modelColor.xyz, 1.0f);
 }

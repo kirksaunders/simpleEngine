@@ -1,94 +1,118 @@
-#include "render_base/texturemanager.hpp"
-
 #include <iostream>
+#include <algorithm>
+
+#include "render_base/exception.hpp"
+#include "render_base/texturemanager.hpp"
+#include "render_base/texturebuffer.hpp"
+#include "render_base/color.hpp"
 
 using namespace Render3D;
 
+const std::string TextureManager::diffNames[TextureManager::MAX_MATERIAL_TEXTURES] = {
+	"texture_diffuse1",
+	"texture_diffuse2",
+	"texture_diffuse3",
+	"texture_diffuse4",
+	"texture_diffuse5"
+};
+
+const std::string TextureManager::specNames[TextureManager::MAX_MATERIAL_TEXTURES] = {
+	"texture_specular1",
+	"texture_specular2",
+	"texture_specular3",
+	"texture_specular4",
+	"texture_specular5"
+};
+
 TextureManager::TextureManager() {
-	// nothing?
+	TextureBuffer buff(1, 1, 4);
+	buff.setPixel(0, 0, Color(0, 0, 0, 0));
+
+	defaultTexture = Texture(buff);
 }
 
-bool TextureManager::textureDoesExist(const std::string& textureName) const {
-	return textures.count(textureName) == 1;
-}
-
-void TextureManager::addWindow(Window* win) {
-	std::unordered_map<Window*, std::vector<GLuint> >::iterator it = activeTexturesByWindow.find(win);
-	if (it != activeTexturesByWindow.end()) {
-        activeTexturesByWindow.erase(it);
-	} else {
-		// error
-        return; // i guess for now
-	}
-}
-
-void TextureManager::removeWindow(Window* win) {
-	std::unordered_map<Window*, std::vector<GLuint> >::iterator it = activeTexturesByWindow.find(win);
-	if (it != activeTexturesByWindow.end()) {
-        // error
-		return; // i guess for now
-	} else {
-		std::vector<GLuint> vec;
-		activeTexturesByWindow.insert(std::pair<Window*, std::vector<GLuint> >(win, vec));
-	}
-}
-
-Texture* TextureManager::getTexture(const std::string& textureName) {
-	return &textures.at(textureName);
-}
-
-int TextureManager::getNumberTextures(Window* win) const {
-	std::unordered_map<Window*, std::vector<GLuint> >::const_iterator it = activeTexturesByWindow.find(win);
-	if (it != activeTexturesByWindow.end()) {
-		return it->second.size();
-	} else {
-		return 0;
-	}
-}
-
-void TextureManager::addTexture(const std::string& textureName, Texture&& texture) {
-	std::unordered_map<std::string, Texture>::iterator it = textures.find(textureName);
-	if (it != textures.end()) {
-		// texture with that name already exists, replace it with this one
-		it->second = std::move(texture);
-	} else {
-		textures.insert(std::pair<std::string, Texture>(textureName, std::move(texture)));
-	}
-}
-
-void TextureManager::addTexture(const std::string& textureName, const Texture& texture) {
-	std::unordered_map<std::string, Texture>::iterator it = textures.find(textureName);
-	if (it != textures.end()) {
-		// texture with that name already exists, replace it with this one
-		it->second = texture;
-	} else {
-		textures.insert(std::pair<std::string, Texture>(textureName, texture));
-	}
-}
-
-GLuint TextureManager::getActiveTexture(int location, Window* win) {
-	std::unordered_map<Window*, std::vector<GLuint> >::iterator it = activeTexturesByWindow.find(win);
-	if (it != activeTexturesByWindow.end()) {
-		return it->second[location];
-	} else {
-		return 0;
-	}
-}
-
-void TextureManager::setActive(GLuint texID, int location, Window* win) {
-	std::unordered_map<Window*, std::vector<GLuint> >::iterator it = activeTexturesByWindow.find(win);
-	if (it != activeTexturesByWindow.end()) {
-		if (location >= it->second.size()) {
-			it->second.push_back(texID);
-		} else {
-			it->second[location] = texID;
+void TextureManager::addWindow(const Window& win) {
+	for (unsigned int i = 0; i < activeTexturesByWindow.size(); ++i) {
+		if (activeTexturesByWindow[i].first == &win) {
+			return;
 		}
-	} else {
-        // error
-		return; // for now
+	}
+
+	activeTexturesByWindow.push_back(std::pair<const Window*, std::vector<GLuint> >(&win, std::vector<GLuint>()));
+}
+
+void TextureManager::removeWindow(const Window& win) {
+	for (unsigned int i = 0; i < activeTexturesByWindow.size(); ++i) {
+		if (activeTexturesByWindow[i].first == &win) {
+			std::swap(activeTexturesByWindow[i], activeTexturesByWindow.back());
+			activeTexturesByWindow.pop_back();
+			return;
+		}
 	}
 }
 
-namespace Render3D {
-	TextureManager textureManager;
+int TextureManager::getTextureLocation(GLuint texID, const Window& win) {
+	for (unsigned int i = 0; i < activeTexturesByWindow.size(); ++i) {
+		if (activeTexturesByWindow[i].first == &win) {
+			const std::vector<GLuint>* vec = &activeTexturesByWindow[i].second;
+			for (unsigned int i2 = 0; i2 < vec->size(); ++i2) {
+				if ((*vec)[i2] == texID) {
+					return i2;
+				}
+			}
+
+			return -1;
+		}
+	}
+
+	return -1;
+}
+
+int TextureManager::makeTextureActive(GLuint texID, const Window& win) {
+	for (unsigned int i = 0; i < activeTexturesByWindow.size(); ++i) {
+		if (activeTexturesByWindow[i].first == &win) {
+			std::vector<GLuint>* vec = &activeTexturesByWindow[i].second;
+			for (unsigned int i2 = 0; i2 < vec->size(); ++i2) {
+				if ((*vec)[i2] == 0) {
+					(*vec)[i2] = texID;
+					return i2;
+				}
+			}
+
+			vec->push_back(texID);
+			return vec->size() - 1;
+		}
+	}
+
+	throw Exception("Unable to make texture active, Window has not been added to TextureManager list");
+}
+
+int TextureManager::makeTextureInactive(GLuint texID, const Window& win) {
+	for (unsigned int i = 0; i < activeTexturesByWindow.size(); ++i) {
+		if (activeTexturesByWindow[i].first == &win) {
+			std::vector<GLuint>* vec = &activeTexturesByWindow[i].second;
+			for (unsigned int i2 = 0; i2 < vec->size(); ++i2) {
+				if ((*vec)[i2] == 0) {
+					(*vec)[i2] = 0;
+					return i2;
+				}
+			}
+
+			return -1;
+		}
+	}
+
+	throw Exception("Unable to make texture inactive, Window has not been added to TextureManager list");
+}
+
+const std::string& TextureManager::getDiffuseName(unsigned int num) {
+	return diffNames[num];
+}
+
+const std::string& TextureManager::getSpecularName(unsigned int num) {
+	return specNames[num];
+}
+
+Texture& TextureManager::getDefaultTexture() {
+	return defaultTexture;
 }

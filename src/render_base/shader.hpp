@@ -4,68 +4,73 @@
 #define GLEW_STATIC
 
 #include <string>
-#include <sstream>
+#include <vector>
 #include <unordered_map>
+#include <memory>
+#include <array>
 
 #include <GLEW/glew.h>
 
-#include "math/vector4.hpp"
-#include "math/matrix4x4.hpp"
-
-#include "render_base/color.hpp"
+#include "render_base/shadervariable.hpp"
+#include "render_base/texturemanager.hpp"
 
 namespace Render3D {
     class Window; // forward declaration
 
-    struct KeyPairHash {
-        size_t operator()(const std::pair<std::string, GLuint>& key) const {
-            std::stringstream sstream(key.first);
-            sstream << key.second;
-            return std::hash<std::string>()(sstream.str());
-        }
-    };
+    struct ProgramID {
+        GLuint id;
+        GLuint useCount;
 
-    struct KeyPairEqual {
-        bool operator()(const std::pair<std::string, GLuint>& lhs, const std::pair<std::string, GLuint>& rhs) const {
-            return lhs.first == rhs.first && lhs.second == rhs.second;
-        }
+        ProgramID() : id(), useCount() {}
+        ProgramID(GLuint i) : id(i), useCount(1) {}
     };
 
 	class Shader {
 	 public:
-		Shader() {}
-
+		Shader() = delete;
+        Shader(const Shader& other);
 		Shader(const GLchar* vertexPath, const GLchar* fragmentPath);
+        Shader& operator=(const Shader& other);
 
-        void prepareContent(Window* win);
-		void use(Window* win);
+        void prepareContent(const Window& win);
+        void destroyContent(const Window& win);
+		void use(const Window& win);
 
-		void setVariable(Window* win, const char *variableName, int number);
-		void setVariable(Window* win, const char *variableName, float number);
-		void setVariable(Window* win, const char *variableName, const Math3D::Matrix4x4& matrix);
-		void setVariable(Window* win, const char *variableName, const Math3D::Vector4& vector);
-		void setVariable(Window* win, const char *variableName, const Color& color);
+        template <class T>
+		ShaderVariable<T>* getVariable(const std::string& name);
+
+		ShaderVariable<int>* getDiffuseVariable(unsigned int num);
+		ShaderVariable<int>* getSpecularVariable(unsigned int num);
+
+		GLuint getProgramID(GLuint clusterID);
+
+        static Shader defaultPerspective();
+        static Shader defaultImage();
 
 	 private:
         std::string vertexSource;
         std::string fragmentSource;
-        std::unordered_map<GLuint, GLuint> programIDs;
+        std::vector<std::pair<GLuint, ProgramID> > programIDs;
+        typedef std::unordered_map<std::string, std::unique_ptr<ShaderVariableInterface> > VariablesMap;
+        VariablesMap variables;
+		std::array<ShaderVariable<int>*, TextureManager::MAX_MATERIAL_TEXTURES> diffTextureVariables;
+		std::array<ShaderVariable<int>*, TextureManager::MAX_MATERIAL_TEXTURES> specTextureVariables;
 
-        typedef std::pair<std::string, GLuint> KeyPair;
-        typedef std::unordered_map<KeyPair, std::pair<GLuint, int>, KeyPairHash, KeyPairEqual> IntegerMap;
-        typedef std::unordered_map<KeyPair, std::pair<GLuint, float>, KeyPairHash, KeyPairEqual> FloatMap;
-        typedef std::unordered_map<KeyPair, std::pair<GLuint, Math3D::Matrix4x4>, KeyPairHash, KeyPairEqual> MatrixMap;
-        typedef std::unordered_map<KeyPair, std::pair<GLuint, Math3D::Vector4>, KeyPairHash, KeyPairEqual> VectorMap;
-        typedef std::unordered_map<KeyPair, std::pair<GLuint, Color>, KeyPairHash, KeyPairEqual> ColorMap;
-        IntegerMap integers;
-        FloatMap floats;
-        MatrixMap matrices;
-        VectorMap vectors;
-        ColorMap colors;
-
-        GLuint compileProgram(GLuint clusterID);
-		GLuint getProgramID(GLuint clusterID);
+        void compileProgram(GLuint clusterID);
+        void destroyProgram(GLuint clusterID);
 	};
+
+    template <class T>
+    ShaderVariable<T>* Shader::getVariable(const std::string& name) {
+        VariablesMap::iterator it = variables.find(name);
+        if (it != variables.end()) {
+            return static_cast<ShaderVariable<T>*>(it->second.get());
+        } else {
+            std::unique_ptr<ShaderVariableInterface> ptr(new ShaderVariable<T>(this, name));
+            std::pair<VariablesMap::iterator, bool> result = variables.insert(std::pair<std::string, std::unique_ptr<ShaderVariableInterface> >(name, std::move(ptr)));
+            return static_cast<ShaderVariable<T>*>(result.first->second.get());
+        }
+    }
 }
 
 #endif
