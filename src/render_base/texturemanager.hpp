@@ -20,13 +20,13 @@ namespace Render3D {
 
 		TextureManager();
 
-		void addWindow(const Window& win);
-		void removeWindow(const Window& win);
+		void addWindow(Window& win);
+		void removeWindow(Window& win);
 
-		int getTextureLocation(GLuint texID, const Window& win);
+		int getTextureLocation(GLuint texID, Window& win);
 
-		int makeTextureActive(GLuint texID, const Window& win);
-		int makeTextureInactive(GLuint texID, const Window& win);
+		int makeTextureActive(GLuint texID, Window& win);
+		int makeTextureInactive(GLuint texID, Window& win);
 
 		static const std::string& getDiffuseName(unsigned int num);
 		static const std::string& getSpecularName(unsigned int num);

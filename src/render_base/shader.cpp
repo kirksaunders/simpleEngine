@@ -64,16 +64,26 @@ Shader& Shader::operator=(const Shader& other) {
     return *this;
 }
 
-void Shader::prepareContent(const Window& win) {
+void Shader::prepareContent(Window& win) {
     compileProgram(win.getClusterID());
 }
 
-void Shader::destroyContent(const Window& win) {
+void Shader::destroyContent(Window& win) {
     destroyProgram(win.getClusterID());
 }
 
-void Shader::use(const Window& win) {
-	glUseProgram(getProgramID(win.getClusterID()));
+void Shader::use(Window& win) {
+	if (!win.isShaderActive(*this)) {
+		win.setShaderActive(*this);
+		glUseProgram(getProgramID(win.getClusterID()));
+	}
+}
+
+void Shader::unuse(Window& win) {
+	if (win.isShaderActive(*this)) {
+		win.setShaderActive(*this, false);
+		glUseProgram(0);
+	}
 }
 
 void Shader::compileProgram(GLuint clusterID) {

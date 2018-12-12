@@ -10,7 +10,7 @@ std::string Exception::what() const {
 	return message;
 }
 
-std::ostream& operator<<(std::ostream& outs, const Exception& e) {
+std::ostream& Render3D::operator<<(std::ostream& outs, const Exception& e) {
 	outs << e.what();
 	
 	return outs;

@@ -16,6 +16,7 @@ Window::Window(int w, int h, const char* title, Window* parent) {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24); // default is 16
 
 	window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
 	if (!window) {
@@ -56,6 +57,8 @@ Window::Window(int w, int h, const char* title, Window* parent) {
 	glEnable(GL_MULTISAMPLE);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
 
 	width = w;
 	height = h;
@@ -349,7 +352,8 @@ bool Window::isMouseDown(MOUSE_BUTTON button) {
 }
 
 void Window::getMousePosition(double& x, double& y) {
-	//glfwGetCursorPos(window, &x, &y);
+	x = mouseX;
+    y = mouseY;
 }
 
 void Window::setMouseDownCallback(const MouseButtonCallback& callback) {
@@ -390,4 +394,29 @@ Window* Window::getParent() const {
 
 Context3D* Window::getContext() const {
     return context;
+}
+
+bool Window::isShaderActive(const Shader& shader) const {
+    std::thread::id thisThread = std::this_thread::get_id();
+    for (unsigned int i = 0; i < activeShaders.size(); ++i) {
+        if (activeShaders[i].first == thisThread) {
+            return activeShaders[i].second == &shader;
+        }
+    }
+
+	return false;
+}
+
+void Window::setShaderActive(const Shader& shader, bool active) {
+    std::thread::id thisThread = std::this_thread::get_id();
+    for (unsigned int i = 0; i < activeShaders.size(); ++i) {
+        if (activeShaders[i].first == thisThread) {
+            activeShaders[i].second = active ? &shader : nullptr;
+            return;
+        }
+    }
+
+	if (active) {
+		activeShaders.push_back(std::pair<std::thread::id, const Shader*>(thisThread, &shader));
+	}
 }

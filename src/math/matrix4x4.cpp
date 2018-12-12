@@ -6,60 +6,60 @@
 using namespace Math3D;
 
 Matrix4x4::Matrix4x4() {
-	values[0][0] = (float)1;
-	values[0][1] = 0;
-	values[0][2] = 0;
-	values[0][3] = 0;
-	values[1][0] = 0;
-	values[1][1] = (float)1;
-	values[1][2] = 0;
-	values[1][3] = 0;
-	values[2][0] = 0;
-	values[2][1] = 0;
-	values[2][2] = (float)1;
-	values[2][3] = 0;
-	values[3][0] = 0;
-	values[3][1] = 0;
-	values[3][2] = 0;
-	values[3][3] = (float)1;
+	values[0][0] = 1.0f;
+	values[0][1] = 0.0f;
+	values[0][2] = 0.0f;
+	values[0][3] = 0.0f;
+	values[1][0] = 0.0f;
+	values[1][1] = 1.0f;
+	values[1][2] = 0.0f;
+	values[1][3] = 0.0f;
+	values[2][0] = 0.0f;
+	values[2][1] = 0.0f;
+	values[2][2] = 1.0f;
+	values[2][3] = 0.0f;
+	values[3][0] = 0.0f;
+	values[3][1] = 0.0f;
+	values[3][2] = 0.0f;
+	values[3][3] = 1.0f;
 }
 
 Matrix4x4::Matrix4x4(const Vector4& vector) {
-	values[0][0] = (float)1;
-	values[0][1] = 0;
-	values[0][2] = 0;
+	values[0][0] = 1.0f;
+	values[0][1] = 0.0f;
+	values[0][2] = 0.0f;
 	values[0][3] = vector[0];
-	values[1][0] = 0;
-	values[1][1] = (float)1;
-	values[1][2] = 0;
+	values[1][0] = 0.0f;
+	values[1][1] = 1.0f;
+	values[1][2] = 0.0f;
 	values[1][3] = vector[1];
-	values[2][0] = 0;
-	values[2][1] = 0;
-	values[2][2] = (float)1;
+	values[2][0] = 0.0f;
+	values[2][1] = 0.0f;
+	values[2][2] = 1.0f;
 	values[2][3] = vector[2];
-	values[3][0] = 0;
-	values[3][1] = 0;
-	values[3][2] = 0;
-	values[3][3] = (float)1;
+	values[3][0] = 0.0f;
+	values[3][1] = 0.0f;
+	values[3][2] = 0.0f;
+	values[3][3] = 1.0f;
 }
 
 Matrix4x4::Matrix4x4(float x, float y, float z) {
-	values[0][0] = (float)1;
-	values[0][1] = 0;
-	values[0][2] = 0;
+	values[0][0] = 1.0f;
+	values[0][1] = 0.0f;
+	values[0][2] = 0.0f;
 	values[0][3] = x;
-	values[1][0] = 0;
-	values[1][1] = (float)1;
-	values[1][2] = 0;
+	values[1][0] = 0.0f;
+	values[1][1] = 1.0f;
+	values[1][2] = 0.0f;
 	values[1][3] = y;
-	values[2][0] = 0;
-	values[2][1] = 0;
-	values[2][2] = (float)1;
+	values[2][0] = 0.0f;
+	values[2][1] = 0.0f;
+	values[2][2] = 1.0f;
 	values[2][3] = z;
-	values[3][0] = 0;
-	values[3][1] = 0;
-	values[3][2] = 0;
-	values[3][3] = (float)1;
+	values[3][0] = 0.0f;
+	values[3][1] = 0.0f;
+	values[3][2] = 0.0f;
+	values[3][3] = 1.0f;
 }
 
 Matrix4x4::Matrix4x4(float x, float y, float z, float r00, float r01, float r02, float r10, float r11, float r12, float r20, float r21, float r22) {
@@ -77,10 +77,10 @@ Matrix4x4::Matrix4x4(float x, float y, float z, float r00, float r01, float r02,
 	values[2][1] = r21;
 	values[2][2] = r22;
 
-	values[3][0] = 0;
-	values[3][1] = 0;
-	values[3][2] = 0;
-	values[3][3] = 1;
+	values[3][0] = 0.0f;
+	values[3][1] = 0.0f;
+	values[3][2] = 0.0f;
+	values[3][3] = 1.0f;
 }
 
 Matrix4x4 Matrix4x4::fromEuler(float x, float y, float z) {
@@ -89,19 +89,19 @@ Matrix4x4 Matrix4x4::fromEuler(float x, float y, float z) {
 	out.values[0][0] = cos(y) * cos(z);
 	out.values[0][1] = -sin(z) * cos(y);
 	out.values[0][2] = sin(y);
-	out.values[0][3] = 0;
+	out.values[0][3] = 0.0f;
 	out.values[1][0] = cos(z) * sin(y) * sin(x) + sin(z) * cos(x);
 	out.values[1][1] = cos(z) * cos(x) - sin(z) * sin(y) * sin(x);
 	out.values[1][2] = -cos(y) * sin(x);
-	out.values[1][3] = 0;
+	out.values[1][3] = 0.0f;
 	out.values[2][0] = sin(z) * sin(x) - cos(z) * sin(y) * cos(x);
 	out.values[2][1] = sin(z) * sin(y) * cos(x) + cos(z) * sin(x);
 	out.values[2][2] = cos(y) * cos(x);
-	out.values[2][3] = 0;
-	out.values[3][0] = 0;
-	out.values[3][1] = 0;
-	out.values[3][2] = 0;
-	out.values[3][3] = 1;
+	out.values[2][3] = 0.0f;
+	out.values[3][0] = 0.0f;
+	out.values[3][1] = 0.0f;
+	out.values[3][2] = 0.0f;
+	out.values[3][3] = 1.0f;
 
 	return out;
 }
@@ -113,21 +113,21 @@ Matrix4x4 Matrix4x4::projection(float fov, float aspectRatio, float near, float 
 	Matrix4x4 out;
 
 	out.values[0][0] = 1 / (tanHalfFOV * aspectRatio);
-	out.values[0][1] = 0;
-	out.values[0][2] = 0;
-	out.values[0][3] = 0;
-	out.values[1][0] = 0;
+	out.values[0][1] = 0.0f;
+	out.values[0][2] = 0.0f;
+	out.values[0][3] = 0.0f;
+	out.values[1][0] = 0.0f;
 	out.values[1][1] = 1 / tanHalfFOV;
-	out.values[1][2] = 0;
-	out.values[1][3] = 0;
-	out.values[2][0] = 0;
-	out.values[2][1] = 0;
+	out.values[1][2] = 0.0f;
+	out.values[1][3] = 0.0f;
+	out.values[2][0] = 0.0f;
+	out.values[2][1] = 0.0f;
 	out.values[2][2] = -(far + near) / range;
 	out.values[2][3] = -2 * far * near / range;
-	out.values[3][0] = 0;
-	out.values[3][1] = 0;
+	out.values[3][0] = 0.0f;
+	out.values[3][1] = 0.0f;
 	out.values[3][2] = -1;
-	out.values[3][3] = 0;
+	out.values[3][3] = 0.0f;
 
 	return out;
 }
@@ -180,7 +180,7 @@ Vector4 Matrix4x4::lookvector() const {
 	out[0] = -values[0][2];
 	out[1] = -values[1][2];
 	out[2] = -values[2][2];
-	out[3] = (float)1;
+	out[3] = 1.0f;
 
 	return out;
 }
@@ -191,7 +191,7 @@ Vector4 Matrix4x4::position() const {
 	out[0] = values[0][3];
 	out[1] = values[1][3];
 	out[2] = values[2][3];
-	out[3] = (float)1;
+	out[3] = 1.0f;
 
 	return out;
 }
@@ -250,9 +250,9 @@ Matrix4x4 Matrix4x4::operator+(const Vector4& b) const {
 	out.values[2][1] = values[2][1];
 	out.values[2][2] = values[2][2];
 	out.values[2][3] = values[2][3] + b[2];
-	out.values[3][0] = 0;
-	out.values[3][1] = 0;
-	out.values[3][2] = 0;
+	out.values[3][0] = 0.0f;
+	out.values[3][1] = 0.0f;
+	out.values[3][2] = 0.0f;
 	out.values[3][3] = 1;
 
 	return out;
@@ -273,9 +273,9 @@ Matrix4x4 Matrix4x4::operator-(const Vector4& b) const {
 	out.values[2][1] = values[2][1];
 	out.values[2][2] = values[2][2];
 	out.values[2][3] = values[2][3] - b[2];
-	out.values[3][0] = 0;
-	out.values[3][1] = 0;
-	out.values[3][2] = 0;
+	out.values[3][0] = 0.0f;
+	out.values[3][1] = 0.0f;
+	out.values[3][2] = 0.0f;
 	out.values[3][3] = 1;
 
 	return out;

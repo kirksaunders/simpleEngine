@@ -34,7 +34,7 @@ namespace Render3D {
 		Texture(const char *filePath);
         Texture(const TextureBuffer& buff);
         Texture(const Texture& other);
-        Texture(Texture&& other);
+        Texture(Texture&& other) noexcept; // must be noexcept for vector to use it
         ~Texture();
 
         Texture& operator=(const Texture& other);
@@ -52,13 +52,13 @@ namespace Render3D {
 		void setShader(Shader* s);
 		Shader* const getShader();
 
-		void use(const Window& win, TextureManager& textureManager);
-		void useDiffuse(Shader& shader, const Window& win, TextureManager& textureManager, unsigned int num);
-		void useSpecular(Shader& shader, const Window& win, TextureManager& textureManager, unsigned int num);
-		void resetDiffAndSpec(Shader& shader, const Window& win, TextureManager& textureManager);
-		void render(const Window& win, TextureManager& textureManager);
-        void prepareContent(const Window& win, TextureManager& textureManager);
-        void destroyContent(const Window& win, TextureManager& textureManager);
+		void use(Window& win, TextureManager& textureManager);
+		void useDiffuse(Shader& shader, Window& win, TextureManager& textureManager, unsigned int num);
+		void useSpecular(Shader& shader, Window& win, TextureManager& textureManager, unsigned int num);
+		void resetDiffAndSpec(Shader& shader, Window& win, TextureManager& textureManager);
+		void render(Window& win, TextureManager& textureManager);
+        void prepareContent(Window& win, TextureManager& textureManager);
+        void destroyContent(Window& win, TextureManager& textureManager);
 
 	 private:
         GLubyte* image;
@@ -73,16 +73,16 @@ namespace Render3D {
 		std::vector<std::pair<const Window*, GLuint> > VAOs;
         std::vector<std::pair<GLuint, TextureID> > IDs;
 
-		int useNextLocation(GLuint textureID, const Window& win, TextureManager& textureManager);
+		int useNextLocation(GLuint textureID, Window& win, TextureManager& textureManager);
 
 		BufferPair generateBuffers(GLuint clusterID);
         void destroyBuffers(GLuint clusterID);
 		void generateTexture(GLuint clusterID);
 		void destroyTexture(GLuint clusterID);
-        void generateVertexArrayObject(const Window& win);
-        void destroyVertexArrayObject(const Window& win);
+        void generateVertexArrayObject(Window& win);
+        void destroyVertexArrayObject(Window& win);
 		GLuint getTextureID(GLuint clusterID);
-		GLuint getVertexArrayObject(const Window& win);
+		GLuint getVertexArrayObject(Window& win);
 
         void copy(const Texture& other);
         void move(Texture& other);

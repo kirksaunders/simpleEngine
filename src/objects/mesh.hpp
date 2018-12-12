@@ -31,15 +31,15 @@ namespace Render3D {
              const std::vector<TextureCoord>& texCs, const std::vector<TextureData>& texs,
              const std::vector<GLuint>& inds);
 
-		void bindTextures(Shader& shader, const Window& win, TextureManager& textureManager);
+		void bindTextures(Shader& shader, Window& win, TextureManager& textureManager);
 
-		void unbindTextures(Shader& shader, const Window& win, TextureManager& textureManager);
+		void unbindTextures(Shader& shader, Window& win, TextureManager& textureManager);
 
 		int getVertexCount();
 
-		void render(Shader& shader, const Window& win, TextureManager& textureManager);
-        void prepareContent(const Window& win, TextureManager& textureManager);
-        void destroyContent(const Window& win, TextureManager& textureManager);
+		void render(Shader& shader, Window& win, TextureManager& textureManager);
+        void prepareContent(Window& win, TextureManager& textureManager);
+        void destroyContent(Window& win, TextureManager& textureManager);
 
 	 private:
         std::vector<Math3D::Vector4> vertices;
@@ -55,9 +55,9 @@ namespace Render3D {
 
         BufferTriple generateBuffers(GLuint clusterID);
         void destroyBuffers(GLuint clusterID);
-        void generateVertexArrayObject(const Window& win);
-        void destroyVertexArrayObject(const Window& win);
-		GLuint getVertexArrayObject(const Window& win);
+        void generateVertexArrayObject(Window& win);
+        void destroyVertexArrayObject(Window& win);
+		GLuint getVertexArrayObject(Window& win);
 	};
 }
 

@@ -5,6 +5,7 @@
 #include "mains/mains.hpp"
 #include "astar/node.hpp"
 #include "astar/grid.hpp"
+#include "render_base/exception.hpp"
 
 using std::size_t;
 using namespace Math3D;
@@ -107,7 +108,12 @@ void pathfind() {
 	Context3D* context = window.getContext();
 
 	Shader defaultShader = Shader::defaultPerspective();
-	context->addShader(&defaultShader);
+	try {
+		context->addShader(&defaultShader);
+	} catch (Exception& ex) { // catch shader compilation issues
+		std::cout << ex << std::endl;
+		exit(-1);
+	}
 
 	Camera* cam = context->getCamera();
 
@@ -123,6 +129,7 @@ void pathfind() {
 					cube->setCFrame(Matrix4x4(x * GRID_SIZE, y * GRID_SIZE, z * GRID_SIZE));
 					cube->setColor(Color(0.75, 0.75, 0.75));
 					cube->setShader(&defaultShader);
+					cube->setWireframeEnabled(true);
 					context->addObject(cube);
 					walls.push_back(cube);
 				}

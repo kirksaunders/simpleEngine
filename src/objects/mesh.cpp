@@ -96,7 +96,7 @@ void Mesh::destroyBuffers(GLuint clusterID) {
 	}
 }
 
-void Mesh::generateVertexArrayObject(const Window& win) {
+void Mesh::generateVertexArrayObject(Window& win) {
     for (unsigned int i = 0; i < VAOs.size(); ++i) {
 		if (VAOs[i].first == &win) {
 			return;
@@ -132,7 +132,7 @@ void Mesh::generateVertexArrayObject(const Window& win) {
 	VAOs.push_back(std::pair<const Window*, GLuint>(&win, VAO));
 }
 
-void Mesh::destroyVertexArrayObject(const Window& win) {
+void Mesh::destroyVertexArrayObject(Window& win) {
 	for (unsigned int i = 0; i < VAOs.size(); ++i) {
 		if (VAOs[i].first == &win) {
 			glDeleteVertexArrays(1, &VAOs[i].second);
@@ -143,7 +143,7 @@ void Mesh::destroyVertexArrayObject(const Window& win) {
 	}
 }
 
-GLuint Mesh::getVertexArrayObject(const Window& win) {
+GLuint Mesh::getVertexArrayObject(Window& win) {
 	for (unsigned int i = 0; i < VAOs.size(); ++i) {
 		if (VAOs[i].first == &win) {
 			return VAOs[i].second;
@@ -157,7 +157,7 @@ int Mesh::getVertexCount() {
 	return numVertices;
 }
 
-void Mesh::bindTextures(Shader& shader, const Window& win, TextureManager& textureManager) {
+void Mesh::bindTextures(Shader& shader, Window& win, TextureManager& textureManager) {
 	unsigned int diffuseNr = 0;
 	unsigned int specularNr = 0;
     TextureData* tex;
@@ -173,7 +173,7 @@ void Mesh::bindTextures(Shader& shader, const Window& win, TextureManager& textu
 	}
 }
 
-void Mesh::unbindTextures(Shader& shader, const Window& win, TextureManager& textureManager) {
+void Mesh::unbindTextures(Shader& shader, Window& win, TextureManager& textureManager) {
 	Texture& defaultTex = textureManager.getDefaultTexture();
 	unsigned int diffuseNr = 0;
 	unsigned int specularNr = 0;
@@ -190,7 +190,7 @@ void Mesh::unbindTextures(Shader& shader, const Window& win, TextureManager& tex
 	}
 }
 
-void Mesh::render(Shader& shader, const Window& win, TextureManager& textureManager) {
+void Mesh::render(Shader& shader, Window& win, TextureManager& textureManager) {
 	bindTextures(shader, win, textureManager);
 
 	glBindVertexArray(getVertexArrayObject(win));
@@ -199,11 +199,11 @@ void Mesh::render(Shader& shader, const Window& win, TextureManager& textureMana
 	unbindTextures(shader, win, textureManager);
 }
 
-void Mesh::prepareContent(const Window& win, TextureManager& textureManager) {
+void Mesh::prepareContent(Window& win, TextureManager& textureManager) {
     generateVertexArrayObject(win);
 }
 
-void Mesh::destroyContent(const Window& win, TextureManager& textureManager) {
+void Mesh::destroyContent(Window& win, TextureManager& textureManager) {
 	destroyVertexArrayObject(win);
 	destroyBuffers(win.getClusterID());
 }

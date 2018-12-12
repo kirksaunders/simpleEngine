@@ -22,11 +22,11 @@ namespace Render3D {
      public:
         virtual ~ShaderVariableInterface() {}
 
-        virtual void setValue(const Window& win, const int& val) {}
-        virtual void setValue(const Window& win, const float& val) {}
-        virtual void setValue(const Window& win, const Math3D::Matrix4x4& val) {}
-        virtual void setValue(const Window& win, const Math3D::Vector4& val) {}
-        virtual void setValue(const Window& win, const Color& val) {}
+        virtual void setValue(Window& win, const int& val) {}
+        virtual void setValue(Window& win, const float& val) {}
+        virtual void setValue(Window& win, const Math3D::Matrix4x4& val) {}
+        virtual void setValue(Window& win, const Math3D::Vector4& val) {}
+        virtual void setValue(Window& win, const Color& val) {}
     };
 
     template <class T>
@@ -35,7 +35,7 @@ namespace Render3D {
         ShaderVariable() : shader(nullptr) {}
         ShaderVariable(Shader* const s, const std::string& n) : shader(s), name(n) {}
 
-        virtual void setValue(const Window& win, const T& val);
+        virtual void setValue(Window& win, const T& val);
      private:
 	 	typedef std::pair<GLuint, T> VariablePair;
         typedef std::vector<std::pair<GLuint, VariablePair> > VariableMap;

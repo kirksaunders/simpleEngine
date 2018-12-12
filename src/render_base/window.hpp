@@ -6,6 +6,8 @@
 #include <functional>
 #include <atomic>
 #include <vector>
+#include <thread>
+#include <utility>
 
 #include <GLEW/glew.h>
 #include <SDL2/sdl.h>
@@ -13,7 +15,9 @@
 #include "keycodes.hpp"
 
 namespace Render3D {
-    class Context3D; // forward declaration
+    // forward declarations
+    class Context3D;
+    class Shader;
 
     enum class MOUSE_BUTTON {
         LEFT = 1,
@@ -94,6 +98,9 @@ namespace Render3D {
         Window* getParent() const;
         Context3D* getContext() const;
 
+        bool isShaderActive(const Shader& shader) const;
+        void setShaderActive(const Shader& shader, bool active = true);
+
 	 private:
 		SDL_Window* window;
 		SDL_GLContext glContext;
@@ -116,6 +123,8 @@ namespace Render3D {
         KeyCallback keyDownCallback;
         KeyCallback keyUpCallback;
         WindowResizeCallback windowResizeCallback;
+
+        std::vector<std::pair<std::thread::id, const Shader*> > activeShaders;
 
         std::vector<int> mouseState;
         std::vector<int> keyboardState;

@@ -56,7 +56,7 @@ Texture::Texture(const Texture& other) {
     copy(other);
 }
 
-Texture::Texture(Texture&& other) {
+Texture::Texture(Texture&& other) noexcept {
     move(other);
 	other.initialize();
 }
@@ -148,7 +148,7 @@ Shader* const Texture::getShader() {
 	return shader;
 }
 
-void Texture::use(const Window& win, TextureManager& textureManager) {
+void Texture::use(Window& win, TextureManager& textureManager) {
     GLuint clusterID = win.getClusterID();
     GLuint textureID = getTextureID(clusterID);
 
@@ -159,7 +159,7 @@ void Texture::use(const Window& win, TextureManager& textureManager) {
     textureVariable->setValue(win, location);
 }
 
-void Texture::useDiffuse(Shader& shader, const Window& win, TextureManager& textureManager, unsigned int num) {
+void Texture::useDiffuse(Shader& shader, Window& win, TextureManager& textureManager, unsigned int num) {
 	GLuint clusterID = win.getClusterID();
     GLuint textureID = getTextureID(clusterID);
 
@@ -171,7 +171,7 @@ void Texture::useDiffuse(Shader& shader, const Window& win, TextureManager& text
     shader.getDiffuseVariable(num)->setValue(win, location);
 }
 
-void Texture::useSpecular(Shader& shader, const Window& win, TextureManager& textureManager, unsigned int num) {
+void Texture::useSpecular(Shader& shader, Window& win, TextureManager& textureManager, unsigned int num) {
 	GLuint clusterID = win.getClusterID();
     GLuint textureID = getTextureID(clusterID);
 
@@ -183,7 +183,7 @@ void Texture::useSpecular(Shader& shader, const Window& win, TextureManager& tex
     shader.getSpecularVariable(num)->setValue(win, location);
 }
 
-void Texture::resetDiffAndSpec(Shader& shader, const Window& win, TextureManager& textureManager) {
+void Texture::resetDiffAndSpec(Shader& shader, Window& win, TextureManager& textureManager) {
 	GLuint clusterID = win.getClusterID();
     GLuint textureID = getTextureID(clusterID);
 
@@ -198,7 +198,7 @@ void Texture::resetDiffAndSpec(Shader& shader, const Window& win, TextureManager
 	}
 }
 
-int Texture::useNextLocation(GLuint textureID, const Window& win, TextureManager& textureManager) {
+int Texture::useNextLocation(GLuint textureID, Window& win, TextureManager& textureManager) {
 	int location = textureManager.makeTextureActive(textureID, win);
 	glActiveTexture(GL_TEXTURE0 + location);
 	glBindTexture(GL_TEXTURE_2D, textureID);
@@ -216,10 +216,10 @@ BufferPair Texture::generateBuffers(GLuint clusterID) {
 	}
 
 	GLfloat vertices[12];
-	vertices[0] = -1.0;
+	vertices[0] = 1.0;
 	vertices[1] = 1.0;
 	
-	vertices[2] = 1.0;
+	vertices[2] = -1.0;
 	vertices[3] = 1.0;
 
 	vertices[4] = -1.0;
@@ -228,17 +228,17 @@ BufferPair Texture::generateBuffers(GLuint clusterID) {
 	vertices[6] = 1.0;
 	vertices[7] = 1.0;
 
-	vertices[8] = 1.0;
+	vertices[8] = -1.0;
 	vertices[9] = -1.0;
 
-	vertices[10] = -1.0;
+	vertices[10] = 1.0;
 	vertices[11] = -1.0;
 
 	GLfloat texCoords[12];
-	texCoords[0] = 0.0;
+	texCoords[0] = 1.0;
 	texCoords[1] = 0.0;
 
-	texCoords[2] = 1.0;
+	texCoords[2] = 0.0;
 	texCoords[3] = 0.0;
 
 	texCoords[4] = 0.0;
@@ -247,10 +247,10 @@ BufferPair Texture::generateBuffers(GLuint clusterID) {
 	texCoords[6] = 1.0;
 	texCoords[7] = 0.0;
 
-	texCoords[8] = 1.0;
+	texCoords[8] = 0.0;
 	texCoords[9] = 1.0;
 
-	texCoords[10] = 0.0;
+	texCoords[10] = 1.0;
 	texCoords[11] = 1.0;
 
     BufferPair pair;
@@ -329,7 +329,7 @@ void Texture::destroyTexture(GLuint clusterID) {
 	}
 }
 
-void Texture::generateVertexArrayObject(const Window& win) {
+void Texture::generateVertexArrayObject(Window& win) {
 	for (unsigned int i = 0; i < VAOs.size(); ++i) {
 		if (VAOs[i].first == &win) {
 			return;
@@ -358,7 +358,7 @@ void Texture::generateVertexArrayObject(const Window& win) {
 	VAOs.push_back(std::pair<const Window*, GLuint>(&win, VAO));
 }
 
-void Texture::destroyVertexArrayObject(const Window& win) {
+void Texture::destroyVertexArrayObject(Window& win) {
 	for (unsigned int i = 0; i < VAOs.size(); ++i) {
 		if (VAOs[i].first == &win) {
 			glDeleteVertexArrays(1, &VAOs[i].second);
@@ -379,7 +379,7 @@ GLuint Texture::getTextureID(GLuint clusterID) {
 	return 0;
 }
 
-GLuint Texture::getVertexArrayObject(const Window& win) {
+GLuint Texture::getVertexArrayObject(Window& win) {
 	for (unsigned int i = 0; i < VAOs.size(); ++i) {
 		if (VAOs[i].first == &win) {
 			return VAOs[i].second;
@@ -389,19 +389,19 @@ GLuint Texture::getVertexArrayObject(const Window& win) {
 	return 0;
 }
 
-void Texture::render(const Window& win, TextureManager& textureManager) {
+void Texture::render(Window& win, TextureManager& textureManager) {
 	use(win, textureManager);
 
 	glBindVertexArray(getVertexArrayObject(win));
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
-void Texture::prepareContent(const Window& win, TextureManager& textureManager) {
+void Texture::prepareContent(Window& win, TextureManager& textureManager) {
     generateTexture(win.getClusterID());
     generateVertexArrayObject(win);
 }
 
-void Texture::destroyContent(const Window& win, TextureManager& textureManager) {
+void Texture::destroyContent(Window& win, TextureManager& textureManager) {
     GLuint clusterID = win.getClusterID();
     textureManager.makeTextureInactive(getTextureID(clusterID), win);
     destroyVertexArrayObject(win);

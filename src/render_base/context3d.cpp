@@ -137,7 +137,7 @@ void Context3D::render() {
 
 	Vector4 lightPosition = Vector4(40, 300, 150);
 	Color lightColor = Color(1, 1, 1);
-	Color ambient = Color(0.15, 0.15, 0.15);
+	float ambient = 0.15f;
 
 	Shader* currentShader = nullptr;
 
@@ -159,7 +159,7 @@ void Context3D::render() {
 			// Scene Lighting Data
             currentShader->getVariable<Vector4>("lightPos")->setValue(*window, lightPosition);
             currentShader->getVariable<Color>("lightColor")->setValue(*window, lightColor);
-            currentShader->getVariable<Color>("ambientColor")->setValue(*window, ambient);
+            currentShader->getVariable<float>("ambientAmount")->setValue(*window, ambient);
 
 			// Camera Data
             currentShader->getVariable<Vector4>("cameraPos")->setValue(*window, cameraPosition);
@@ -171,8 +171,10 @@ void Context3D::render() {
 		object->render(*window, *textureManager.get());
 	}
 
+	if (currentShader != nullptr) {
+		currentShader->unuse(*window);
+	}
 	glBindVertexArray(0);
-	glUseProgram(0);
 }
 
 void Context3D::renderTexture(Texture& tex) {
@@ -182,6 +184,6 @@ void Context3D::renderTexture(Texture& tex) {
 	}
 	tex.getShader()->use(*window);
 	tex.render(*window, *textureManager.get());
+	tex.getShader()->unuse(*window);
 	glBindVertexArray(0);
-	glUseProgram(0);
 }

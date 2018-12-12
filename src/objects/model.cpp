@@ -5,6 +5,7 @@
 
 #include "objects/model.hpp"
 
+#include "render_base/exception.hpp"
 #include "render_base/shader.hpp"
 
 using namespace Render3D;
@@ -14,18 +15,21 @@ Model::Model(const char* filePath) : Primitive3D() {
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(filePath, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals);
 	if (!scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
-		std::cout << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
-		return;
+        throw Exception(std::string("Unable to load model, ") + importer.GetErrorString());
 	}
 
 	std::string path = std::string(filePath);
 
 	directory = path.substr(0, path.find_last_of('/'));
 
-	TexturesMap textureCache;
-
 	meshes.reserve(scene->mNumMeshes);
 	processNode(scene->mRootNode, scene);
+}
+
+Model::~Model() {
+    for (unsigned int i = 0; i < textureCache.size(); ++i) {
+        delete textureCache[i].second;
+    }
 }
 
 void Model::processNode(aiNode* node, const aiScene* scene) {
@@ -72,7 +76,7 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
 			aiVec = mesh->mNormals[i];
 			norm[0] = aiVec.x;
 			norm[1] = aiVec.y;
-			norm[2] = aiVec.z;
+			norm[2] = -aiVec.z;
 		} else {
 			// will throw exception eventually
 		}
@@ -115,47 +119,47 @@ void Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::strin
 		mat->GetTexture(type, i, &str);
 
         std::string filePath = directory + "/" + std::string(str.C_Str());
-        TexturesMap::iterator it = textureCache.find(filePath);
-        if (it == textureCache.end()) {
-            std::pair<TexturesMap::iterator, bool> p = textureCache.insert(std::pair<std::string, Texture>(filePath, Texture(filePath.c_str())));
-			textures.push_back(TextureData(typeName, &(p.first->second)));
-        } else {
-			textures.push_back(TextureData(typeName, &(it->second)));
+        bool found = false;
+        for (unsigned int i2 = 0; i2 < textureCache.size(); ++i2) {
+            if (textureCache[i2].first == filePath) {
+                textures.push_back(TextureData(typeName, textureCache[i2].second));
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            textureCache.push_back(std::pair<std::string, Texture*>(filePath, new Texture(filePath.c_str())));
+            textures.push_back(TextureData(typeName, textureCache.back().second));
         }
 
 		std::cout << typeName << ", " << str.C_Str() << ", " << i << std::endl;
 	}
 }
 
-void Model::render(const Window& win, TextureManager& textureManager) {
-	Matrix4x4 rotation = cframe.rotation();
-
-	modelCFrameVariable->setValue(win, cframe);
-	modelRotationVariable->setValue(win, rotation);
-	modelSizeVariable->setValue(win, size);
-	modelColorVariable->setValue(win, color);
+void Model::render(Window& win, TextureManager& textureManager) {
+	applyVariables(win);
     
 	for (unsigned int i = 0; i < meshes.size(); i++) {
 		meshes[i].render(*shader, win, textureManager);
 	}
 }
 
-void Model::prepareContent(const Window& win, TextureManager& textureManager) {	
+void Model::prepareContent(Window& win, TextureManager& textureManager) {	
     for (unsigned int i = 0; i < meshes.size(); i++) {
 		meshes[i].prepareContent(win, textureManager);
 	}
 
-    for (TexturesMap::iterator it = textureCache.begin(); it != textureCache.end(); ++it) {
-        it->second.prepareContent(win, textureManager);
+    for (unsigned int i = 0; i < textureCache.size(); ++i) {
+        textureCache[i].second->prepareContent(win, textureManager);
     }
 }
 
-void Model::destroyContent(const Window& win, TextureManager& textureManager) {
+void Model::destroyContent(Window& win, TextureManager& textureManager) {
 	for (unsigned int i = 0; i < meshes.size(); i++) {
 		meshes[i].destroyContent(win, textureManager);
 	}
 
-    for (TexturesMap::iterator it = textureCache.begin(); it != textureCache.end(); ++it) {
-        it->second.destroyContent(win, textureManager);
+    for (unsigned int i = 0; i < textureCache.size(); ++i) {
+        textureCache[i].second->destroyContent(win, textureManager);
     }
 }

@@ -31,7 +31,7 @@ TextureManager::TextureManager() {
 	defaultTexture = Texture(buff);
 }
 
-void TextureManager::addWindow(const Window& win) {
+void TextureManager::addWindow(Window& win) {
 	for (unsigned int i = 0; i < activeTexturesByWindow.size(); ++i) {
 		if (activeTexturesByWindow[i].first == &win) {
 			return;
@@ -41,7 +41,7 @@ void TextureManager::addWindow(const Window& win) {
 	activeTexturesByWindow.push_back(std::pair<const Window*, std::vector<GLuint> >(&win, std::vector<GLuint>()));
 }
 
-void TextureManager::removeWindow(const Window& win) {
+void TextureManager::removeWindow(Window& win) {
 	for (unsigned int i = 0; i < activeTexturesByWindow.size(); ++i) {
 		if (activeTexturesByWindow[i].first == &win) {
 			std::swap(activeTexturesByWindow[i], activeTexturesByWindow.back());
@@ -51,7 +51,7 @@ void TextureManager::removeWindow(const Window& win) {
 	}
 }
 
-int TextureManager::getTextureLocation(GLuint texID, const Window& win) {
+int TextureManager::getTextureLocation(GLuint texID, Window& win) {
 	for (unsigned int i = 0; i < activeTexturesByWindow.size(); ++i) {
 		if (activeTexturesByWindow[i].first == &win) {
 			const std::vector<GLuint>* vec = &activeTexturesByWindow[i].second;
@@ -68,7 +68,7 @@ int TextureManager::getTextureLocation(GLuint texID, const Window& win) {
 	return -1;
 }
 
-int TextureManager::makeTextureActive(GLuint texID, const Window& win) {
+int TextureManager::makeTextureActive(GLuint texID, Window& win) {
 	for (unsigned int i = 0; i < activeTexturesByWindow.size(); ++i) {
 		if (activeTexturesByWindow[i].first == &win) {
 			std::vector<GLuint>* vec = &activeTexturesByWindow[i].second;
@@ -87,7 +87,7 @@ int TextureManager::makeTextureActive(GLuint texID, const Window& win) {
 	throw Exception("Unable to make texture active, Window has not been added to TextureManager list");
 }
 
-int TextureManager::makeTextureInactive(GLuint texID, const Window& win) {
+int TextureManager::makeTextureInactive(GLuint texID, Window& win) {
 	for (unsigned int i = 0; i < activeTexturesByWindow.size(); ++i) {
 		if (activeTexturesByWindow[i].first == &win) {
 			std::vector<GLuint>* vec = &activeTexturesByWindow[i].second;

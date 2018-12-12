@@ -5,7 +5,7 @@
 
 #include <vector>
 #include <string>
-#include <unordered_map>
+#include <utility>
 
 #include <GLEW/glew.h>
 #include <ASSIMP/scene.h>
@@ -19,18 +19,18 @@ namespace Render3D {
 	class Model : public Primitive3D {
 	 public:
 		Model() : Primitive3D() {}
+        ~Model();
 
 		Model(const char *filePath);
 
-		void render(const Window& win, TextureManager& textureManager);
+		void render(Window& win, TextureManager& textureManager);
 
-        void prepareContent(const Window& win, TextureManager& textureManager);
-        void destroyContent(const Window& win, TextureManager& textureManager);
+        void prepareContent(Window& win, TextureManager& textureManager);
+        void destroyContent(Window& win, TextureManager& textureManager);
 
 	 private:
 		std::string directory;
-        typedef std::unordered_map<std::string, Texture> TexturesMap;
-        TexturesMap textureCache;
+        std::vector<std::pair<std::string, Texture*> > textureCache;
 
 		std::vector<Mesh> meshes;
 

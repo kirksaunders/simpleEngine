@@ -32,9 +32,10 @@ namespace Render3D {
 		Shader(const GLchar* vertexPath, const GLchar* fragmentPath);
         Shader& operator=(const Shader& other);
 
-        void prepareContent(const Window& win);
-        void destroyContent(const Window& win);
-		void use(const Window& win);
+        void prepareContent(Window& win);
+        void destroyContent(Window& win);
+		void use(Window& win);
+		void unuse(Window& win);
 
         template <class T>
 		ShaderVariable<T>* getVariable(const std::string& name);

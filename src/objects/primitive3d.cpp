@@ -1,17 +1,10 @@
 #include "objects/primitive3d.hpp"
 
 #include "render_base/shader.hpp"
+#include "render_base/window.hpp"
 
 using namespace Render3D;
 using namespace Math3D;
-
-Primitive3D::Primitive3D() {
-	shader = nullptr;
-    modelCFrameVariable = nullptr;
-    modelRotationVariable = nullptr;
-    modelSizeVariable = nullptr;
-    modelColorVariable = nullptr;
-}
 
 void Primitive3D::setSize(const Vector4& value) {
 	size = value;
@@ -44,14 +37,34 @@ void Primitive3D::setShader(Shader* const s) {
         modelRotationVariable = shader->getVariable<Matrix4x4>("modelRotation");
         modelSizeVariable = shader->getVariable<Vector4>("modelSize");
         modelColorVariable = shader->getVariable<Color>("modelColor");
+        wireframeVariable = shader->getVariable<int>("wireframeEnabled");
     } else {
         modelCFrameVariable = nullptr;
         modelRotationVariable = nullptr;
         modelSizeVariable = nullptr;
         modelColorVariable = nullptr;
+		wireframeVariable = nullptr;
     }
 }
 
 Shader* const Primitive3D::getShader() const {
 	return shader;
+}
+
+void Primitive3D::setWireframeEnabled(bool enabled) {
+	wireframeEnabled = enabled;
+}
+
+bool Primitive3D::isWireframeEnabled() const {
+	return wireframeEnabled;
+}
+
+void Primitive3D::applyVariables(Window& win) {
+	Matrix4x4 rotation = cframe.rotation();
+
+	modelCFrameVariable->setValue(win, cframe);
+	modelRotationVariable->setValue(win, rotation);
+	modelSizeVariable->setValue(win, size);
+	modelColorVariable->setValue(win, color);
+	wireframeVariable->setValue(win, static_cast<int>(wireframeEnabled));
 }

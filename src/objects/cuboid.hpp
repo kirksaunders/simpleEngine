@@ -20,10 +20,10 @@ namespace Render3D {
 
 		int getVertexCount();
 
-		void render(const Window& win, TextureManager& textureManager);
+		void render(Window& win, TextureManager& textureManager);
 
-        void prepareContent(const Window& win, TextureManager& textureManager);
-		void destroyContent(const Window& win, TextureManager& textureManager);
+        void prepareContent(Window& win, TextureManager& textureManager);
+		void destroyContent(Window& win, TextureManager& textureManager);
 
 	 private:
         std::vector<std::pair<GLuint, BufferPair> > bufferObjects;
@@ -40,9 +40,9 @@ namespace Render3D {
 
 		BufferPair generateBuffers(GLuint clusterID);
 		void destroyBuffers(GLuint clusterID);
-        void generateVertexArrayObject(const Window& win);
-        void destroyVertexArrayObject(const Window& win);
-		GLuint getVertexArrayObject(const Window& win);
+        void generateVertexArrayObject(Window& win);
+        void destroyVertexArrayObject(Window& win);
+		GLuint getVertexArrayObject(Window& win);
 	};
 }
 
