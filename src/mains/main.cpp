@@ -10,8 +10,11 @@ int main(int arc, char** arcv) {
 			  << "2.) Texture loading (multiple windows)" << std::endl
 			  << "3.) Cuboids (multiple windows)" << std::endl
 			  << "4.) Mesh loading (multiple windows)" << std::endl
-			  << "5.) Raytracer" << std::endl
-			  << "6.) Pathfind" << std::endl
+			  << "5.) Render while resizing (using callback)" << std::endl
+			  << "6.) Render while resizing (using multiple threads)" << std::endl
+			  << "7.) Render while resizing (using multiple threads and callback)" << std::endl
+			  << "8.) Raytracer" << std::endl
+			  << "9.) Pathfind" << std::endl
 			  << "Enter your choice for situation to run: ";
 	std::cin >> option;
 	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -30,9 +33,18 @@ int main(int arc, char** arcv) {
 		main4();
 		break;
 	 case 5:
-		raytracer();
+	 	main5();
 		break;
 	 case 6:
+	 	main6();
+		break;
+	 case 7:
+	 	main7();
+		break;
+	 case 8:
+		raytracer();
+		break;
+	 case 9:
 		pathfind();
 		break;
 	 default:

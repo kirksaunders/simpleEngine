@@ -1,5 +1,5 @@
 # simpleEngine
-***WARNING***: Very incomplete and in progress.
+***WARNING***: Very incomplete and in progress. The API (both the internal API and the external API) is highly volatile and I will change it massively anytime I see fit (this is a personal, educational project afterall).
 
 The purpose of this project is to provide an easy-to-use, cross-platform library that is capable of rendering 3D objects with simple and powerful code. simpleEngine is built on top of OpenGL and aims to provide easy-to-use APIs while still providing powerful and fast 3D rendering capabilities. This is being developed for fun and is the first program I have written that uses OpenGL. Therefore, it is more of a learning experience, but I hope to make this engine useful for projects to come.
 

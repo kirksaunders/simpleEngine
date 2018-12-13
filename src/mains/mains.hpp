@@ -7,6 +7,7 @@
 
 #include "math/math.hpp"
 
+#include "render_base/exception.hpp"
 #include "render_base/window.hpp"
 #include "render_base/context3d.hpp"
 #include "objects/model.hpp"
@@ -24,6 +25,9 @@ void main1();
 void main2();
 void main3();
 void main4();
+void main5();
+void main6();
+void main7();
 void raytracer();
 void updateCamera(Render3D::Camera* cam, Render3D::Window* window, float cX, float cY);
 void pathfind();
