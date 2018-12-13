@@ -1,5 +1,6 @@
 #include <thread>
-#include <atomic>
+#include <mutex>
+#include <condition_variable>
 
 #include "mains/mains.hpp"
 
@@ -54,6 +55,8 @@ void main7() {
         }
     });
 
+    std::mutex mtx; // for the condition variable
+    std::condition_variable cv; // variable that will be used to indidcate when threads have given up context
 	std::atomic<bool> transferContext(false); // bool writes and reads should be atomic already, but just in case we will use std::atomic
 
 	// This example makes use of the window resize callback and multithreading combined to allow rendering "while" resizing a window.
@@ -65,10 +68,9 @@ void main7() {
 	// Here is where the magic happens. In our resize callback we do the render step we would normally do, minus the pollEvents at the end.
 	// But we must additionally gain ownership of the context before we can render it.
 	window.setResizeCallback([&](int width, int height) {
-		transferContext.store(true); // indicate to the render thread that we need the context
-        while (transferContext.load()) {
-            std::this_thread::yield(); // yield until the render thread has released the context
-        }
+        std::unique_lock<std::mutex> lck(mtx); // acquire lock
+        transferContext.store(true); // indicate to the render thread that we need the context
+        cv.wait(lck); // wait until render thread has released context
         window.makeCurrent(); // claim the context on this thread
 
 		window.applyResize(width, height); // we must explicitly call this when we set a resize callback or else the window's size won't be kept track of
@@ -88,10 +90,9 @@ void main7() {
 
         window.update();
 		window.makeCurrent(false);
-        transferContext.store(true); // indicate that the render thread can have the context back
-		while (transferContext.load()) {
-            std::this_thread::yield(); // yield until the render thread has reset transferContext to false
-        }
+
+        transferContext.store(false); // reset variable
+        cv.notify_one(); // tell render thread that it can take context back
     });
 
 	window.makeCurrent(false); // release rendering control from this thread
@@ -100,13 +101,13 @@ void main7() {
 		window.makeCurrent(); // take rendering control on this thread
 		while (window.isActive()) {
             if (transferContext.load()) { // main thread wants the context
-                window.makeCurrent(false); // releast context
-                transferContext.store(false); // indicate this thread has released the context
-                while (!transferContext.load()) {
-                    std::this_thread::yield(); // yield until the main thread has released the context
-                }
-                transferContext.store(false); // reset variable for next time
+                std::unique_lock<std::mutex> lck(mtx); // acquire lock
+                window.makeCurrent(false); // release context
+                cv.notify_one(); // tell main thread we have given up the context
+                cv.wait(lck); // wait until main thread is done and has given up context
 				window.makeCurrent(); // take context back
+                cv.notify_one();
+                
 				continue; // go ahead and skip back to beginning of loop (and also check if window is still active)
             }
 
