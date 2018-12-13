@@ -27,70 +27,70 @@ namespace Render3D {
         X2
     };
 
-	class Window {
+    class Window {
         friend Context3D; // so that Context3D can set/get the value of the "context" member
 
-	 public:
-		typedef std::function<void(MOUSE_BUTTON, int, int)> MouseButtonCallback;
-		typedef std::function<void(KEYCODE)> KeyCallback;
-		typedef std::function<void(int, int, int, int)> MouseMoveCallback;
-		typedef std::function<void(int, int)> WindowResizeCallback;
+     public:
+        typedef std::function<void(MOUSE_BUTTON, int, int)> MouseButtonCallback;
+        typedef std::function<void(KEYCODE)> KeyCallback;
+        typedef std::function<void(int, int, int, int)> MouseMoveCallback;
+        typedef std::function<void(int, int)> WindowResizeCallback;
 
-		Window() = delete;
-		Window(int width, int height, const char* title, Window* parent = nullptr);
+        Window() = delete;
+        Window(int width, int height, const char* title, Window* parent = nullptr);
 
-		~Window();
+        ~Window();
 
-		void makeCurrent(bool isCurrent = true);
-		void updateViewport();
+        void makeCurrent(bool isCurrent = true);
+        void updateViewport();
 
-		void close();
+        void close();
 
-		bool isActive() const;
+        bool isActive() const;
 
-		static void pollEvents();
-		static void waitEvents();
+        static void pollEvents();
+        static void waitEvents();
 
-		void clear();
+        void clear();
 
-		int getWidth() const;
-		int getHeight() const;
+        int getWidth() const;
+        int getHeight() const;
         void getSize(int& w, int& h) const;
 
-		void setWidth(int w);
-		void setHeight(int h);
+        void setWidth(int w);
+        void setHeight(int h);
         void setSize(int w, int h);
         void applyResize(int w, int h);
 
-		void drawTriangle(GLfloat[]);
+        void drawTriangle(GLfloat[]);
 
-		void update();
+        void update();
 
-		void destroy();
+        void destroy();
 
-		void setVSyncEnabled(bool enabled);
+        void setVSyncEnabled(bool enabled);
         void setFullscreenEnabled(bool enabled);
-		void setMouseLockEnabled(bool enabled);
+        void setMouseLockEnabled(bool enabled);
 
-		bool isVSyncEnabled() const;
-		bool isFullscreenEnabled() const;
-		bool isMouseLockEnabled() const;
+        bool isVSyncEnabled() const;
+        bool isFullscreenEnabled() const;
+        bool isMouseLockEnabled() const;
 
         void toggleFullscreen();
 
         static KEYCODE getKeycodeFromName(const std::string& name);
         static std::string getKeyNameFromCode(KEYCODE key);
-		bool isKeyPressed(KEYCODE key);
-		bool isMouseDown(MOUSE_BUTTON button);
+        bool isKeyPressed(KEYCODE key);
+        bool isMouseDown(MOUSE_BUTTON button);
 
-		void getMousePosition(double& x, double& y);
+        void getMousePosition(double& x, double& y);
 
-		void setMouseDownCallback(const MouseButtonCallback& callback);
-		void setMouseUpCallback(const MouseButtonCallback& callback);
-		void setMouseMoveCallback(const MouseMoveCallback& callback);
+        void setMouseDownCallback(const MouseButtonCallback& callback);
+        void setMouseUpCallback(const MouseButtonCallback& callback);
+        void setMouseMoveCallback(const MouseMoveCallback& callback);
         void setKeyDownCallback(const KeyCallback& callback);
         void setKeyUpCallback(const KeyCallback& callback);
-		void setResizeCallback(const WindowResizeCallback& callback);
+        void setResizeCallback(const WindowResizeCallback& callback);
 
         bool isChild() const;
 
@@ -101,25 +101,25 @@ namespace Render3D {
         bool isShaderActive(const Shader& shader) const;
         void setShaderActive(const Shader& shader, bool active = true);
 
-	 private:
-		SDL_Window* window;
-		SDL_GLContext glContext;
+     private:
+        SDL_Window* window;
+        SDL_GLContext glContext;
         static std::atomic<GLuint> clusterCount;
         Window* parentWindow;
         Context3D* context;
         GLuint clusterID;
-		bool active;
-		bool destroyed;
-		int width;
-		int height;
+        bool active;
+        bool destroyed;
+        int width;
+        int height;
         int windowedWidth;
         int windowedHeight;
-		bool vsyncEnabled;
-		bool fullscreenEnabled;
-		bool mouseLockEnabled;
-		MouseButtonCallback mouseDownCallback;
-		MouseButtonCallback mouseUpCallback;
-		MouseMoveCallback mouseMoveCallback;
+        bool vsyncEnabled;
+        bool fullscreenEnabled;
+        bool mouseLockEnabled;
+        MouseButtonCallback mouseDownCallback;
+        MouseButtonCallback mouseUpCallback;
+        MouseMoveCallback mouseMoveCallback;
         KeyCallback keyDownCallback;
         KeyCallback keyUpCallback;
         WindowResizeCallback windowResizeCallback;
@@ -134,12 +134,12 @@ namespace Render3D {
 
         static int eventWatcher(void* data, SDL_Event* event);
 
-		/*static void closeCallback(GLFWwindow* window);
-		//static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
-		static void resizeCallback(GLFWwindow* glfwWin, int width, int height);
-		static void mouseButtonCallback(GLFWwindow* glfwWin, int button, int action, int mods);
-		static void cursorPositionCallback(GLFWwindow* glfwWin, double x, double y);*/
-	};
+        /*static void closeCallback(GLFWwindow* window);
+        //static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+        static void resizeCallback(GLFWwindow* glfwWin, int width, int height);
+        static void mouseButtonCallback(GLFWwindow* glfwWin, int button, int action, int mods);
+        static void cursorPositionCallback(GLFWwindow* glfwWin, double x, double y);*/
+    };
 }
 
 #endif

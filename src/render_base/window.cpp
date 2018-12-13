@@ -10,7 +10,7 @@ using namespace Render3D;
 std::atomic<GLuint> Window::clusterCount(0);
 
 Window::Window(int w, int h, const char* title, Window* parent) {
-	SDL_Init(SDL_INIT_VIDEO);
+    SDL_Init(SDL_INIT_VIDEO);
 
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
@@ -18,58 +18,58 @@ Window::Window(int w, int h, const char* title, Window* parent) {
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24); // default is 16
 
-	window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
-	if (!window) {
-		SDL_Quit();
-
-		throw Exception(std::string("Exception occurred with initializing window: ") + SDL_GetError());
-	}
-    if (parent != nullptr && !parent->destroyed && parent->context != nullptr) {
-        SDL_GL_MakeCurrent(parent->window, parent->glContext);
-		SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
-        parentWindow = parent;
-        clusterID = parent->clusterID;
-	} else {
-		SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 0);
-        parentWindow = nullptr;
-        clusterID = ++clusterCount;
-	}
-	glContext = SDL_GL_CreateContext(window);
-    if (glContext == nullptr) {
-		SDL_GL_DeleteContext(glContext);
-		SDL_DestroyWindow(window);
+    window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
+    if (!window) {
         SDL_Quit();
 
-		throw Exception(std::string("Exception occurred with initializing opengl context: ") + SDL_GetError());
+        throw Exception(std::string("Exception occurred with initializing window: ") + SDL_GetError());
+    }
+    if (parent != nullptr && !parent->destroyed && parent->context != nullptr) {
+        SDL_GL_MakeCurrent(parent->window, parent->glContext);
+        SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
+        parentWindow = parent;
+        clusterID = parent->clusterID;
+    } else {
+        SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 0);
+        parentWindow = nullptr;
+        clusterID = ++clusterCount;
+    }
+    glContext = SDL_GL_CreateContext(window);
+    if (glContext == nullptr) {
+        SDL_GL_DeleteContext(glContext);
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+
+        throw Exception(std::string("Exception occurred with initializing opengl context: ") + SDL_GetError());
     }
 
-	SDL_GL_MakeCurrent(window, glContext);
+    SDL_GL_MakeCurrent(window, glContext);
 
-	GLenum glewError = glewInit();
-	if (glewError != GLEW_OK) {
-		SDL_DestroyWindow(window);
-		SDL_Quit();
-		// throw exception
-		throw Exception(std::string("Exception occurred with initializing glew: ") + reinterpret_cast<const char*>(glewGetErrorString(glewError)));
-	}
+    GLenum glewError = glewInit();
+    if (glewError != GLEW_OK) {
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        // throw exception
+        throw Exception(std::string("Exception occurred with initializing glew: ") + reinterpret_cast<const char*>(glewGetErrorString(glewError)));
+    }
 
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_MULTISAMPLE);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_MULTISAMPLE);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
-	width = w;
-	height = h;
-	active = true;
-	destroyed = false;
-	vsyncEnabled = false;
-	fullscreenEnabled = false;
+    width = w;
+    height = h;
+    active = true;
+    destroyed = false;
+    vsyncEnabled = false;
+    fullscreenEnabled = false;
     mouseLockEnabled = false;
-	mouseDownCallback = mouseUpCallback = nullptr;
-	mouseMoveCallback = nullptr;
-	windowResizeCallback = nullptr;
+    mouseDownCallback = mouseUpCallback = nullptr;
+    mouseMoveCallback = nullptr;
+    windowResizeCallback = nullptr;
     mouseX = mouseY = 0;
 
     SDL_AddEventWatch(eventWatcher, this);
@@ -80,23 +80,23 @@ Window::Window(int w, int h, const char* title, Window* parent) {
 }
 
 Window::~Window() {
-	close();
+    close();
 }
 
 void Window::makeCurrent(bool isCurrent) {
     if (isCurrent) {
         if (SDL_GL_GetCurrentContext() != glContext) {
             if (SDL_GL_MakeCurrent(window, glContext) != 0) {
-				throw Exception(std::string("Exception occurred with making window current: ") + SDL_GetError());
-			}
-			if (SDL_GL_SetSwapInterval(vsyncEnabled) != 0) {
-				throw Exception(std::string("Error setting window swap interval: ") + SDL_GetError());
-			}
+                throw Exception(std::string("Exception occurred with making window current: ") + SDL_GetError());
+            }
+            if (SDL_GL_SetSwapInterval(vsyncEnabled) != 0) {
+                throw Exception(std::string("Error setting window swap interval: ") + SDL_GetError());
+            }
         }
     } else {
         if (SDL_GL_MakeCurrent(window, nullptr) != 0) {
-			throw Exception(std::string("Exception occurred with making window not current: ") + SDL_GetError());
-		}
+            throw Exception(std::string("Exception occurred with making window not current: ") + SDL_GetError());
+        }
     }
 }
 
@@ -105,20 +105,20 @@ void Window::updateViewport() {
 }
 
 void Window::close() {
-	if (!destroyed) {
-		destroyed = true;
-		context->clearObjects();
+    if (!destroyed) {
+        destroyed = true;
+        context->clearObjects();
         context->clearShaders();
         context->clearTextures();
         delete context;
-		SDL_GL_DeleteContext(glContext);
-		SDL_DestroyWindow(window);
+        SDL_GL_DeleteContext(glContext);
+        SDL_DestroyWindow(window);
         context = nullptr;
-	}
+    }
 }
 
 bool Window::isActive() const {
-	return active;
+    return active;
 }
 
 void Window::pollEvents() {
@@ -126,25 +126,25 @@ void Window::pollEvents() {
 }
 
 void Window::waitEvents() {
-	SDL_Event event;
-	SDL_WaitEvent(&event);
+    SDL_Event event;
+    SDL_WaitEvent(&event);
     SDL_PumpEvents();
 }
 
 void Window::clear() {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void Window::drawTriangle(GLfloat vertices[]) {
-	
+    
 }
 
 int Window::getWidth() const {
-	return width;
+    return width;
 }
 
 int Window::getHeight() const {
-	return height;
+    return height;
 }
 
 void Window::getSize(int& w, int& h) const {
@@ -153,12 +153,12 @@ void Window::getSize(int& w, int& h) const {
 }
 
 void Window::setWidth(int w) {
-	width = w;
+    width = w;
     SDL_SetWindowSize(window, width, height);
 }
 
 void Window::setHeight(int h) {
-	height = h;
+    height = h;
     SDL_SetWindowSize(window, width, height);
 }
 
@@ -174,14 +174,14 @@ void Window::applyResize(int w, int h) {
 }
 
 void Window::update() {
-	SDL_GL_SwapWindow(window);
+    SDL_GL_SwapWindow(window);
 }
 
 void Window::setVSyncEnabled(bool enabled) {
-	vsyncEnabled = enabled;
-	if (SDL_GL_SetSwapInterval(vsyncEnabled) != 0) {
-		throw Exception(std::string("Error setting window swap interval: ") + SDL_GetError());
-	}
+    vsyncEnabled = enabled;
+    if (SDL_GL_SetSwapInterval(vsyncEnabled) != 0) {
+        throw Exception(std::string("Error setting window swap interval: ") + SDL_GetError());
+    }
 }
 
 void Window::setFullscreenEnabled(bool enabled) {
@@ -201,23 +201,23 @@ void Window::setFullscreenEnabled(bool enabled) {
 }
 
 void Window::setMouseLockEnabled(bool enabled) {
-	mouseLockEnabled = enabled;
-	SDL_SetRelativeMouseMode((enabled ? SDL_TRUE : SDL_FALSE));
+    mouseLockEnabled = enabled;
+    SDL_SetRelativeMouseMode((enabled ? SDL_TRUE : SDL_FALSE));
     if (!enabled) {
         SDL_WarpMouseInWindow(window, mouseX, mouseY);
     }
 }
 
 bool Window::isVSyncEnabled() const {
-	return vsyncEnabled;
+    return vsyncEnabled;
 }
 
 bool Window::isFullscreenEnabled() const {
-	return fullscreenEnabled;
+    return fullscreenEnabled;
 }
 
 bool Window::isMouseLockEnabled() const {
-	return mouseLockEnabled;
+    return mouseLockEnabled;
 }
 
 void Window::toggleFullscreen() {
@@ -309,8 +309,8 @@ int Window::eventWatcher(void* data, SDL_Event* event) {
                     if (window->windowResizeCallback != nullptr) {
                         window->windowResizeCallback(event->window.data1, event->window.data2);
                     } else {
-						window->applyResize(event->window.data1, event->window.data2);
-					}
+                        window->applyResize(event->window.data1, event->window.data2);
+                    }
                     break;
                 case SDL_WINDOWEVENT_CLOSE:
                     window->active = false;
@@ -342,7 +342,7 @@ bool Window::isKeyPressed(KEYCODE key) {
 }
 
 bool Window::isMouseDown(MOUSE_BUTTON button) {
-	for (unsigned int i = 0; i < mouseState.size(); ++i) {
+    for (unsigned int i = 0; i < mouseState.size(); ++i) {
         if (mouseState[i] == static_cast<int>(button)) {
             return true;
         }
@@ -352,16 +352,16 @@ bool Window::isMouseDown(MOUSE_BUTTON button) {
 }
 
 void Window::getMousePosition(double& x, double& y) {
-	x = mouseX;
+    x = mouseX;
     y = mouseY;
 }
 
 void Window::setMouseDownCallback(const MouseButtonCallback& callback) {
-	mouseDownCallback = callback;
+    mouseDownCallback = callback;
 }
 
 void Window::setMouseUpCallback(const MouseButtonCallback& callback) {
-	mouseUpCallback = callback;
+    mouseUpCallback = callback;
 }
 
 void Window::setKeyDownCallback(const KeyCallback& callback) {
@@ -373,11 +373,11 @@ void Window::setKeyUpCallback(const KeyCallback& callback) {
 }
 
 void Window::setMouseMoveCallback(const MouseMoveCallback& callback) {
-	mouseMoveCallback = callback;
+    mouseMoveCallback = callback;
 }
 
 void Window::setResizeCallback(const WindowResizeCallback& callback) {
-	windowResizeCallback = callback;
+    windowResizeCallback = callback;
 }
 
 bool Window::isChild() const {
@@ -404,7 +404,7 @@ bool Window::isShaderActive(const Shader& shader) const {
         }
     }
 
-	return false;
+    return false;
 }
 
 void Window::setShaderActive(const Shader& shader, bool active) {
@@ -416,7 +416,7 @@ void Window::setShaderActive(const Shader& shader, bool active) {
         }
     }
 
-	if (active) {
-		activeShaders.push_back(std::pair<std::thread::id, const Shader*>(thisThread, &shader));
-	}
+    if (active) {
+        activeShaders.push_back(std::pair<std::thread::id, const Shader*>(thisThread, &shader));
+    }
 }

@@ -4,17 +4,17 @@
 #include <iostream>
 
 namespace Render3D {
-	class Exception {
-	 public:
-		Exception(const std::string& msg = "");
+    class Exception {
+     public:
+        Exception(const std::string& msg = "");
 
-		std::string what() const;
+        std::string what() const;
 
-	 private:
-		std::string message;
-	};
+     private:
+        std::string message;
+    };
 
-	std::ostream& operator<<(std::ostream& outs, const Exception& e);
+    std::ostream& operator<<(std::ostream& outs, const Exception& e);
 };
 
 #endif

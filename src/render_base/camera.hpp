@@ -4,34 +4,34 @@
 #include "math/matrix4x4.hpp"
 
 namespace Render3D {
-	class Camera {
-	 public:
-		Camera() : fieldOfView(50), near(0.1), far(1000) {}
+    class Camera {
+     public:
+        Camera() : fieldOfView(50), near(0.1), far(1000) {}
 
-		void setCFrame(const Math3D::Matrix4x4& cframe);
+        void setCFrame(const Math3D::Matrix4x4& cframe);
 
-		Math3D::Matrix4x4 getCFrame() const;
+        Math3D::Matrix4x4 getCFrame() const;
 
-		void setFieldOfView(float fov);
+        void setFieldOfView(float fov);
 
-		float getFieldOfView() const;
+        float getFieldOfView() const;
 
-		void setNear(float n);
+        void setNear(float n);
 
-		float getNear() const;
+        float getNear() const;
 
-		void setFar(float f);
+        void setFar(float f);
 
-		float getFar() const;
+        float getFar() const;
 
-		Math3D::Matrix4x4 getPerspective(float aspectRatio) const;
+        Math3D::Matrix4x4 getPerspective(float aspectRatio) const;
 
-	 private:
-		Math3D::Matrix4x4 cframe;
-		float fieldOfView;
-		float near;
-		float far;
-	};
+     private:
+        Math3D::Matrix4x4 cframe;
+        float fieldOfView;
+        float near;
+        float far;
+    };
 }
 
 #endif

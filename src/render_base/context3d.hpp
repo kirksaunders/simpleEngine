@@ -15,41 +15,41 @@ namespace Render3D {
     class Primitive3D;
     class Shader;
 
-	class Context3D {
-	 public:
-		Context3D();
-		Context3D(Window* win);
+    class Context3D {
+     public:
+        Context3D();
+        Context3D(Window* win);
         ~Context3D();
 
-		void addObject(Primitive3D* object);
-		void removeObject(Primitive3D* object);
-		void clearObjects();
+        void addObject(Primitive3D* object);
+        void removeObject(Primitive3D* object);
+        void clearObjects();
 
-		void addShader(Shader* shader);
-		void removeShader(Shader* Shader);
-		void clearShaders();
+        void addShader(Shader* shader);
+        void removeShader(Shader* Shader);
+        void clearShaders();
 
         void addTexture(Texture* texture);
-		void removeTexture(Texture* texture);
-		void clearTextures();
+        void removeTexture(Texture* texture);
+        void clearTextures();
 
-		Camera* const getCamera();
-		TextureManager* const getTextureManager();
+        Camera* const getCamera();
+        TextureManager* const getTextureManager();
 
-		void render();
+        void render();
 
-		void renderTexture(Texture& tex);
+        void renderTexture(Texture& tex);
 
-	 private:
-		Window* window;
+     private:
+        Window* window;
         std::shared_ptr<TextureManager> textureManager;
 
-		std::set<Primitive3D*> objects;
-		std::set<Shader*> shaders;
-		std::set<Texture*> textures;
+        std::set<Primitive3D*> objects;
+        std::set<Shader*> shaders;
+        std::set<Texture*> textures;
 
-		Camera camera;
-	};
+        Camera camera;
+    };
 }
 
 #endif

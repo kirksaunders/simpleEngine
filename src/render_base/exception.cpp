@@ -3,15 +3,15 @@
 using namespace Render3D;
 
 Exception::Exception(const std::string& msg) {
-	message = msg;
+    message = msg;
 }
 
 std::string Exception::what() const {
-	return message;
+    return message;
 }
 
 std::ostream& Render3D::operator<<(std::ostream& outs, const Exception& e) {
-	outs << e.what();
-	
-	return outs;
+    outs << e.what();
+    
+    return outs;
 }

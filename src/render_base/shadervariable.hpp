@@ -37,7 +37,7 @@ namespace Render3D {
 
         virtual void setValue(Window& win, const T& val);
      private:
-	 	typedef std::pair<GLuint, T> VariablePair;
+         typedef std::pair<GLuint, T> VariablePair;
         typedef std::vector<std::pair<GLuint, VariablePair> > VariableMap;
 
         Shader* shader;

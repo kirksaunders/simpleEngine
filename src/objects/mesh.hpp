@@ -12,36 +12,36 @@
 #include "render_base/texture.hpp"
 
 namespace Render3D {
-	struct TextureCoord {
-		GLfloat x;
-		GLfloat y;
-	};
+    struct TextureCoord {
+        GLfloat x;
+        GLfloat y;
+    };
 
-	struct TextureData {
-		std::string type;
+    struct TextureData {
+        std::string type;
         Texture* tex;
 
-		TextureData() : type(""), tex(nullptr) {}
-		TextureData(const std::string& typ, Texture* t) : type(typ), tex(t) {}
-	};
+        TextureData() : type(""), tex(nullptr) {}
+        TextureData(const std::string& typ, Texture* t) : type(typ), tex(t) {}
+    };
 
-	class Mesh {
-	 public:
-		Mesh(const std::vector<Math3D::Vector4>& verts, const std::vector<Math3D::Vector4>& norms,
+    class Mesh {
+     public:
+        Mesh(const std::vector<Math3D::Vector4>& verts, const std::vector<Math3D::Vector4>& norms,
              const std::vector<TextureCoord>& texCs, const std::vector<TextureData>& texs,
              const std::vector<GLuint>& inds);
 
-		void bindTextures(Shader& shader, Window& win, TextureManager& textureManager);
+        void bindTextures(Shader& shader, Window& win, TextureManager& textureManager);
 
-		void unbindTextures(Shader& shader, Window& win, TextureManager& textureManager);
+        void unbindTextures(Shader& shader, Window& win, TextureManager& textureManager);
 
-		int getVertexCount();
+        int getVertexCount();
 
-		void render(Shader& shader, Window& win, TextureManager& textureManager);
+        void render(Shader& shader, Window& win, TextureManager& textureManager);
         void prepareContent(Window& win, TextureManager& textureManager);
         void destroyContent(Window& win, TextureManager& textureManager);
 
-	 private:
+     private:
         std::vector<Math3D::Vector4> vertices;
         std::vector<Math3D::Vector4> normals;
         std::vector<TextureCoord> texCoords;
@@ -51,14 +51,14 @@ namespace Render3D {
         unsigned int numVertices;
 
         std::vector<std::pair<GLuint, BufferTriple> > bufferObjects;
-		std::vector<std::pair<const Window*, GLuint> > VAOs;
+        std::vector<std::pair<const Window*, GLuint> > VAOs;
 
         BufferTriple generateBuffers(GLuint clusterID);
         void destroyBuffers(GLuint clusterID);
         void generateVertexArrayObject(Window& win);
         void destroyVertexArrayObject(Window& win);
-		GLuint getVertexArrayObject(Window& win);
-	};
+        GLuint getVertexArrayObject(Window& win);
+    };
 }
 
 #endif

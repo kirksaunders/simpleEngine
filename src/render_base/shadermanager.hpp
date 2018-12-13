@@ -7,17 +7,17 @@
 #include "render_base/shader.hpp"
 
 namespace Render3D {
-	class ShaderManager {
-	 public:
-		bool shaderDoesExist(const std::string& shaderName) const;
+    class ShaderManager {
+     public:
+        bool shaderDoesExist(const std::string& shaderName) const;
 
-		Shader* getShader(const std::string& shaderName);
+        Shader* getShader(const std::string& shaderName);
 
-		void addShader(const std::string& shaderName, const Shader& shader);
+        void addShader(const std::string& shaderName, const Shader& shader);
         
-	 private:
-		std::unordered_map<std::string, Shader> shaders;
-	};
+     private:
+        std::unordered_map<std::string, Shader> shaders;
+    };
 }
 
 #endif

@@ -16,34 +16,34 @@
 #include "render_base/texture.hpp"
 
 namespace Render3D {
-	class Model : public Primitive3D {
-	 public:
-		Model() : Primitive3D() {}
+    class Model : public Primitive3D {
+     public:
+        Model() : Primitive3D() {}
         ~Model();
 
-		Model(const char *filePath);
+        Model(const char *filePath);
 
-		void render(Window& win, TextureManager& textureManager);
+        void render(Window& win, TextureManager& textureManager);
 
         void prepareContent(Window& win, TextureManager& textureManager);
         void destroyContent(Window& win, TextureManager& textureManager);
 
-	 private:
-		std::string directory;
+     private:
+        std::string directory;
         std::vector<std::pair<std::string, Texture*> > textureCache;
 
-		std::vector<Mesh> meshes;
+        std::vector<Mesh> meshes;
 
-		void updateVertices();
+        void updateVertices();
 
-		void updateNormals();
+        void updateNormals();
 
-		void processNode(aiNode* node, const aiScene* scene);
+        void processNode(aiNode* node, const aiScene* scene);
 
-		Mesh processMesh(aiMesh* mesh, const aiScene* scene);
+        Mesh processMesh(aiMesh* mesh, const aiScene* scene);
 
-		void loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName, std::vector<TextureData>& textures);
-	};
+        void loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName, std::vector<TextureData>& textures);
+    };
 }
 
 #endif

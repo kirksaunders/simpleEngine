@@ -25,41 +25,41 @@ namespace Render3D {
         ProgramID(GLuint i) : id(i), useCount(1) {}
     };
 
-	class Shader {
-	 public:
-		Shader() = delete;
+    class Shader {
+     public:
+        Shader() = delete;
         Shader(const Shader& other);
-		Shader(const GLchar* vertexPath, const GLchar* fragmentPath);
+        Shader(const GLchar* vertexPath, const GLchar* fragmentPath);
         Shader& operator=(const Shader& other);
 
         void prepareContent(Window& win);
         void destroyContent(Window& win);
-		void use(Window& win);
-		void unuse(Window& win);
+        void use(Window& win);
+        void unuse(Window& win);
 
         template <class T>
-		ShaderVariable<T>* getVariable(const std::string& name);
+        ShaderVariable<T>* getVariable(const std::string& name);
 
-		ShaderVariable<int>* getDiffuseVariable(unsigned int num);
-		ShaderVariable<int>* getSpecularVariable(unsigned int num);
+        ShaderVariable<int>* getDiffuseVariable(unsigned int num);
+        ShaderVariable<int>* getSpecularVariable(unsigned int num);
 
-		GLuint getProgramID(GLuint clusterID);
+        GLuint getProgramID(GLuint clusterID);
 
         static Shader defaultPerspective();
         static Shader defaultImage();
 
-	 private:
+     private:
         std::string vertexSource;
         std::string fragmentSource;
         std::vector<std::pair<GLuint, ProgramID> > programIDs;
         typedef std::unordered_map<std::string, std::unique_ptr<ShaderVariableInterface> > VariablesMap;
         VariablesMap variables;
-		std::array<ShaderVariable<int>*, TextureManager::MAX_MATERIAL_TEXTURES> diffTextureVariables;
-		std::array<ShaderVariable<int>*, TextureManager::MAX_MATERIAL_TEXTURES> specTextureVariables;
+        std::array<ShaderVariable<int>*, TextureManager::MAX_MATERIAL_TEXTURES> diffTextureVariables;
+        std::array<ShaderVariable<int>*, TextureManager::MAX_MATERIAL_TEXTURES> specTextureVariables;
 
         void compileProgram(GLuint clusterID);
         void destroyProgram(GLuint clusterID);
-	};
+    };
 
     template <class T>
     ShaderVariable<T>* Shader::getVariable(const std::string& name) {

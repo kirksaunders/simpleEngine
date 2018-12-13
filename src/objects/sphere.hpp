@@ -9,10 +9,10 @@
 #include "objects/model.hpp"
 
 namespace Render3D {
-	class Sphere : public Model {
-	 public:
-		Sphere() : Model("res/meshes/sphere.obj") {}
-	};
+    class Sphere : public Model {
+     public:
+        Sphere() : Model("res/meshes/sphere.obj") {}
+    };
 };
 
 #endif
