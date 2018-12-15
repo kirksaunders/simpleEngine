@@ -1,4 +1,5 @@
 #include <thread>
+#include <mutex>
 
 #include "mains/mains.hpp"
 
@@ -52,26 +53,50 @@ void main6() {
             window.toggleFullscreen();
         }
     });
-    // the default defined resize callback will work fine for this example
+    // The default defined resize callback could work fine for this example.
+	// However, the default resize callback will apply the resize automatically for us. This is not likely
+	// to be thread safe, as the render thread could be accessing the window size while the resize callback
+	// is modifying it. To handle this, we can make it thread safe ourselves, in this case by a mutex and bool.
 
-    // Note: while this example for the most part works great for rendering while resizing, it generates a flicker on some hardware and OS combos
-    //          such as nvidia on windows, and even frame hits for my old laptop with intel hd graphics and windows.
-    //       This is due to the window resize internally clearing the contents of the viewport, so the window stays black until
-    //         the next render step occurs in the render thread. This may be good enough for some applications, as it provides
-    //         responsive window resizing and uninterrupted rendering. To solve these side effects, check out main7.cpp
+	bool needResize = false;
+	std::mutex mtx;
+	window.setResizeCallback([&](int width, int height) {
+		std::lock_guard<std::mutex> lck(mtx); // acquire lock
+        needResize = true; // tell the render thread that it needs to apply our resize
+		// when lock goes out of scope it will unlock the mutex
+    });
+
+    // NOTE: While this example for the most part works great for rendering while resizing, it generates a flicker on some hardware and OS combos
+    //		 such as NVIDIA on Windows 10, and even frame drops for my old laptop with Intel HD graphics and Windows 10.
+    //       The flicker is due to the window resize internally clearing the contents of the viewport, so the window stays black until
+    //		 the next render step occurs in the render thread. This may be good enough for some applications, as it provides
+    //		 responsive window resizing and uninterrupted rendering (on some hardware). To solve these side effects, check out main7.cpp
+    //       Additionally, on my old laptop, this example, even with the above callback does quite poorly. Trying
+    //       to render during a resize in this way does poorly, and I suspect it is an issue in the underlying
+    //       drives or hardware. However, example main5 and main7 perform well and as expected, if you ignore
+    //       the fact that window resizes on that laptop only occur at 30 FPS.
+
 
     window.makeCurrent(false); // release rendering control from this thread
 
     std::thread t([&]() {
         window.makeCurrent(); // take rendering control on this thread
         while (window.isActive()) {
+			mtx.lock(); // lock mutex so we can read the needResize value and resize accordingly
+			if (needResize) {
+				window.applyResize(); // apply the last resize
+				window.updateViewport(); // update the render viewport
+				needResize = false; // reset variable
+			}
+			mtx.unlock(); // unlock mutex because we're done
+
             x = x + 0.01;
             y = y + 0.01;
             z = z + 0.01;
 
             cube.setCFrame(Matrix4x4(cube.getCFrame().position()) * Matrix4x4::fromEuler(x, y, z));
 
-            window.updateViewport();
+            // we no longer need to do updateViewport right here because it is handled above
             window.clear();
 
             updateCamera(cam, &window, cX1, cY1);

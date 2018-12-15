@@ -55,8 +55,11 @@ void main5() {
     // note this, only works while the window is actively being resized. it does not work when the mouse is held down on a window edge, but is
     // not being moved.
     window.setResizeCallback([&](int width, int height) {
-        window.applyResize(width, height); // we must explicitly call this when we set a resize callback or else the window's size won't be kept track of
-        // the reason this is the case is because setResizeCallback leaves it up to the programmer so that they can do any thread safety stuff
+		// We must explicitly call applyResize when we set a resize callback or else the window's
+		// size won't be kept track of. This is left up to the application programmer when implementing
+		// a resize callback so that they can take care of thread safety issues, or so they can discard
+		// window resizes if they so choose.
+        window.applyResize();
 
         // do render
         x = x + 0.01;

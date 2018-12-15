@@ -12,8 +12,9 @@ std::atomic<GLuint> Window::clusterCount(0);
 Window::Window(int w, int h, const char* title, Window* parent) {
     SDL_Init(SDL_INIT_VIDEO);
 
+    // OGL 3.2 is the minimum version required for RenderDoc debugging
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24); // default is 16
@@ -152,6 +153,10 @@ void Window::getSize(int& w, int& h) const {
     h = height;
 }
 
+float Window::getAspectRatio() const {
+	return static_cast<float>(width) / height;
+}
+
 void Window::setWidth(int w) {
     width = w;
     SDL_SetWindowSize(window, width, height);
@@ -168,9 +173,9 @@ void Window::setSize(int w, int h) {
     SDL_SetWindowSize(window, width, height);
 }
 
-void Window::applyResize(int w, int h) {
-    width = w;
-    height = h;
+void Window::applyResize() {
+    width = pendingWidth;
+    height = pendingHeight;
 }
 
 void Window::update() {
@@ -306,10 +311,12 @@ int Window::eventWatcher(void* data, SDL_Event* event) {
         if (event->window.windowID == SDL_GetWindowID(window->window)) {
             switch (event->window.event) {
                 case SDL_WINDOWEVENT_SIZE_CHANGED:
+					window->pendingWidth = event->window.data1;
+					window->pendingHeight = event->window.data2;
                     if (window->windowResizeCallback != nullptr) {
                         window->windowResizeCallback(event->window.data1, event->window.data2);
                     } else {
-                        window->applyResize(event->window.data1, event->window.data2);
+                        window->applyResize();
                     }
                     break;
                 case SDL_WINDOWEVENT_CLOSE:

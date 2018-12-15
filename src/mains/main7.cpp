@@ -1,6 +1,7 @@
 #include <thread>
 #include <mutex>
 #include <condition_variable>
+#include <chrono>
 
 #include "mains/mains.hpp"
 
@@ -31,8 +32,8 @@ void main7() {
     float x, y, z;
     x = y = z = 0.0;
 
-    float cX1, cY1;
-    cX1 = cY1 = 0;
+    float cX, cY;
+    cX = cY = 0;
     window.setMouseDownCallback([&window](MOUSE_BUTTON button, int x, int y) {
         if (button == MOUSE_BUTTON::RIGHT) { // right mouse button
             window.setMouseLockEnabled(true);
@@ -43,10 +44,10 @@ void main7() {
             window.setMouseLockEnabled(false);
         }
     });
-    window.setMouseMoveCallback([&window, &cX1, &cY1](int x, int y, int dx, int dy) {
+    window.setMouseMoveCallback([&window, &cX, &cY](int x, int y, int dx, int dy) {
         if (window.isMouseDown(MOUSE_BUTTON::RIGHT)) {
-            cX1 -= dx * MOUSE_SENS;
-            cY1 = std::max(std::min(cY1 - dy * MOUSE_SENS, 90.0f), -90.0f);
+            cX -= dx * MOUSE_SENS;
+            cY = std::max(std::min(cY - dy * MOUSE_SENS, 90.0f), -90.0f);
         }
     });
     window.setKeyUpCallback([&window](KEYCODE key) {
@@ -56,43 +57,30 @@ void main7() {
     });
 
     std::mutex mtx; // for the condition variable
-    std::condition_variable cv; // variable that will be used to indidcate when threads have given up context
-    std::atomic<bool> transferContext(false); // bool writes and reads should be atomic already, but just in case we will use std::atomic
+    std::condition_variable cv; // variable that will be used to indicate when threads have given up context
+    std::atomic<bool> needSync(false); // bool writes and reads should be atomic already, but just in case we will use std::atomic
 
     // This example makes use of the window resize callback and multithreading combined to allow rendering "while" resizing a window.
-    // The catch with this is that an OpenGL context is not able to be made current in more than one thread at a time, so the render thread must
-    // give up the context to the main thread so that it may render upon window resize. One side effect of this method is that resizing the window
-    // can start to feel a little bit laggy or sluggish when the rendering function takes too long to give up the thread. One solution could potentially be
-    // to turn off vsync for the whole application, or just while the window is being resized.
+    // This works by "holding up" the window resize callback until the render thread has had time to process the
+    // resize and render. Since we don't let the window resize callback finish until a render has happened, the
+    // flicker experienced in example main6 (multiple threads, but no resize callback) is eliminated. Essentially
+    // this method syncs up the render and window event threads upon window resize. The only drawback is that
+    // the rendering speed then becomes dependent on the speed of the window resizing, so if you are on a slow
+    // system where resizing windows is sluggish, the rendering performance will take a hit during resize. This
+    // is the price that is paid to have window resizing be synced with the rendering.
 
-    // Here is where the magic happens. In our resize callback we do the render step we would normally do, minus the pollEvents at the end.
-    // But we must additionally gain ownership of the context before we can render it.
+    // Here is where the magic happens. In our resize callback we make sure to wait until a resize has occured
+    // before we return, so that the threads can sync.
     window.setResizeCallback([&](int width, int height) {
         std::unique_lock<std::mutex> lck(mtx); // acquire lock
-        transferContext.store(true); // indicate to the render thread that we need the context
-        cv.wait(lck); // wait until render thread has released context
-        window.makeCurrent(); // claim the context on this thread
-
-        window.applyResize(width, height); // we must explicitly call this when we set a resize callback or else the window's size won't be kept track of
-        // the reason this is the case is because setResizeCallback leaves it up to the programmer so that they can do any thread safety stuff, like we are doing now
-
-        x = x + 0.01;
-        y = y + 0.01;
-        z = z + 0.01;
-
-        cube.setCFrame(Matrix4x4(cube.getCFrame().position()) * Matrix4x4::fromEuler(x, y, z));
-
-        window.updateViewport();
-        window.clear();
-
-        updateCamera(cam, &window, cX1, cY1);
-        context->render();
-
-        window.update();
-        window.makeCurrent(false);
-
-        transferContext.store(false); // reset variable
-        cv.notify_one(); // tell render thread that it can take context back
+        needSync.store(true); // indicate to the render thread that it needs to sync up (and update viewport)
+        // after the render thread has synced a resize render successfully it waits for the next resize event
+        // with a timeout of 7 milliseconds. This is done because if the render thread were to go on to render
+        // again before the next resize event was processed, it would slow down resizing; this avoids that.
+        // So, we must notify the render thread that another resize is happening, which is what the following
+        // line does. Note, if the render thread is not waiting for a resize, this line does nothing.
+		cv.notify_one();
+        cv.wait(lck); // block this function and thread until the render has completed
     });
 
     window.makeCurrent(false); // release rendering control from this thread
@@ -100,16 +88,19 @@ void main7() {
     std::thread t([&]() {
         window.makeCurrent(); // take rendering control on this thread
         while (window.isActive()) {
-            if (transferContext.load()) { // main thread wants the context
-                std::unique_lock<std::mutex> lck(mtx); // acquire lock
-                window.makeCurrent(false); // release context
-                cv.notify_one(); // tell main thread we have given up the context
-                cv.wait(lck); // wait until main thread is done and has given up context
-                window.makeCurrent(); // take context back
-                cv.notify_one();
-                
-                continue; // go ahead and skip back to beginning of loop (and also check if window is still active)
-            }
+			bool shouldNotify = needSync.load(); // store value of needSync at start of render step
+			if (shouldNotify) {
+				// If the window event thread wants to sync, we know that a resize has occured and therefore
+                // we must apply the resize and update the viewport. We must explicitly call applyResize when
+				// we set a resize callback or else the window's size won't be kept track of. This is left up
+				// to the application programmer when implementing a resize callback so that they can take
+				// care of thread safety issues, or so they can discard window resizes if they so choose.
+				// In this example, applying the resize here is thread safe because the main window event
+				// thread is currently waiting for this render thread to render, so it cannot be modifying or
+				// reading the window at this point.
+				window.applyResize();
+				window.updateViewport();
+			}
 
             x = x + 0.01;
             y = y + 0.01;
@@ -117,14 +108,21 @@ void main7() {
 
             cube.setCFrame(Matrix4x4(cube.getCFrame().position()) * Matrix4x4::fromEuler(x, y, z));
 
-            // we no longer need to do updateViewport in this loop because it is handled in the resize callback
+            // we no longer need to do updateViewport right here because it is handled above
             window.clear();
 
-            updateCamera(cam, &window, cX1, cY1);
+            updateCamera(cam, &window, cX, cY);
             context->render();
 
-            window.update();
-            // notice we don't poll events here
+			window.update();
+			if (shouldNotify) {
+				needSync.store(false); // reset sync variable
+				cv.notify_one(); // tell window event thread that this thread has rendered with the updated window size
+				std::unique_lock<std::mutex> lck(mtx); // acquire lock
+				cv.wait_for(lck, std::chrono::milliseconds(7)); // try to wait for next resize, timeout if one doesn't come in 7 milliseconds
+                // 7 is the magic number ;)
+            }
+            // notice we don't poll events here, the main window event thread handles that
         }
         // release rendering control from this thread so that the main thread can clean up resources
         // and close the window
@@ -132,7 +130,7 @@ void main7() {
     });
 
     while (window.isActive()) {
-        window.waitEvents(); // notice we wait for events here instead of polling. this is much more efficient
+        window.waitEvents(); // notice we wait for events here instead of polling. this is much more efficient (avoids a busy loop)
     }
 
     t.join();

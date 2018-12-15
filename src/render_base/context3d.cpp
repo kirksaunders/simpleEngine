@@ -128,12 +128,11 @@ TextureManager* const Context3D::getTextureManager() {
 
 void Context3D::render() {
     window->makeCurrent();
-    float aspectRatio = (float) window->getWidth() / window->getHeight();
 
     Matrix4x4 cameraCFrame = camera.getCFrame();
     Vector4 cameraPosition = cameraCFrame.position();
     Matrix4x4 cameraInverse = cameraCFrame.inverse();
-    Matrix4x4 projection = camera.getPerspective(aspectRatio);
+    Matrix4x4 projection = camera.getPerspective(window->getAspectRatio());
 
     Vector4 lightPosition = Vector4(40, 300, 150);
     Color lightColor = Color(1, 1, 1);

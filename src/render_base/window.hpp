@@ -56,11 +56,12 @@ namespace Render3D {
         int getWidth() const;
         int getHeight() const;
         void getSize(int& w, int& h) const;
+		float getAspectRatio() const;
 
         void setWidth(int w);
         void setHeight(int h);
         void setSize(int w, int h);
-        void applyResize(int w, int h);
+        void applyResize();
 
         void drawTriangle(GLfloat[]);
 
@@ -114,6 +115,8 @@ namespace Render3D {
         int height;
         int windowedWidth;
         int windowedHeight;
+		int pendingWidth;
+		int pendingHeight;
         bool vsyncEnabled;
         bool fullscreenEnabled;
         bool mouseLockEnabled;
