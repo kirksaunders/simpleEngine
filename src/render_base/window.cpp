@@ -12,17 +12,17 @@ std::atomic<GLuint> Window::clusterCount(0);
 Window::Window(int w, int h, const char* title, Window* parent) {
     SDL_Init(SDL_INIT_VIDEO);
 
-    // OGL 3.2 is the minimum version required for RenderDoc debugging
+    // OGL 3.2 is the minimum version required for RenderDoc debugging, so let's use that
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24); // default is 16
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE); // force core profile
 
     window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
     if (!window) {
         SDL_Quit();
-
         throw Exception(std::string("Exception occurred with initializing window: ") + SDL_GetError());
     }
     if (parent != nullptr && !parent->destroyed && parent->context != nullptr) {
@@ -40,7 +40,6 @@ Window::Window(int w, int h, const char* title, Window* parent) {
         SDL_GL_DeleteContext(glContext);
         SDL_DestroyWindow(window);
         SDL_Quit();
-
         throw Exception(std::string("Exception occurred with initializing opengl context: ") + SDL_GetError());
     }
 
@@ -50,7 +49,6 @@ Window::Window(int w, int h, const char* title, Window* parent) {
     if (glewError != GLEW_OK) {
         SDL_DestroyWindow(window);
         SDL_Quit();
-        // throw exception
         throw Exception(std::string("Exception occurred with initializing glew: ") + reinterpret_cast<const char*>(glewGetErrorString(glewError)));
     }
 

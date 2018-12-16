@@ -1,8 +1,6 @@
 #ifndef SPHERE_HPP
 #define SPHERE_HPP
 
-#define GLEW_STATIC
-
 #include <GLEW/glew.h>
 
 #include "objects/primitive3d.hpp"

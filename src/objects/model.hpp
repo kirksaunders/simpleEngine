@@ -1,8 +1,6 @@
 #ifndef MODEL_HPP
 #define MODEL_HPP
 
-#define GLEW_STATIC
-
 #include <vector>
 #include <string>
 #include <utility>

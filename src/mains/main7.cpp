@@ -73,8 +73,8 @@ void main7() {
     // before we return, so that the threads can sync.
     window.setResizeCallback([&](int width, int height) {
         std::unique_lock<std::mutex> lck(mtx); // acquire lock
-        needSync.store(true); // indicate to the render thread that it needs to sync up (and update viewport)
-        // after the render thread has synced a resize render successfully it waits for the next resize event
+        needSync.store(true); // indicate to the render thread that it needs to sync up (and apply resize)
+        // After the render thread has synced a resize successfully, it waits for the next resize event
         // with a timeout of 7 milliseconds. This is done because if the render thread were to go on to render
         // again before the next resize event was processed, it would slow down resizing; this avoids that.
         // So, we must notify the render thread that another resize is happening, which is what the following

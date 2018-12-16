@@ -1,8 +1,6 @@
 #ifndef SHADERVARIABLE_HPP
 #define SHADERVARIABLE_HPP
 
-#define GLEW_STATIC
-
 #include <vector>
 #include <utility>
 #include <string>

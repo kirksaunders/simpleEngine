@@ -1,8 +1,6 @@
 #ifndef TEXTURE_HPP
 #define TEXTURE_HPP
 
-#define GLEW_STATIC
-
 #include <string>
 #include <vector>
 #include <utility>

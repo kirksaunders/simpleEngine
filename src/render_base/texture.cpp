@@ -1,9 +1,12 @@
 #include <algorithm>
 #include <utility>
 #include <iostream>
+#include <cstdlib>
 
-#include <SOIL/SOIL.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
 
+#include "render_base/exception.hpp"
 #include "render_base/window.hpp"
 #include "render_base/texture.hpp"
 #include "render_base/shader.hpp"
@@ -27,10 +30,14 @@ Texture::Texture(const char *filePath) {
     shader = nullptr;
     textureVariable = nullptr;
 
-    image = SOIL_load_image(filePath, &width, &height, 0, SOIL_LOAD_RGBA);
-    depth = 4;
+    image = stbi_load(filePath, &width, &height, &depth, 0);
+	if (image == nullptr) {
+		throw Exception(std::string("Unable to load texture from file ") + filePath);
+	}
+	if (depth != 3 && depth != 4) {
+        throw Exception("Unable to load texture from file, the number of image channels must be either 3 or 4");
+    }
     std::cout << filePath << std::endl;
-    std::cout << SOIL_last_result() << std::endl;
     std::cout << width << " x " << height << std::endl;
 }
 
@@ -44,12 +51,14 @@ Texture::Texture(const TextureBuffer& buff) {
     depth = buff.getDepth();
 
     if (depth != 3 && depth != 4) {
-        // error
-        return;
+        throw Exception("Unable to create texture from texture buffer, the depth of the texture buffer must be either 3 or 4");
     }
 
-    image = new GLubyte[width * height * depth];
-    std::copy(buff.getAddress(), buff.getAddress() + (width * height * depth), image);
+	image = static_cast<GLubyte*>(malloc(width * height * depth)); // to be consistent with stb_image, we use malloc and memcpy for the image data
+	if (image == nullptr) {
+		throw Exception("Unable to allocate memory for texture");
+	}
+	memcpy(image, buff.getAddress(), width * height * depth);
 }
 
 Texture::Texture(const Texture& other) {
@@ -420,8 +429,11 @@ void Texture::copy(const Texture& other) {
     VAOs = other.VAOs;
     IDs = other.IDs;
     if (other.image != nullptr) {
-        image = new GLubyte[width * height * depth];
-        std::copy(other.image, other.image + (width * height * depth), image);
+        image = static_cast<GLubyte*>(malloc(width * height * depth)); // to be consistent with stb_image, we use malloc and memcpy for the image data
+		if (image == nullptr) {
+			throw Exception("Unable to allocate memory for texture");
+		}
+		memcpy(image, other.image, width * height * depth);
     } else {
         image = nullptr;
     }
@@ -455,6 +467,6 @@ void Texture::initialize() {
 
 void Texture::destroy() {
     if (image != nullptr) {
-        delete[] image;
+        free(image); // stb_image uses malloc to allocate image, so to deallocate we should use free
     }
 }

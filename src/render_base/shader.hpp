@@ -1,8 +1,6 @@
 #ifndef SHADER_HPP
 #define SHADER_HPP
 
-#define GLEW_STATIC
-
 #include <string>
 #include <vector>
 #include <unordered_map>

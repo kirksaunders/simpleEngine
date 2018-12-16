@@ -1,8 +1,6 @@
 #ifndef MESH_HPP
 #define MESH_HPP
 
-#define GLEW_STATIC
-
 #include <vector>
 #include <string>
 #include <utility>

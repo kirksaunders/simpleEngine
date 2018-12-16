@@ -1,8 +1,6 @@
 #ifndef BUFFERCONTAINERS_HPP
 #define BUFFERCONTAINERS_HPP
 
-#define GLEW_STATIC
-
 #include <GLEW/glew.h>
 
 namespace Render3D {

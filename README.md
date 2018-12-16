@@ -6,5 +6,5 @@ The purpose of this project is to provide an easy-to-use, cross-platform library
 ## Dependencies (All cross-platform)
 - **GLEW**(GL Extension Wrangler) - Loads in all of the required OpenGL libraries for use
 - **SDL**(Simple DirectMedia Layer) - Windowing and input library with OpenGL support
-- **SOIL**(Simple OpenGL Image Library) - Used for loading textures
+- **stb_image**(Sean Barrett's Image Loading Library) - Single file, header-only C library for loading images
 - **ASSIMP**(Open Asset Importer Library) - Used to parse many different 3D object file formats

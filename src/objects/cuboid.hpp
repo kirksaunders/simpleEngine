@@ -1,8 +1,6 @@
 #ifndef CUBOID_HPP
 #define CUBOID_HPP
 
-#define GLEW_STATIC
-
 #include <vector>
 #include <utility>
 

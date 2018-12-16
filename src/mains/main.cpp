@@ -11,8 +11,8 @@ int main(int arc, char** arcv) {
               << "3.) Cuboids (multiple windows)" << std::endl
               << "4.) Mesh loading (multiple windows)" << std::endl
               << "5.) Render while resizing (using callback)" << std::endl
-              << "6.) Render while resizing (using multiple threads)" << std::endl
-              << "7.) Render while resizing (using multiple threads and callback)" << std::endl
+              << "6.) Render while resizing (using two threads)" << std::endl
+              << "7.) Render while resizing (using two threads and callback)" << std::endl
               << "8.) Raytracer" << std::endl
               << "9.) Pathfind" << std::endl
               << "Enter your choice for situation to run: ";

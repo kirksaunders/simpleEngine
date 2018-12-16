@@ -1,8 +1,6 @@
 #ifndef TEXTUREBUFFER_HPP
 #define TEXTUREBUFFER_HPP
 
-#define GLEW_STATIC
-
 #include <GLEW/glew.h>
 
 namespace Render3D {

@@ -1,8 +1,6 @@
 #ifndef WINDOW__HPP
 #define WINDOW__HPP
 
-#define GLEW_STATIC
-
 #include <functional>
 #include <atomic>
 #include <vector>

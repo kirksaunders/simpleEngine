@@ -32,7 +32,8 @@ out vec4 color;
 vec4 blend(vec4 a, vec4 b) {
     vec4 c;
     c.a = a.a + b.a * (1.0f - a.a);
-    c.rgb = a.rgb * a.a + b.rgb * b.a * (1 - a.a) / max(c.a, 0.001f) * sign(c.a);
+	c.rgb = mix(b.rgb * b.a, a.rgb, a.a) / max(c.a, 0.001f) * sign(c.a);
+    //c.rgb = a.rgb * a.a + b.rgb * b.a * (1 - a.a) / max(c.a, 0.001f) * sign(c.a);
     return c;
 }
 
