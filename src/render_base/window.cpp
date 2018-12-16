@@ -12,7 +12,7 @@ std::atomic<GLuint> Window::clusterCount(0);
 Window::Window(int w, int h, const char* title, Window* parent) {
     SDL_Init(SDL_INIT_VIDEO);
 
-    // OGL 3.2 is the minimum version required for RenderDoc debugging, so let's use that
+    // I've noticed that OGL 3.1 performs better and with less bugs than 3.2+ on my high-end rig, so 3.1 it is for now
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
@@ -56,8 +56,8 @@ Window::Window(int w, int h, const char* title, Window* parent) {
     glEnable(GL_MULTISAMPLE);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    //glEnable(GL_CULL_FACE);
-    //glCullFace(GL_BACK);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
 
     width = w;
     height = h;

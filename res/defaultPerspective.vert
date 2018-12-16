@@ -15,19 +15,19 @@ out vec2 texCoords;
 
 out vec3 faceNormal;
 out vec3 vertexPosition;
-out vec3 barycentric;
+//out vec3 barycentric;
 
 void main() {
     vertexPosition = (modelCFrame * (vec4(position, 1.0f) * modelSize)).xyz;
     faceNormal = normalize((modelRotation * (vec4(normal.xyz, 1.0f) * modelSize)).xyz);
     texCoords = texCoord;
 
-	float m = mod(gl_VertexID, 3);
+	/*float m = mod(gl_VertexID, 3);
 	barycentric = vec3(
 		1.0 - abs(sign(m)),
 		1.0 - abs(sign(m - 1.0f)),
 		1.0 - abs(sign(m - 2.0f))
-	);
+	);*/
 
     gl_Position = projection * cameraInverse * vec4(vertexPosition.xyz, 1.0f);
 }
