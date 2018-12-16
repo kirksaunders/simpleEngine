@@ -17,7 +17,7 @@ Mesh::Mesh(const std::vector<Vector4>& verts, const std::vector<Vector4>& norms,
     numVertices = indices.size();
 }
 
-BufferTriple Mesh::generateBuffers(GLuint clusterID) {
+DoubleBufferObject Mesh::generateBuffers(GLuint clusterID) {
     for (unsigned int i = 0; i < bufferObjects.size(); ++i) {
         if (bufferObjects[i].first == clusterID) {
             ++(bufferObjects[i].second.useCount);
@@ -25,69 +25,49 @@ BufferTriple Mesh::generateBuffers(GLuint clusterID) {
         }
     }
 
-    BufferTriple triple;
+    DoubleBufferObject buffers;
 
     // generate and load buffers
-    glGenBuffers(1, &triple.first);
-    glGenBuffers(1, &triple.second);
-    glGenBuffers(1, &triple.third);
+    glGenBuffers(1, &buffers.firstID);
+	glGenBuffers(1, &buffers.secondID);
 
-    GLfloat* verticesNew = new GLfloat[3 * numVertices];
+    GLfloat* data = new GLfloat[8 * numVertices];
 
-    for (int i = 0; i < numVertices; i++) {
-        Vector4 vert = vertices[indices[i]];
+    for (int i = 0; i < vertices.size(); ++i) {
+        data[i*8] =		vertices[i][0];
+        data[i*8 + 1] =	vertices[i][1];
+        data[i*8 + 2] =	vertices[i][2];
 
-        verticesNew[i * 3] = vert[0];
-        verticesNew[i * 3 + 1] = vert[1];
-        verticesNew[i * 3 + 2] = vert[2];
+		data[i*8 + 3] =	normals[i][0];
+        data[i*8 + 4] =	normals[i][1];
+        data[i*8 + 5] =	normals[i][2];
+
+		data[i*8 + 6] =	texCoords[i].x;
+        data[i*8 + 7] =	texCoords[i].y;
     }
 
-    glBindBuffer(GL_ARRAY_BUFFER, triple.first);
-    glBufferData(GL_ARRAY_BUFFER, 3 * sizeof(GLfloat) * numVertices, verticesNew, GL_STATIC_DRAW);
-    delete[] verticesNew;
+    glBindBuffer(GL_ARRAY_BUFFER, buffers.firstID);
+    glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat) * vertices.size(), data, GL_STATIC_DRAW);
+    delete[] data;
 
-    GLfloat* normalsNew = new GLfloat[3 * numVertices];
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers.secondID);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * indices.size(), &indices[0], GL_STATIC_DRAW);
 
-    for (int i = 0; i < numVertices; i++) {
-        Vector4 vert = normals[indices[i]];
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-        normalsNew[i * 3] = vert[0];
-        normalsNew[i * 3 + 1] = vert[1];
-        normalsNew[i * 3 + 2] = vert[2];
-    }
+    buffers.useCount = 1;
+    bufferObjects.push_back(std::pair<GLuint, DoubleBufferObject>(clusterID, buffers));
 
-    glBindBuffer(GL_ARRAY_BUFFER, triple.second);
-    glBufferData(GL_ARRAY_BUFFER, 3 * sizeof(GLfloat) * numVertices, normalsNew, GL_STATIC_DRAW);
-    delete[] normalsNew;
-
-    GLfloat* texCoordsNew = new GLfloat[2 * numVertices];
-
-    for (int i = 0; i < numVertices; i++) {
-        TextureCoord tex = texCoords[indices[i]];
-
-        texCoordsNew[i * 2] = tex.x;
-        texCoordsNew[i * 2 + 1] = tex.y;
-    }
-
-    glBindBuffer(GL_ARRAY_BUFFER, triple.third);
-    glBufferData(GL_ARRAY_BUFFER, 2 * sizeof(GLfloat) * numVertices, texCoordsNew, GL_STATIC_DRAW);
-    delete[] texCoordsNew;
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0); // make sure no buffer is bound
-
-    triple.useCount = 1;
-    bufferObjects.push_back(std::pair<GLuint, BufferTriple>(clusterID, triple));
-
-    return triple;
+    return buffers;
 }
 
 void Mesh::destroyBuffers(GLuint clusterID) {
     for (unsigned int i = 0; i < bufferObjects.size(); ++i) {
         if (bufferObjects[i].first == clusterID) {
             if (--(bufferObjects[i].second.useCount) == 0) {
-                glDeleteBuffers(1, &bufferObjects[i].second.first);
-                glDeleteBuffers(1, &bufferObjects[i].second.second);
-                glDeleteBuffers(1, &bufferObjects[i].second.third);
+                glDeleteBuffers(1, &bufferObjects[i].second.firstID);
+                glDeleteBuffers(1, &bufferObjects[i].second.secondID);
                 std::swap(bufferObjects[i], bufferObjects.back());
                 bufferObjects.pop_back();
             }
@@ -103,29 +83,32 @@ void Mesh::generateVertexArrayObject(Window& win) {
         }
     }
 
-    BufferTriple buffers = generateBuffers(win.getClusterID());
+    DoubleBufferObject buffers = generateBuffers(win.getClusterID());
 
     GLuint VAO;
     glGenVertexArrays(1, &VAO);
 
     glBindVertexArray(VAO);
 
-    // Bind VBO
-    glBindBuffer(GL_ARRAY_BUFFER, buffers.first);
+    // Bind Buffers
+    glBindBuffer(GL_ARRAY_BUFFER, buffers.firstID);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers.secondID);
+
+	// Set Vertex Info
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0);
 
-    // Bind NBO
-    glBindBuffer(GL_ARRAY_BUFFER, buffers.second);
+    // Set Normal Info
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
 
-    // Bind TBO
-    glBindBuffer(GL_ARRAY_BUFFER, buffers.third);
+    // Set UV Coordinate Info
     glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)0);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(6 * sizeof(GLfloat)));
 
+	// Unbind Buffers
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     glBindVertexArray(0);
 
@@ -147,6 +130,16 @@ GLuint Mesh::getVertexArrayObject(Window& win) {
     for (unsigned int i = 0; i < VAOs.size(); ++i) {
         if (VAOs[i].first == &win) {
             return VAOs[i].second;
+        }
+    }
+
+    return 0;
+}
+
+GLuint Mesh::getElementArrayBuffer(GLuint clusterID) {
+    for (unsigned int i = 0; i < bufferObjects.size(); ++i) {
+        if (bufferObjects[i].first == clusterID) {
+            return bufferObjects[i].second.secondID;
         }
     }
 
@@ -194,7 +187,9 @@ void Mesh::render(Shader& shader, Window& win, TextureManager& textureManager) {
     bindTextures(shader, win, textureManager);
 
     glBindVertexArray(getVertexArrayObject(win));
-    glDrawArrays(GL_TRIANGLES, 0, numVertices);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, getElementArrayBuffer(win.getClusterID()));
+    //glDrawArrays(GL_TRIANGLES, 0, numVertices);
+	glDrawElements(GL_TRIANGLES, numVertices, GL_UNSIGNED_INT, (GLvoid*)0);
     
     unbindTextures(shader, win, textureManager);
 }

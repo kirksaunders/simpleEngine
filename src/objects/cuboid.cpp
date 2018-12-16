@@ -7,7 +7,7 @@ using namespace Render3D;
 using namespace Math3D;
 
 Cuboid::Cuboid() : Primitive3D() {
-    vertices[0] = Vector4(-0.5, 0.5, 0.5);
+	vertices[0] = Vector4(-0.5, 0.5, 0.5);
     vertices[1] = Vector4(-0.5, 0.5, -0.5);
     vertices[2] = Vector4(0.5, 0.5, -0.5);
     vertices[3] = Vector4(0.5, 0.5, 0.5);
@@ -80,7 +80,7 @@ Cuboid::Cuboid() : Primitive3D() {
     vertexIndices[29] = 3;
 
     for (int i = 24; i < 30; i++) {
-        normalIndices[i] = 4;
+        normalIndices[i] = 5;
     }
 
     // Back Face
@@ -92,12 +92,11 @@ Cuboid::Cuboid() : Primitive3D() {
     vertexIndices[35] = 5;
 
     for (int i = 30; i < 36; i++) {
-        normalIndices[i] = 5;
+        normalIndices[i] = 4;
     }
-
 }
 
-BufferPair Cuboid::generateBuffers(GLuint clusterID) {
+BufferObject Cuboid::generateBuffers(GLuint clusterID) {
     for (unsigned int i = 0; i < bufferObjects.size(); ++i) {
         if (bufferObjects[i].first == clusterID) {
             ++(bufferObjects[i].second.useCount);
@@ -105,49 +104,41 @@ BufferPair Cuboid::generateBuffers(GLuint clusterID) {
         }
     }
 
-    GLfloat verts[108];
-    GLfloat norms[108];
+	GLfloat data[36 * 3 * 2];
+	for (unsigned int i = 0; i < 36; i++) {
+		unsigned int ind = vertexIndices[i];
+		data[i*6] =		vertices[ind][0];
+		data[i*6 + 1] =	vertices[ind][1];
+		data[i*6 + 2] =	vertices[ind][2];
 
-    for (int i = 0; i < 36; i++) {
-        Vector4 temp = vertices[vertexIndices[i]];
-
-        verts[i * 3] = temp[0];
-        verts[i * 3 + 1] = temp[1];
-        verts[i * 3 + 2] = temp[2];
-
-        temp = normals[normalIndices[i]];
-
-        norms[i * 3] = temp[0];
-        norms[i * 3 + 1] = temp[1];
-        norms[i * 3 + 2] = temp[2];
-    }
+		ind = normalIndices[i];
+		data[i*6 + 3] =	normals[ind][0];
+		data[i*6 + 4] =	normals[ind][1];
+		data[i*6 + 5] =	normals[ind][2];
+	}
 
     // Generate GL Buffers
-    BufferPair pair;
+    BufferObject buffer;
 
-    glGenBuffers(1, &pair.first);
-    glGenBuffers(1, &pair.second);
+	glGenBuffers(2, &buffer.id);
 
-    glBindBuffer(GL_ARRAY_BUFFER, pair.first);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ARRAY_BUFFER, pair.second);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(norms), norms, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, buffer.id);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    pair.useCount = 1;
-    bufferObjects.push_back(std::pair<GLuint, BufferPair>(clusterID, pair));
+    buffer.useCount = 1;
+    bufferObjects.push_back(std::pair<GLuint, BufferObject>(clusterID, buffer));
 
-    return pair;
+    return buffer;
 }
 
 void Cuboid::destroyBuffers(GLuint clusterID) {
     for (unsigned int i = 0; i < bufferObjects.size(); ++i) {
         if (bufferObjects[i].first == clusterID) {
             if (--(bufferObjects[i].second.useCount) == 0) {
-                glDeleteBuffers(1, &bufferObjects[i].second.first);
-                glDeleteBuffers(1, &bufferObjects[i].second.second);
+                glDeleteBuffers(1, &bufferObjects[i].second.id);
                 std::swap(bufferObjects[i], bufferObjects.back());
                 bufferObjects.pop_back();
             }
@@ -163,22 +154,23 @@ void Cuboid::generateVertexArrayObject(Window& win) {
         }
     }
 
-    BufferPair buffers = generateBuffers(win.getClusterID());
+    BufferObject buffer = generateBuffers(win.getClusterID());
 
     GLuint VAO;
     glGenVertexArrays(1, &VAO);
 
     glBindVertexArray(VAO);
 
-    // Bind VBO
-    glBindBuffer(GL_ARRAY_BUFFER, buffers.first);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+    // Bind Buffer
+    glBindBuffer(GL_ARRAY_BUFFER, buffer.id);
 
-    // Bind NBO
-    glBindBuffer(GL_ARRAY_BUFFER, buffers.second);
+	// Set Vertex Info
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
+
+    // Set Normal Info
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -208,15 +200,11 @@ GLuint Cuboid::getVertexArrayObject(Window& win) {
     return 0;
 }
 
-int Cuboid::getVertexCount() {
-    return 36;
-}
-
 void Cuboid::render(Window& win, TextureManager& textureManager) {
     applyVariables(win);
 
     glBindVertexArray(getVertexArrayObject(win));
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
 }
 
 void Cuboid::prepareContent(Window& win, TextureManager& textureManager) {

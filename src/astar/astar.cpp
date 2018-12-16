@@ -129,7 +129,7 @@ void pathfind() {
                     cube->setCFrame(Matrix4x4(x * GRID_SIZE, y * GRID_SIZE, z * GRID_SIZE));
                     cube->setColor(Color(0.75, 0.75, 0.75));
                     cube->setShader(&defaultShader);
-                    cube->setWireframeEnabled(true);
+                    //cube->setWireframeEnabled(true);
                     context->addObject(cube);
                     walls.push_back(cube);
                 }

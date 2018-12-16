@@ -173,6 +173,8 @@ void Context3D::render() {
     if (currentShader != nullptr) {
         currentShader->unuse(*window);
     }
+	
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 }
 

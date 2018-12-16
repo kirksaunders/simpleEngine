@@ -5,7 +5,7 @@
 #include <string>
 #include <utility>
 
-#include "objects/buffercontainers.hpp"
+#include "objects/bufferobject.hpp"
 #include "objects/primitive3d.hpp"
 #include "render_base/texture.hpp"
 
@@ -48,14 +48,15 @@ namespace Render3D {
 
         unsigned int numVertices;
 
-        std::vector<std::pair<GLuint, BufferTriple> > bufferObjects;
+        std::vector<std::pair<GLuint, DoubleBufferObject> > bufferObjects;
         std::vector<std::pair<const Window*, GLuint> > VAOs;
 
-        BufferTriple generateBuffers(GLuint clusterID);
+        DoubleBufferObject generateBuffers(GLuint clusterID);
         void destroyBuffers(GLuint clusterID);
         void generateVertexArrayObject(Window& win);
         void destroyVertexArrayObject(Window& win);
         GLuint getVertexArrayObject(Window& win);
+        GLuint getElementArrayBuffer(GLuint clusterID);
     };
 }
 

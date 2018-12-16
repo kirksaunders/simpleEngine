@@ -216,7 +216,7 @@ int Texture::useNextLocation(GLuint textureID, Window& win, TextureManager& text
     return location;
 }
 
-BufferPair Texture::generateBuffers(GLuint clusterID) {
+BufferObject Texture::generateBuffers(GLuint clusterID) {
     for (unsigned int i = 0; i < bufferObjects.size(); ++i) {
         if (bufferObjects[i].first == clusterID) {
             ++(bufferObjects[i].second.useCount);
@@ -224,58 +224,54 @@ BufferPair Texture::generateBuffers(GLuint clusterID) {
         }
     }
 
-    GLfloat vertices[12];
-    vertices[0] = 1.0;
-    vertices[1] = 1.0;
+    GLfloat data[24];
+	// vertex 1
+    data[0] = 1.0;
+    data[1] = 1.0;
+	data[2] = 1.0;
+	data[3] = 0.0;
     
-    vertices[2] = -1.0;
-    vertices[3] = 1.0;
+	// vertex 2
+    data[4] = -1.0;
+    data[5] = 1.0;
+	data[6] = 0.0;
+    data[7] = 0.0;
 
-    vertices[4] = -1.0;
-    vertices[5] = -1.0;
+	// vertex 3
+    data[8] = -1.0;
+    data[9] = -1.0;
+	data[10] = 0.0;
+    data[11] = 1.0;
 
-    vertices[6] = 1.0;
-    vertices[7] = 1.0;
+	// vertex 4
+    data[12] = 1.0;
+    data[13] = 1.0;
+	data[14] = 1.0;
+    data[15] = 0.0;
 
-    vertices[8] = -1.0;
-    vertices[9] = -1.0;
+	// vertex 5
+    data[16] = -1.0;
+    data[17] = -1.0;
+	data[18] = 0.0;
+    data[19] = 1.0;
 
-    vertices[10] = 1.0;
-    vertices[11] = -1.0;
+	// vertex 6
+    data[20] = 1.0;
+    data[21] = -1.0;
+	data[22] = 1.0;
+    data[23] = 1.0;
 
-    GLfloat texCoords[12];
-    texCoords[0] = 1.0;
-    texCoords[1] = 0.0;
+    BufferObject pair;
 
-    texCoords[2] = 0.0;
-    texCoords[3] = 0.0;
+    glGenBuffers(1, &pair.id);
 
-    texCoords[4] = 0.0;
-    texCoords[5] = 1.0;
-
-    texCoords[6] = 1.0;
-    texCoords[7] = 0.0;
-
-    texCoords[8] = 0.0;
-    texCoords[9] = 1.0;
-
-    texCoords[10] = 1.0;
-    texCoords[11] = 1.0;
-
-    BufferPair pair;
-
-    glGenBuffers(1, &pair.first);
-    glBindBuffer(GL_ARRAY_BUFFER, pair.first);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glGenBuffers(1, &pair.second);
-    glBindBuffer(GL_ARRAY_BUFFER, pair.second);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(texCoords), texCoords, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, pair.id);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     pair.useCount = 1;
-    bufferObjects.push_back(std::pair<GLuint, BufferPair>(clusterID, pair));
+    bufferObjects.push_back(std::pair<GLuint, BufferObject>(clusterID, pair));
 
     return pair;
 }
@@ -284,8 +280,7 @@ void Texture::destroyBuffers(GLuint clusterID) {
     for (unsigned int i = 0; i < bufferObjects.size(); ++i) {
         if (bufferObjects[i].first == clusterID) {
             if (--(bufferObjects[i].second.useCount) == 0) {
-                glDeleteBuffers(1, &bufferObjects[i].second.first);
-                glDeleteBuffers(1, &bufferObjects[i].second.second);
+                glDeleteBuffers(1, &bufferObjects[i].second.id);
                 std::swap(bufferObjects[i], bufferObjects.back());
                 bufferObjects.pop_back();
             }
@@ -345,20 +340,20 @@ void Texture::generateVertexArrayObject(Window& win) {
         }
     }
 
-    BufferPair pair = generateBuffers(win.getClusterID());
+    BufferObject pair = generateBuffers(win.getClusterID());
 
     GLuint VAO;
 
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
 
-    glBindBuffer(GL_ARRAY_BUFFER, pair.first);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)0);
+    glBindBuffer(GL_ARRAY_BUFFER, pair.id);
 
-    glBindBuffer(GL_ARRAY_BUFFER, pair.second);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)0);
+
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)0);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)(2 * sizeof(GLfloat)));
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 

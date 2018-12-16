@@ -76,7 +76,7 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
             aiVec = mesh->mNormals[i];
             norm[0] = aiVec.x;
             norm[1] = aiVec.y;
-            norm[2] = -aiVec.z;
+            norm[2] = aiVec.z;
         } else {
             // will throw exception eventually
         }

@@ -7,7 +7,7 @@
 
 #include <GLEW/glew.h>
 
-#include "objects/buffercontainers.hpp"
+#include "objects/bufferobject.hpp"
 
 #include "render_base/shadervariable.hpp"
 
@@ -67,13 +67,13 @@ namespace Render3D {
         Shader* shader;
         ShaderVariable<int>* textureVariable;
 
-        std::vector<std::pair<GLuint, BufferPair> > bufferObjects;
+        std::vector<std::pair<GLuint, BufferObject> > bufferObjects;
         std::vector<std::pair<const Window*, GLuint> > VAOs;
         std::vector<std::pair<GLuint, TextureID> > IDs;
 
         int useNextLocation(GLuint textureID, Window& win, TextureManager& textureManager);
 
-        BufferPair generateBuffers(GLuint clusterID);
+        BufferObject generateBuffers(GLuint clusterID);
         void destroyBuffers(GLuint clusterID);
         void generateTexture(GLuint clusterID);
         void destroyTexture(GLuint clusterID);

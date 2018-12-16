@@ -19,7 +19,7 @@ out vec3 barycentric;
 
 void main() {
     vertexPosition = (modelCFrame * (vec4(position, 1.0f) * modelSize)).xyz;
-    faceNormal = normalize((modelRotation * (vec4(normal.xy, -normal.z, 1.0f) * modelSize)).xyz);
+    faceNormal = normalize((modelRotation * (vec4(normal.xyz, 1.0f) * modelSize)).xyz);
     texCoords = texCoord;
 
 	float m = mod(gl_VertexID, 3);
