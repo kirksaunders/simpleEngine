@@ -61,8 +61,6 @@ namespace Render3D {
         void setSize(int w, int h);
         void applyResize();
 
-        void drawTriangle(GLfloat[]);
-
         void update();
 
         void destroy();
