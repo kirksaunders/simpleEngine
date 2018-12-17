@@ -74,6 +74,7 @@ void Shader::destroyContent(Window& win) {
 
 void Shader::use(Window& win) {
     if (!win.isShaderActive(*this)) {
+        win.makeCurrent();
         win.setShaderActive(*this);
         glUseProgram(getProgramID(win.getClusterID()));
     }

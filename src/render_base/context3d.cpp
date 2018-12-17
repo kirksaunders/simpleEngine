@@ -55,9 +55,9 @@ void Context3D::addObject(Primitive3D* object) {
 }
 
 void Context3D::removeObject(Primitive3D* object) {
-    window->makeCurrent();
     unsigned int numRemoved = objects.erase(object);
     if (numRemoved > 0) {
+        window->makeCurrent();
         object->destroyContent(*window, *textureManager.get());
     }
 }
@@ -180,11 +180,21 @@ void Context3D::render() {
 
 void Context3D::renderTexture(Texture& tex) {
     window->makeCurrent();
+
     if (tex.getShader() == nullptr) {
         throw Exception("Tried to render texture with no shader set");
     }
+
     tex.getShader()->use(*window);
+
+    bool depthTest = window->isDepthTestEnabled();
+    window->setDepthTestEnabled(false);
+    // Note: If tex.render throws, then depthTest will be left set to false.
+    //       I need to fix this in the future.
     tex.render(*window, *textureManager.get());
+    window->setDepthTestEnabled(depthTest);
+
     tex.getShader()->unuse(*window);
+    
     glBindVertexArray(0);
 }

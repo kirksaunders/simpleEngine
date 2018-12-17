@@ -10,6 +10,7 @@ void raytracer() {
     using namespace std;
 
     Window window(WIDTH, HEIGHT, "Testing");
+    window.setVSyncEnabled(true);
     Context3D* context = window.getContext();
     Camera* camera = context->getCamera();
     Matrix4x4 camCFr = camera->getCFrame();

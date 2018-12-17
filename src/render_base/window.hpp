@@ -10,7 +10,7 @@
 #include <GLEW/glew.h>
 #include <SDL2/sdl.h>
 
-#include "keycodes.hpp"
+#include "render_base/keycodes.hpp"
 
 namespace Render3D {
     // forward declarations
@@ -70,10 +70,12 @@ namespace Render3D {
         void setVSyncEnabled(bool enabled);
         void setFullscreenEnabled(bool enabled);
         void setMouseLockEnabled(bool enabled);
+        void setDepthTestEnabled(bool enabled);
 
         bool isVSyncEnabled() const;
         bool isFullscreenEnabled() const;
         bool isMouseLockEnabled() const;
+        bool isDepthTestEnabled() const;
 
         void toggleFullscreen();
 
@@ -118,14 +120,16 @@ namespace Render3D {
         bool vsyncEnabled;
         bool fullscreenEnabled;
         bool mouseLockEnabled;
+        bool depthTestEnabled;
         MouseButtonCallback mouseDownCallback;
         MouseButtonCallback mouseUpCallback;
         MouseMoveCallback mouseMoveCallback;
         KeyCallback keyDownCallback;
         KeyCallback keyUpCallback;
         WindowResizeCallback windowResizeCallback;
-
-        std::vector<std::pair<std::thread::id, const Shader*> > activeShaders;
+        static thread_local const Window* currentWindow;
+        std::thread::id currentThread;
+        const Shader* activeShader;
 
         std::vector<int> mouseState;
         std::vector<int> keyboardState;
@@ -134,12 +138,6 @@ namespace Render3D {
         int mouseY;
 
         static int eventWatcher(void* data, SDL_Event* event);
-
-        /*static void closeCallback(GLFWwindow* window);
-        //static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
-        static void resizeCallback(GLFWwindow* glfwWin, int width, int height);
-        static void mouseButtonCallback(GLFWwindow* glfwWin, int button, int action, int mods);
-        static void cursorPositionCallback(GLFWwindow* glfwWin, double x, double y);*/
     };
 }
 
