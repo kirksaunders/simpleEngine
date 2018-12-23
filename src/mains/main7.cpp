@@ -34,6 +34,7 @@ void main7() {
 
     float cX, cY;
     cX = cY = 0;
+
     window.setMouseDownCallback([&window](MOUSE_BUTTON button, int x, int y) {
         if (button == MOUSE_BUTTON::RIGHT) { // right mouse button
             window.setMouseLockEnabled(true);
@@ -50,15 +51,22 @@ void main7() {
             cY = std::max(std::min(cY - dy * MOUSE_SENS, 90.0f), -90.0f);
         }
     });
-    window.setKeyUpCallback([&window](KEYCODE key) {
-        if (key == KEYCODE::F11) {
-            window.toggleFullscreen();
-        }
-    });
 
-    std::mutex mtx; // for the condition variable
+	std::mutex mtx; // for the condition variable
     std::condition_variable cv; // variable that will be used to indicate when threads have given up context
     std::atomic<bool> needSync(false); // bool writes and reads should be atomic already, but just in case we will use std::atomic
+	std::atomic<bool> goingFullscreen(false);
+
+	window.setKeyUpCallback([&window, &mtx, &cv, &goingFullscreen](KEYCODE key) {
+        if (key == KEYCODE::F11) {
+			std::unique_lock<std::mutex> lck(mtx);
+			goingFullscreen.store(true);
+			cv.wait(lck);
+			window.toggleFullscreen();
+			goingFullscreen.store(false);
+			cv.notify_one();
+        }
+    });
 
     // This example makes use of the window resize callback and multithreading combined to allow rendering "while" resizing a window.
     // This works by "holding up" the window resize callback until the render thread has had time to process the
@@ -72,15 +80,17 @@ void main7() {
     // Here is where the magic happens. In our resize callback we make sure to wait until a resize has occured
     // before we return, so that the threads can sync.
     window.setResizeCallback([&](int width, int height) {
-        std::unique_lock<std::mutex> lck(mtx); // acquire lock
-        needSync.store(true); // indicate to the render thread that it needs to sync up (and apply resize)
-        // After the render thread has synced a resize successfully, it waits for the next resize event
-        // with a timeout of 7 milliseconds. This is done because if the render thread were to go on to render
-        // again before the next resize event was processed, it would slow down resizing; this avoids that.
-        // So, we must notify the render thread that another resize is happening, which is what the following
-        // line does. Note, if the render thread is not waiting for a resize, this line does nothing.
-		cv.notify_one();
-        cv.wait(lck); // block this function and thread until the render has completed
+		if (!goingFullscreen.load()) {
+			std::unique_lock<std::mutex> lck(mtx); // acquire lock
+			needSync.store(true); // indicate to the render thread that it needs to sync up (and apply resize)
+			// After the render thread has synced a resize successfully, it waits for the next resize event
+			// with a timeout of 7 milliseconds. This is done because if the render thread were to go on to render
+			// again before the next resize event was processed, it would slow down resizing; this avoids that.
+			// So, we must notify the render thread that another resize is happening, which is what the following
+			// line does. Note, if the render thread is not waiting for a resize, this line does nothing.
+			cv.notify_one();
+			cv.wait(lck); // block this function and thread until the render has completed
+		}
     });
 
     window.makeCurrent(false); // release rendering control from this thread
@@ -88,6 +98,14 @@ void main7() {
     std::thread t([&]() {
         window.makeCurrent(); // take rendering control on this thread
         while (window.isActive()) {
+            // handle window going fullscreen as well
+			if (goingFullscreen.load()) {
+				cv.notify_one();
+				std::unique_lock<std::mutex> lck(mtx);
+				cv.wait(lck);
+				window.applyResize();
+				window.updateViewport();
+			}
 			bool shouldNotify = needSync.load(); // store value of needSync at start of render step
 			if (shouldNotify) {
 				// If the window event thread wants to sync, we know that a resize has occured and therefore

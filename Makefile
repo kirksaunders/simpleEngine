@@ -6,7 +6,7 @@ INCLUDE_DIR		:= include/
 LIBRARY_DIR		:= lib/
 
 CXX				:= g++
-CXXFLAGS		:= -std=c++11 -I$(INCLUDE_DIR) -I$(SOURCE_DIR) -O3 -DGLEW_STATIC=1
+CXXFLAGS		:= -std=c++11 -I$(INCLUDE_DIR) -I$(SOURCE_DIR) -O3 -DGLEW_STATIC=1 -gdwarf-2
 LDFLAGS			:= -L$(LIBRARY_DIR)
 LDLIBS			:= -lmingw32 -lassimp -lglew32 -lSDL2main -lSDL2 -lopengl32
 
