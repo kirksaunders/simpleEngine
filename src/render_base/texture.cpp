@@ -1,17 +1,17 @@
 #include <algorithm>
-#include <utility>
-#include <iostream>
 #include <cstdlib>
+#include <iostream>
+#include <utility>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
 #include "render_base/exception.hpp"
-#include "render_base/window.hpp"
-#include "render_base/texture.hpp"
 #include "render_base/shader.hpp"
-#include "render_base/texturemanager.hpp"
+#include "render_base/texture.hpp"
 #include "render_base/texturebuffer.hpp"
+#include "render_base/texturemanager.hpp"
+#include "render_base/window.hpp"
 
 using namespace Render3D;
 
@@ -201,7 +201,7 @@ void Texture::resetDiffAndSpec(Shader& shader, Window& win, TextureManager& text
         location = useNextLocation(textureID, win, textureManager);
     }
 
-    for (unsigned int i = 0; i < TextureManager::MAX_MATERIAL_TEXTURES; i++) {
+    for (unsigned int i = 0; i < TextureManager::MAX_MATERIAL_TEXTURES; ++i) {
         shader.getDiffuseVariable(i)->setValue(win, location);
         shader.getSpecularVariable(i)->setValue(win, location);
     }

@@ -2,8 +2,8 @@
 #define TEXTUREMANAGER_HPP
 
 #include <string>
-#include <vector>
 #include <utility>
+#include <vector>
 
 #include <GLEW/glew.h>
 
@@ -31,10 +31,10 @@ namespace Render3D {
 
         Texture& getDefaultTexture();
      private:
-         static const std::string diffNames[MAX_MATERIAL_TEXTURES];
+        static const std::string diffNames[MAX_MATERIAL_TEXTURES];
         static const std::string specNames[MAX_MATERIAL_TEXTURES];
 
-         Texture defaultTexture;
+        Texture defaultTexture;
         std::vector<std::pair<const Window*, std::vector<GLuint> > > activeTexturesByWindow;
     };
 }

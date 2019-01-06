@@ -1,7 +1,7 @@
 #include <algorithm>
 
-#include "render_base/texturebuffer.hpp"
 #include "render_base/color.hpp"
+#include "render_base/texturebuffer.hpp"
 
 using namespace Render3D;
 

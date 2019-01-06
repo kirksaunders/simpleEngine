@@ -71,5 +71,6 @@
         "condition_variable": "cpp",
         "mutex": "cpp",
         "xxatomic": "cpp"
-    }
+    },
+    "C_Cpp.dimInactiveRegions": false
 }

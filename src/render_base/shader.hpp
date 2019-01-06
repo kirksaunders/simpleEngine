@@ -1,11 +1,11 @@
 #ifndef SHADER_HPP
 #define SHADER_HPP
 
-#include <string>
-#include <vector>
-#include <unordered_map>
-#include <memory>
 #include <array>
+#include <memory>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 #include <GLEW/glew.h>
 
@@ -13,7 +13,10 @@
 #include "render_base/texturemanager.hpp"
 
 namespace Render3D {
-    class Window; // forward declaration
+    // forward declarations
+    class ShaderVariableBlock;
+    class UniformBufferManager;
+    class Window;
 
     struct ProgramID {
         GLuint id;
@@ -41,6 +44,8 @@ namespace Render3D {
         ShaderVariable<int>* getDiffuseVariable(unsigned int num);
         ShaderVariable<int>* getSpecularVariable(unsigned int num);
 
+        void bindVariableBlock(Window& win, UniformBufferManager& uniformBufferManager, const std::string& name, ShaderVariableBlock& block);
+
         GLuint getProgramID(GLuint clusterID);
 
         static Shader defaultPerspective();
@@ -50,7 +55,7 @@ namespace Render3D {
         std::string vertexSource;
         std::string fragmentSource;
         std::vector<std::pair<GLuint, ProgramID> > programIDs;
-        typedef std::unordered_map<std::string, std::unique_ptr<ShaderVariableInterface> > VariablesMap;
+        typedef std::vector<std::unique_ptr<ShaderVariableInterface> > VariablesMap;
         VariablesMap variables;
         std::array<ShaderVariable<int>*, TextureManager::MAX_MATERIAL_TEXTURES> diffTextureVariables;
         std::array<ShaderVariable<int>*, TextureManager::MAX_MATERIAL_TEXTURES> specTextureVariables;
@@ -61,14 +66,15 @@ namespace Render3D {
 
     template <class T>
     ShaderVariable<T>* Shader::getVariable(const std::string& name) {
-        VariablesMap::iterator it = variables.find(name);
-        if (it != variables.end()) {
-            return static_cast<ShaderVariable<T>*>(it->second.get());
-        } else {
-            std::unique_ptr<ShaderVariableInterface> ptr(new ShaderVariable<T>(this, name));
-            std::pair<VariablesMap::iterator, bool> result = variables.insert(std::pair<std::string, std::unique_ptr<ShaderVariableInterface> >(name, std::move(ptr)));
-            return static_cast<ShaderVariable<T>*>(result.first->second.get());
+        for (unsigned int i = 0; i < variables.size(); ++i) {
+            if (variables[i]->getName() == name) {
+                return static_cast<ShaderVariable<T>*>(variables[i].get());
+            }
         }
+
+        std::unique_ptr<ShaderVariableInterface> ptr(new ShaderVariable<T>(*this, name));
+        variables.push_back(std::move(ptr));
+        return static_cast<ShaderVariable<T>*>(variables.back().get());
     }
 }
 

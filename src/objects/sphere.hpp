@@ -3,8 +3,8 @@
 
 #include <GLEW/glew.h>
 
-#include "objects/primitive3d.hpp"
 #include "objects/model.hpp"
+#include "objects/primitive3d.hpp"
 
 namespace Render3D {
     class Sphere : public Model {

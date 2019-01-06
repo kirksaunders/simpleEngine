@@ -1,15 +1,15 @@
 #ifndef MODEL_HPP
 #define MODEL_HPP
 
-#include <vector>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include <GLEW/glew.h>
 #include <ASSIMP/scene.h>
 
-#include "objects/primitive3d.hpp"
 #include "objects/mesh.hpp"
+#include "objects/primitive3d.hpp"
 
 #include "render_base/texture.hpp"
 

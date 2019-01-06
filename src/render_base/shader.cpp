@@ -1,17 +1,19 @@
+#include <algorithm>
 #include <cmath>
 #include <fstream>
 #include <sstream>
-#include <algorithm>
 
 #include "render_base/exception.hpp"
 #include "render_base/shader.hpp"
+#include "render_base/shadervariableblock.hpp"
+#include "render_base/uniformbuffermanager.hpp"
 #include "render_base/window.hpp"
 
 using namespace Render3D;
 using namespace Math3D;
 
 Shader::Shader(const Shader& other) : vertexSource(other.vertexSource), fragmentSource(other.fragmentSource) {
-    for (unsigned int i = 0; i < TextureManager::MAX_MATERIAL_TEXTURES; i++) {
+    for (unsigned int i = 0; i < TextureManager::MAX_MATERIAL_TEXTURES; ++i) {
         diffTextureVariables[i] = getVariable<int>(TextureManager::getDiffuseName(i));
         specTextureVariables[i] = getVariable<int>(TextureManager::getSpecularName(i));
     }
@@ -42,7 +44,7 @@ Shader::Shader(const GLchar* vertexPath, const GLchar* fragmentPath) {
         throw Exception("Shader file loading failed");
     }
 
-    for (unsigned int i = 0; i < TextureManager::MAX_MATERIAL_TEXTURES; i++) {
+    for (unsigned int i = 0; i < TextureManager::MAX_MATERIAL_TEXTURES; ++i) {
         diffTextureVariables[i] = getVariable<int>(TextureManager::getDiffuseName(i));
         specTextureVariables[i] = getVariable<int>(TextureManager::getSpecularName(i));
     }
@@ -55,7 +57,7 @@ Shader& Shader::operator=(const Shader& other) {
         programIDs.clear();
         variables.clear();
 
-        for (unsigned int i = 0; i < TextureManager::MAX_MATERIAL_TEXTURES; i++) {
+        for (unsigned int i = 0; i < TextureManager::MAX_MATERIAL_TEXTURES; ++i) {
             diffTextureVariables[i] = getVariable<int>(TextureManager::getDiffuseName(i));
             specTextureVariables[i] = getVariable<int>(TextureManager::getSpecularName(i));
         }
@@ -183,6 +185,12 @@ ShaderVariable<int>* Shader::getDiffuseVariable(unsigned int num) {
 
 ShaderVariable<int>* Shader::getSpecularVariable(unsigned int num) {
     return specTextureVariables[num];
+}
+
+void Shader::bindVariableBlock(Window& win, UniformBufferManager& uniformBufferManager, const std::string& name, ShaderVariableBlock& block) {
+    GLuint shaderID = getProgramID(win.getClusterID());
+    GLuint blockIndex = glGetUniformBlockIndex(shaderID, name.c_str());   
+    glUniformBlockBinding(shaderID, blockIndex, block.use(win, uniformBufferManager));
 }
 
 Shader Shader::defaultPerspective() {

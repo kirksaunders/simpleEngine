@@ -1,18 +1,20 @@
 #ifndef MAINS_HPP
 #define MAINS_HPP
 
+#include <cstdlib>
 #include <iostream>
 #include <limits>
-#include <cstdlib>
 
 #include "math/math.hpp"
 
-#include "render_base/exception.hpp"
-#include "render_base/window.hpp"
-#include "render_base/context3d.hpp"
-#include "objects/model.hpp"
 #include "objects/cuboid.hpp"
+#include "objects/model.hpp"
 #include "objects/sphere.hpp"
+
+#include "render_base/context3d.hpp"
+#include "render_base/exception.hpp"
+#include "render_base/shader.hpp"
+#include "render_base/window.hpp"
 
 const static size_t WIDTH = 600;
 const static size_t HEIGHT = 600;

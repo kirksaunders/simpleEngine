@@ -1,8 +1,8 @@
 #ifndef CUBOID_HPP
 #define CUBOID_HPP
 
-#include <vector>
 #include <utility>
+#include <vector>
 
 #include <GLEW/glew.h>
 

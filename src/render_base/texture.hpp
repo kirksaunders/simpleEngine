@@ -2,8 +2,8 @@
 #define TEXTURE_HPP
 
 #include <string>
-#include <vector>
 #include <utility>
+#include <vector>
 
 #include <GLEW/glew.h>
 
@@ -13,10 +13,10 @@
 
 namespace Render3D {
     // forward declarations
-    class Window;
     class Shader;
-    class TextureManager;
     class TextureBuffer;
+    class TextureManager;
+    class Window;
 
     struct TextureID {
         GLuint id;

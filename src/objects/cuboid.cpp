@@ -31,7 +31,7 @@ Cuboid::Cuboid() : Primitive3D() {
     vertexIndices[4] = 2;
     vertexIndices[5] = 0;
 
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < 6; ++i) {
         normalIndices[i] = 0;
     }
 
@@ -43,7 +43,7 @@ Cuboid::Cuboid() : Primitive3D() {
     vertexIndices[10] = 6;
     vertexIndices[11] = 7;
 
-    for (int i = 6; i < 12; i++) {
+    for (int i = 6; i < 12; ++i) {
         normalIndices[i] = 1;
     }
 
@@ -55,7 +55,7 @@ Cuboid::Cuboid() : Primitive3D() {
     vertexIndices[16] = 7;
     vertexIndices[17] = 6;
 
-    for (int i = 12; i < 18; i++) {
+    for (int i = 12; i < 18; ++i) {
         normalIndices[i] = 2;
     }
 
@@ -67,7 +67,7 @@ Cuboid::Cuboid() : Primitive3D() {
     vertexIndices[22] = 5;
     vertexIndices[23] = 4;
 
-    for (int i = 18; i < 24; i++) {
+    for (int i = 18; i < 24; ++i) {
         normalIndices[i] = 3;
     }
 
@@ -79,7 +79,7 @@ Cuboid::Cuboid() : Primitive3D() {
     vertexIndices[28] = 7;
     vertexIndices[29] = 3;
 
-    for (int i = 24; i < 30; i++) {
+    for (int i = 24; i < 30; ++i) {
         normalIndices[i] = 5;
     }
 
@@ -91,7 +91,7 @@ Cuboid::Cuboid() : Primitive3D() {
     vertexIndices[34] = 6;
     vertexIndices[35] = 5;
 
-    for (int i = 30; i < 36; i++) {
+    for (int i = 30; i < 36; ++i) {
         normalIndices[i] = 4;
     }
 }
@@ -105,7 +105,7 @@ BufferObject Cuboid::generateBuffers(GLuint clusterID) {
     }
 
 	GLfloat data[36 * 3 * 2];
-	for (unsigned int i = 0; i < 36; i++) {
+	for (unsigned int i = 0; i < 36; ++i) {
 		unsigned int ind = vertexIndices[i];
 		data[i*6] =		vertices[ind][0];
 		data[i*6 + 1] =	vertices[ind][1];
@@ -120,13 +120,12 @@ BufferObject Cuboid::generateBuffers(GLuint clusterID) {
     // Generate GL Buffers
     BufferObject buffer;
 
-	glGenBuffers(2, &buffer.id);
+	glGenBuffers(1, &buffer.id);
 
     glBindBuffer(GL_ARRAY_BUFFER, buffer.id);
     glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     buffer.useCount = 1;
     bufferObjects.push_back(std::pair<GLuint, BufferObject>(clusterID, buffer));
@@ -208,7 +207,7 @@ void Cuboid::render(Window& win, TextureManager& textureManager) {
 }
 
 void Cuboid::prepareContent(Window& win, TextureManager& textureManager) {
-    generateVertexArrayObject(win);
+    generateVertexArrayObject(win); // this function makes a call to generateBuffers
 }
 
 void Cuboid::destroyContent(Window& win, TextureManager& textureManager) {

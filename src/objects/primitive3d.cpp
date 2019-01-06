@@ -1,5 +1,6 @@
 #include "objects/primitive3d.hpp"
 
+#include "render_base/exception.hpp"
 #include "render_base/shader.hpp"
 #include "render_base/window.hpp"
 
@@ -37,13 +38,11 @@ void Primitive3D::setShader(Shader* const s) {
         modelRotationVariable = shader->getVariable<Matrix4x4>("modelRotation");
         modelSizeVariable = shader->getVariable<Vector4>("modelSize");
         modelColorVariable = shader->getVariable<Color>("modelColor");
-        wireframeVariable = shader->getVariable<int>("wireframeEnabled");
     } else {
         modelCFrameVariable = nullptr;
         modelRotationVariable = nullptr;
         modelSizeVariable = nullptr;
         modelColorVariable = nullptr;
-        wireframeVariable = nullptr;
     }
 }
 
@@ -51,12 +50,32 @@ Shader* const Primitive3D::getShader() const {
     return shader;
 }
 
-void Primitive3D::setWireframeEnabled(bool enabled) {
-    wireframeEnabled = enabled;
+Instance* Primitive3D::newInstance(const Matrix4x4& cfr) {
+    Instance* newInstance = new Instance(cfr);
+    instances.push_back(newInstance);
+
+    return newInstance;
 }
 
-bool Primitive3D::isWireframeEnabled() const {
-    return wireframeEnabled;
+void Primitive3D::deleteInstance(Instance*& instance) {
+    for (unsigned int i = 0; i < instances.size(); ++i) {
+        if (instances[i] == instance) {
+            instances.erase(instances.begin() + i);
+            delete instance;
+            instance = nullptr;
+            return;
+        }
+    }
+
+    throw Exception("Unable to delete instance from object, instance not found");
+}
+
+void Primitive3D::clearInstances() {
+    for (unsigned int i = 0; i < instances.size(); ++i) {
+        delete instances[i];
+    }
+
+    instances.clear();
 }
 
 void Primitive3D::applyVariables(Window& win) {
@@ -66,5 +85,4 @@ void Primitive3D::applyVariables(Window& win) {
     modelRotationVariable->setValue(win, rotation);
     modelSizeVariable->setValue(win, size);
     modelColorVariable->setValue(win, color);
-    wireframeVariable->setValue(win, static_cast<int>(wireframeEnabled));
 }

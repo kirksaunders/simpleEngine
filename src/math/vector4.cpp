@@ -109,7 +109,7 @@ Vector4 Vector4::operator-(const Vector4& b) const {
 }
 
 bool Vector4::operator==(const Vector4& b) const {
-    for (unsigned int i = 0; i < 4; i++) {
+    for (unsigned int i = 0; i < 4; ++i) {
         if (fabs(values[i] - b.values[i]) > EPSILON) {
             return false;
         }
@@ -118,7 +118,7 @@ bool Vector4::operator==(const Vector4& b) const {
 }
 
 bool Vector4::operator!=(const Vector4& b) const {
-    for (unsigned int i = 0; i < 4; i++) {
+    for (unsigned int i = 0; i < 4; ++i) {
         if (fabs(values[i] - b.values[i]) > EPSILON) {
             return true;
         }

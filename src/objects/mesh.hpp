@@ -1,9 +1,9 @@
 #ifndef MESH_HPP
 #define MESH_HPP
 
-#include <vector>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "objects/bufferobject.hpp"
 #include "objects/primitive3d.hpp"

@@ -1,11 +1,11 @@
 #ifndef WINDOW__HPP
 #define WINDOW__HPP
 
-#include <functional>
 #include <atomic>
-#include <vector>
+#include <functional>
 #include <thread>
 #include <utility>
+#include <vector>
 
 #include <GLEW/glew.h>
 #include <SDL2/sdl.h>

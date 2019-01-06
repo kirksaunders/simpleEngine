@@ -65,7 +65,7 @@ Color Color::operator/(float a) const {
 }
 
 bool Color::operator==(const Color& b) const {
-    for (unsigned int i = 0; i < 4; i++) {
+    for (unsigned int i = 0; i < 4; ++i) {
         if (fabs(values[i] - b.values[i]) > EPSILON) {
             return false;
         }
@@ -74,7 +74,7 @@ bool Color::operator==(const Color& b) const {
 }
 
 bool Color::operator!=(const Color& b) const {
-    for (unsigned int i = 0; i < 4; i++) {
+    for (unsigned int i = 0; i < 4; ++i) {
         if (fabs(values[i] - b.values[i]) > EPSILON) {
             return true;
         }

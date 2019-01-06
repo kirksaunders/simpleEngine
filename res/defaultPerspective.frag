@@ -1,11 +1,15 @@
 #version 330 core
 
+layout (std140) uniform TestBlock {
+    vec4 lightPos;
+    vec4 cameraPos;
+};
+
+/*uniform vec4 lightPos;
+uniform vec4 cameraPos;*/
+
 uniform vec4 modelColor;
 uniform vec4 lightColor;
-uniform vec4 lightPos;
-uniform vec4 cameraPos;
-
-uniform int wireframeEnabled;
 
 uniform float ambientAmount;
 
@@ -13,7 +17,6 @@ in vec2 texCoords;
 
 in vec3 faceNormal;
 in vec3 vertexPosition;
-//in vec3 barycentric;
 
 uniform sampler2D texture_diffuse1;
 uniform sampler2D texture_diffuse2;
@@ -74,10 +77,6 @@ void main() {
 
     specColor.rgb = specColor.rgb * spec;
 
-	/*float bmin = max(min(min(barycentric.x, barycentric.y), barycentric.z), 1.0f - sign(wireframeEnabled));
-	color.rgb = (ambientColor.rgb + difColor.rgb + specColor.rgb) * max(sign(bmin - 0.015), min(bmin/0.03, 1.0f));
-	color.a = ambientColor.a;
-	color = lightColor * color;*/
 	color.rgb = ambientColor.rgb + difColor.rgb + specColor.rgb;
 	color.a = ambientColor.a;
 	color = lightColor * color;

@@ -4,12 +4,13 @@
 
 #include "objects/primitive3d.hpp"
 
-#include "render_base/exception.hpp"
 #include "render_base/context3d.hpp"
-#include "render_base/window.hpp"
+#include "render_base/exception.hpp"
+#include "render_base/shader.hpp"
+#include "render_base/shadervariableblock.hpp"
 #include "render_base/texture.hpp"
 #include "render_base/texturebuffer.hpp"
-#include "render_base/shader.hpp"
+#include "render_base/window.hpp"
 
 using namespace Render3D;
 using namespace Math3D;
@@ -37,6 +38,15 @@ Context3D::Context3D(Window* win) {
 
     textureManager->addWindow(*window);
     textureManager->getDefaultTexture().prepareContent(*window, *textureManager.get());
+
+    testBlock = ShaderVariableBlock{
+        GLSL_TYPE::VEC4,
+        GLSL_TYPE::VEC4
+    };
+
+    testBlock.prepareContent(*window);
+
+    testBlock.use(*window, uniformBufferManager);
 }
 
 Context3D::~Context3D() {
@@ -75,6 +85,7 @@ void Context3D::addShader(Shader* shader) {
     if (p.second) {
         window->makeCurrent();
         shader->prepareContent(*window);
+        shader->bindVariableBlock(*window, uniformBufferManager, "TestBlock", testBlock);
     }
 }
 
@@ -138,6 +149,10 @@ void Context3D::render() {
     Color lightColor = Color(1, 1, 1);
     float ambient = 0.15f;
 
+    testBlock.getVariable<Vector4>(0)->setValue(lightPosition);
+    testBlock.getVariable<Vector4>(1)->setValue(cameraPosition);
+    testBlock.updateContent(*window);
+
     Shader* currentShader = nullptr;
 
     Texture& defaultTex = textureManager->getDefaultTexture();
@@ -156,12 +171,12 @@ void Context3D::render() {
             defaultTex.resetDiffAndSpec(*currentShader, *window, *textureManager.get()); // reset textures
 
             // Scene Lighting Data
-            currentShader->getVariable<Vector4>("lightPos")->setValue(*window, lightPosition);
+            //currentShader->getVariable<Vector4>("lightPos")->setValue(*window, lightPosition);
             currentShader->getVariable<Color>("lightColor")->setValue(*window, lightColor);
             currentShader->getVariable<float>("ambientAmount")->setValue(*window, ambient);
 
             // Camera Data
-            currentShader->getVariable<Vector4>("cameraPos")->setValue(*window, cameraPosition);
+            //currentShader->getVariable<Vector4>("cameraPos")->setValue(*window, cameraPosition);
             currentShader->getVariable<Matrix4x4>("cameraInverse")->setValue(*window, cameraInverse);
 
             // Projection Matrix

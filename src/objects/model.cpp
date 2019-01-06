@@ -34,7 +34,7 @@ Model::~Model() {
 
 void Model::processNode(aiNode* node, const aiScene* scene) {
     // Process all the node's meshes (if any)
-    for (GLuint i = 0; i < node->mNumMeshes; i++) {
+    for (GLuint i = 0; i < node->mNumMeshes; ++i) {
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]]; 
 
         // Process mesh
@@ -42,7 +42,7 @@ void Model::processNode(aiNode* node, const aiScene* scene) {
     }
 
     // Then do the same for each of its children
-    for (GLuint i = 0; i < node->mNumChildren; i++) {
+    for (GLuint i = 0; i < node->mNumChildren; ++i) {
         processNode(node->mChildren[i], scene);
     }
 }
@@ -58,7 +58,7 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
     std::vector<TextureData> textures;
     std::vector<GLuint> indices;
 
-    for (GLuint i = 0; i < mesh->mNumVertices; i++) {
+    for (GLuint i = 0; i < mesh->mNumVertices; ++i) {
         Vector4 vert;
         aiVector3t<float> aiVec;
         if (mesh->HasPositions()) {
@@ -92,7 +92,7 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
 
     // Process indices
 
-    for (GLuint i = 0; i < mesh->mNumFaces; i++) {
+    for (GLuint i = 0; i < mesh->mNumFaces; ++i) {
         aiFace face = mesh->mFaces[i];
         for (GLuint j = 0; j < face.mNumIndices; j++) {
             GLuint index = face.mIndices[j];
@@ -114,7 +114,7 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
 }
 
 void Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName, std::vector<TextureData>& textures) {
-    for (GLuint i = 0; i < mat->GetTextureCount(type); i++) {
+    for (GLuint i = 0; i < mat->GetTextureCount(type); ++i) {
         aiString str;
         mat->GetTexture(type, i, &str);
 
@@ -139,13 +139,13 @@ void Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::strin
 void Model::render(Window& win, TextureManager& textureManager) {
     applyVariables(win);
     
-    for (unsigned int i = 0; i < meshes.size(); i++) {
+    for (unsigned int i = 0; i < meshes.size(); ++i) {
         meshes[i].render(*shader, win, textureManager);
     }
 }
 
 void Model::prepareContent(Window& win, TextureManager& textureManager) {    
-    for (unsigned int i = 0; i < meshes.size(); i++) {
+    for (unsigned int i = 0; i < meshes.size(); ++i) {
         meshes[i].prepareContent(win, textureManager);
     }
 
@@ -155,7 +155,7 @@ void Model::prepareContent(Window& win, TextureManager& textureManager) {
 }
 
 void Model::destroyContent(Window& win, TextureManager& textureManager) {
-    for (unsigned int i = 0; i < meshes.size(); i++) {
+    for (unsigned int i = 0; i < meshes.size(); ++i) {
         meshes[i].destroyContent(win, textureManager);
     }
 

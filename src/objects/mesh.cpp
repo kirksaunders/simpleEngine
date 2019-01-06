@@ -154,7 +154,7 @@ void Mesh::bindTextures(Shader& shader, Window& win, TextureManager& textureMana
     unsigned int diffuseNr = 0;
     unsigned int specularNr = 0;
     TextureData* tex;
-    for (unsigned int i = 0; i < textures.size(); i++) {
+    for (unsigned int i = 0; i < textures.size(); ++i) {
         tex = &textures[i];
         if (tex->type == "texture_diffuse") {
             tex->tex->useDiffuse(shader, win, textureManager, diffuseNr);
@@ -171,7 +171,7 @@ void Mesh::unbindTextures(Shader& shader, Window& win, TextureManager& textureMa
     unsigned int diffuseNr = 0;
     unsigned int specularNr = 0;
     TextureData* tex;
-    for (unsigned int i = 0; i < textures.size(); i++) {
+    for (unsigned int i = 0; i < textures.size(); ++i) {
         tex = &textures[i];
         if (tex->type == "texture_diffuse") {
             defaultTex.useDiffuse(shader, win, textureManager, diffuseNr);

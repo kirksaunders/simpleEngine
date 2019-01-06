@@ -1,10 +1,12 @@
-#include <fstream>
 #include <cstdlib>
+#include <fstream>
 #include <vector>
 
 #include "mains/mains.hpp"
-#include "astar/node.hpp"
+
 #include "astar/grid.hpp"
+#include "astar/node.hpp"
+
 #include "render_base/exception.hpp"
 
 using std::size_t;
@@ -25,14 +27,14 @@ Node* astar(Grid& grid, Node* start, Node* end) {
                         Node* node = grid.getNode(current->getPosition() + Vector4(x, y, z));
                         if (node != nullptr) {
                             bool found = false;
-                            for (int i = 0; i < closed.size(); i++) {
+                            for (int i = 0; i < closed.size(); ++i) {
                                 if (closed[i] == node) {
                                     found = true;
                                     break;
                                 }
                             }
                             if (!found) { 
-                                for (int i = 0; i < open.size(); i++) {
+                                for (int i = 0; i < open.size(); ++i) {
                                     if (open[i] == node) {
                                         found = true;
                                         break;
@@ -56,7 +58,7 @@ Node* astar(Grid& grid, Node* start, Node* end) {
         }
         Node* best = nullptr;
         unsigned int bestIndex;
-        for (int i = 0; i < open.size(); i++) {
+        for (int i = 0; i < open.size(); ++i) {
             Node* cur = open[i];
             if (best == nullptr || cur->getCost() < best->getCost()) {
                 best = cur;
@@ -124,14 +126,13 @@ void pathfind() {
             for (int z = -20; z <= 20; z++) {
                 node = grid.getNode(x, y, z);
                 if (node == nullptr) {
-                    Cuboid* cube = new Cuboid();
-                    cube->setSize(Vector4(GRID_SIZE, GRID_SIZE, GRID_SIZE));
-                    cube->setCFrame(Matrix4x4(x * GRID_SIZE, y * GRID_SIZE, z * GRID_SIZE));
-                    cube->setColor(Color(0.75, 0.75, 0.75));
-                    cube->setShader(&defaultShader);
-                    //cube->setWireframeEnabled(true);
-                    context->addObject(cube);
-                    walls.push_back(cube);
+					Cuboid* cube = new Cuboid();
+					cube->setSize(Vector4(GRID_SIZE, GRID_SIZE, GRID_SIZE));
+					cube->setCFrame(Matrix4x4(x * GRID_SIZE, y * GRID_SIZE, z * GRID_SIZE));
+					cube->setColor(Color(0.75, 0.75, 0.75));
+					cube->setShader(&defaultShader);
+					context->addObject(cube);
+					walls.push_back(cube);
                 }
             }
         }
@@ -194,10 +195,10 @@ void pathfind() {
                 from all contexts or all windows that use it have been closed. in the future I will
                 likely implement the Context3D to use shared_ptrs instead of raw c pointers */
 
-    for (int i = 0; i < walls.size(); i++) {
+    for (int i = 0; i < walls.size(); ++i) {
         delete walls[i];
     }
-    for (int i = 0; i < paths.size(); i++) {
+    for (int i = 0; i < paths.size(); ++i) {
         delete paths[i];
     }
 }
