@@ -136,6 +136,9 @@ void Window::close() {
         SDL_GL_DeleteContext(glContext);
         SDL_DestroyWindow(window);
         context = nullptr;
+        if (currentWindow == this) {
+            currentWindow = nullptr;
+        }
     }
 }
 

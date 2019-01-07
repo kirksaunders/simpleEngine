@@ -3,15 +3,20 @@
 layout (std140) uniform TestBlock {
     vec4 lightPos;
     vec4 cameraPos;
+	
+	vec4 lightColor;
+
+	float ambientAmount;
 };
 
 /*uniform vec4 lightPos;
-uniform vec4 cameraPos;*/
+uniform vec4 cameraPos;
 
-uniform vec4 modelColor;
 uniform vec4 lightColor;
 
-uniform float ambientAmount;
+uniform float ambientAmount;*/
+
+uniform vec4 modelColor;
 
 in vec2 texCoords;
 

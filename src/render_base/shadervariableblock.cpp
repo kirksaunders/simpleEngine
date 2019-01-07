@@ -25,6 +25,8 @@ static unsigned int GLSL_TYPE_SIZES[] = {
     64  // MAT4
 };
 
+static const unsigned int TOTAL_SIZE_ALIGNMENT = 16;
+
 // ShaderBlockVariable
 
 void ShaderBlockVariableInterface::writeToArray(uint8_t* array) const {
@@ -119,6 +121,14 @@ ShaderVariableBlock::ShaderVariableBlock(std::initializer_list<GLSL_TYPE> types)
 
         size += typeSize;
     }
+
+    // Debugging with RenderDoc produces a warning about the provided buffer not being big enough, and I've
+    // noticed that it wants data with a size that is a multiple 16 bytes, so that's what I'm doing here.
+    // I could NOT find any documentation or mention of this in the opengl standard, so this could be an issue
+    // with RenderDoc or some sort of driver-related quirk.
+    if (size % TOTAL_SIZE_ALIGNMENT > 0) {
+        size += TOTAL_SIZE_ALIGNMENT - size % TOTAL_SIZE_ALIGNMENT;
+    }
 }
 
 int ShaderVariableBlock::use(Window& win, UniformBufferManager& uniformBufferManager) {
@@ -163,7 +173,8 @@ void ShaderVariableBlock::generateBuffer(GLuint clusterID) {
 
     glBindBuffer(GL_UNIFORM_BUFFER, buffer.id);
     glBufferData(GL_UNIFORM_BUFFER, size, data, GL_STATIC_DRAW); // using dynamic because this data is likely to change
-
+    delete[] data;
+    
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
     buffer.useCount = 1;

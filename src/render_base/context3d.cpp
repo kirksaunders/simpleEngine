@@ -37,21 +37,24 @@ Context3D::Context3D(Window* win) {
     }
 
     textureManager->addWindow(*window);
-    textureManager->getDefaultTexture().prepareContent(*window, *textureManager.get());
+    textureManager->getDefaultTexture().prepareContent(*window, *textureManager);
 
     testBlock = ShaderVariableBlock{
         GLSL_TYPE::VEC4,
-        GLSL_TYPE::VEC4
+        GLSL_TYPE::VEC4,
+        GLSL_TYPE::VEC4,
+		GLSL_TYPE::FLOAT
     };
 
     testBlock.prepareContent(*window);
-
     testBlock.use(*window, uniformBufferManager);
 }
 
 Context3D::~Context3D() {
+    window->makeCurrent();
+    testBlock.destroyContent(*window);
     if (textureManager.use_count() == 1) {
-        textureManager->getDefaultTexture().destroyContent(*window, *textureManager.get());
+        textureManager->getDefaultTexture().destroyContent(*window, *textureManager);
     }
     textureManager->removeWindow(*window);
 }
@@ -60,7 +63,7 @@ void Context3D::addObject(Primitive3D* object) {
     std::pair<std::set<Primitive3D*>::iterator, bool> p = objects.insert(object);
     if (p.second) {
         window->makeCurrent();
-        object->prepareContent(*window, *textureManager.get());
+        object->prepareContent(*window, *textureManager);
     }
 }
 
@@ -68,14 +71,14 @@ void Context3D::removeObject(Primitive3D* object) {
     unsigned int numRemoved = objects.erase(object);
     if (numRemoved > 0) {
         window->makeCurrent();
-        object->destroyContent(*window, *textureManager.get());
+        object->destroyContent(*window, *textureManager);
     }
 }
 
 void Context3D::clearObjects() {
     window->makeCurrent();
     for (std::set<Primitive3D*>::iterator it = objects.begin(); it != objects.end(); it++) {
-        (*it)->destroyContent(*window, *textureManager.get());
+        (*it)->destroyContent(*window, *textureManager);
     }
     objects.clear();
 }
@@ -109,7 +112,7 @@ void Context3D::addTexture(Texture* texture) {
     std::pair<std::set<Texture*>::iterator, bool> p = textures.insert(texture);
     if (p.second) {
         window->makeCurrent();
-        texture->prepareContent(*window, *textureManager.get());
+        texture->prepareContent(*window, *textureManager);
     }
 }
 
@@ -117,14 +120,14 @@ void Context3D::removeTexture(Texture* texture) {
     unsigned int numRemoved = textures.erase(texture);
     if (numRemoved > 0) {
         window->makeCurrent();
-        texture->destroyContent(*window, *textureManager.get());
+        texture->destroyContent(*window, *textureManager);
     }
 }
 
 void Context3D::clearTextures() {
     window->makeCurrent();
     for (std::set<Texture*>::iterator it = textures.begin(); it != textures.end(); it++) {
-        (*it)->destroyContent(*window, *textureManager.get());
+        (*it)->destroyContent(*window, *textureManager);
     }
     textures.clear();
 }
@@ -151,13 +154,15 @@ void Context3D::render() {
 
     testBlock.getVariable<Vector4>(0)->setValue(lightPosition);
     testBlock.getVariable<Vector4>(1)->setValue(cameraPosition);
+	testBlock.getVariable<Color>(2)->setValue(lightColor);
+	testBlock.getVariable<float>(3)->setValue(ambient);
     testBlock.updateContent(*window);
 
     Shader* currentShader = nullptr;
 
     Texture& defaultTex = textureManager->getDefaultTexture();
  
-    for (std::set<Primitive3D*>::iterator it = objects.begin(); it != objects.end(); it++) {
+    for (std::set<Primitive3D*>::iterator it = objects.begin(); it != objects.end(); ++it) {
         Primitive3D* object = *it;
 
         if (object->getShader() == nullptr) {
@@ -168,21 +173,21 @@ void Context3D::render() {
             currentShader = object->getShader();
             currentShader->use(*window);
 
-            defaultTex.resetDiffAndSpec(*currentShader, *window, *textureManager.get()); // reset textures
+            defaultTex.resetDiffAndSpec(*currentShader, *window, *textureManager); // reset textures
 
             // Scene Lighting Data
             //currentShader->getVariable<Vector4>("lightPos")->setValue(*window, lightPosition);
-            currentShader->getVariable<Color>("lightColor")->setValue(*window, lightColor);
+            /*currentShader->getVariable<Color>("lightColor")->setValue(*window, lightColor);
             currentShader->getVariable<float>("ambientAmount")->setValue(*window, ambient);
 
             // Camera Data
-            //currentShader->getVariable<Vector4>("cameraPos")->setValue(*window, cameraPosition);
+            //currentShader->getVariable<Vector4>("cameraPos")->setValue(*window, cameraPosition);*/
             currentShader->getVariable<Matrix4x4>("cameraInverse")->setValue(*window, cameraInverse);
 
             // Projection Matrix
             currentShader->getVariable<Matrix4x4>("projection")->setValue(*window, projection);
         }
-        object->render(*window, *textureManager.get());
+        object->render(*window, *textureManager);
     }
 
     if (currentShader != nullptr) {
@@ -206,7 +211,7 @@ void Context3D::renderTexture(Texture& tex) {
     window->setDepthTestEnabled(false);
     // Note: If tex.render throws, then depthTest will be left set to false.
     //       I need to fix this in the future.
-    tex.render(*window, *textureManager.get());
+    tex.render(*window, *textureManager);
     window->setDepthTestEnabled(depthTest);
 
     tex.getShader()->unuse(*window);

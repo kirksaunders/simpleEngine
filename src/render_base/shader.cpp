@@ -176,7 +176,7 @@ GLuint Shader::getProgramID(GLuint clusterID) {
         }
     }
 
-    throw Exception("Unable to use shader, it hasn't been added to the context");
+    throw Exception("Unable to get shader ID, it hasn't been added to the context");
 }
 
 ShaderVariable<int>* Shader::getDiffuseVariable(unsigned int num) {
