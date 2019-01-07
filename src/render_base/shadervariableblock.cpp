@@ -169,7 +169,7 @@ void ShaderVariableBlock::generateBuffer(GLuint clusterID) {
     // Generate GL Buffer
     BufferObject buffer;
 
-	glGenBuffers(1, &buffer.id);
+    glGenBuffers(1, &buffer.id);
 
     glBindBuffer(GL_UNIFORM_BUFFER, buffer.id);
     glBufferData(GL_UNIFORM_BUFFER, size, data, GL_STATIC_DRAW); // using dynamic because this data is likely to change

@@ -7,7 +7,7 @@ using namespace Render3D;
 using namespace Math3D;
 
 Cuboid::Cuboid() : Primitive3D() {
-	vertices[0] = Vector4(-0.5, 0.5, 0.5);
+    vertices[0] = Vector4(-0.5, 0.5, 0.5);
     vertices[1] = Vector4(-0.5, 0.5, -0.5);
     vertices[2] = Vector4(0.5, 0.5, -0.5);
     vertices[3] = Vector4(0.5, 0.5, 0.5);
@@ -104,23 +104,23 @@ BufferObject Cuboid::generateBuffers(GLuint clusterID) {
         }
     }
 
-	GLfloat data[36 * 3 * 2];
-	for (unsigned int i = 0; i < 36; ++i) {
-		unsigned int ind = vertexIndices[i];
-		data[i*6] =		vertices[ind][0];
-		data[i*6 + 1] =	vertices[ind][1];
-		data[i*6 + 2] =	vertices[ind][2];
+    GLfloat data[36 * 3 * 2];
+    for (unsigned int i = 0; i < 36; ++i) {
+        unsigned int ind = vertexIndices[i];
+        data[i*6] =     vertices[ind][0];
+        data[i*6 + 1] = vertices[ind][1];
+        data[i*6 + 2] = vertices[ind][2];
 
-		ind = normalIndices[i];
-		data[i*6 + 3] =	normals[ind][0];
-		data[i*6 + 4] =	normals[ind][1];
-		data[i*6 + 5] =	normals[ind][2];
-	}
+        ind = normalIndices[i];
+        data[i*6 + 3] = normals[ind][0];
+        data[i*6 + 4] = normals[ind][1];
+        data[i*6 + 5] = normals[ind][2];
+    }
 
     // Generate GL Buffers
     BufferObject buffer;
 
-	glGenBuffers(1, &buffer.id);
+    glGenBuffers(1, &buffer.id);
 
     glBindBuffer(GL_ARRAY_BUFFER, buffer.id);
     glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
@@ -163,7 +163,7 @@ void Cuboid::generateVertexArrayObject(Window& win) {
     // Bind Buffer
     glBindBuffer(GL_ARRAY_BUFFER, buffer.id);
 
-	// Set Vertex Info
+    // Set Vertex Info
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
 
@@ -203,7 +203,7 @@ void Cuboid::render(Window& win, TextureManager& textureManager) {
     applyVariables(win);
 
     glBindVertexArray(getVertexArrayObject(win));
-	glDrawArrays(GL_TRIANGLES, 0, 36);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
 }
 
 void Cuboid::prepareContent(Window& win, TextureManager& textureManager) {

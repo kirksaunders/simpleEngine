@@ -52,19 +52,19 @@ void main7() {
         }
     });
 
-	std::mutex mtx; // for the condition variable
+    std::mutex mtx; // for the condition variable
     std::condition_variable cv; // variable that will be used to indicate when threads have given up context
     std::atomic<bool> needSync(false); // bool writes and reads should be atomic already, but just in case we will use std::atomic
-	std::atomic<bool> goingFullscreen(false);
+    std::atomic<bool> goingFullscreen(false);
 
-	window.setKeyUpCallback([&window, &mtx, &cv, &goingFullscreen](KEYCODE key) {
+    window.setKeyUpCallback([&window, &mtx, &cv, &goingFullscreen](KEYCODE key) {
         if (key == KEYCODE::F11) {
-			std::unique_lock<std::mutex> lck(mtx);
-			goingFullscreen.store(true);
-			cv.wait(lck);
-			window.toggleFullscreen();
-			goingFullscreen.store(false);
-			cv.notify_one();
+            std::unique_lock<std::mutex> lck(mtx);
+            goingFullscreen.store(true);
+            cv.wait(lck);
+            window.toggleFullscreen();
+            goingFullscreen.store(false);
+            cv.notify_one();
         }
     });
 
@@ -80,17 +80,17 @@ void main7() {
     // Here is where the magic happens. In our resize callback we make sure to wait until a resize has occured
     // before we return, so that the threads can sync.
     window.setResizeCallback([&](int width, int height) {
-		if (!goingFullscreen.load()) {
-			std::unique_lock<std::mutex> lck(mtx); // acquire lock
-			needSync.store(true); // indicate to the render thread that it needs to sync up (and apply resize)
-			// After the render thread has synced a resize successfully, it waits for the next resize event
-			// with a timeout of 7 milliseconds. This is done because if the render thread were to go on to render
-			// again before the next resize event was processed, it would slow down resizing; this avoids that.
-			// So, we must notify the render thread that another resize is happening, which is what the following
-			// line does. Note, if the render thread is not waiting for a resize, this line does nothing.
-			cv.notify_one();
-			cv.wait(lck); // block this function and thread until the render has completed
-		}
+        if (!goingFullscreen.load()) {
+            std::unique_lock<std::mutex> lck(mtx); // acquire lock
+            needSync.store(true); // indicate to the render thread that it needs to sync up (and apply resize)
+            // After the render thread has synced a resize successfully, it waits for the next resize event
+            // with a timeout of 7 milliseconds. This is done because if the render thread were to go on to render
+            // again before the next resize event was processed, it would slow down resizing; this avoids that.
+            // So, we must notify the render thread that another resize is happening, which is what the following
+            // line does. Note, if the render thread is not waiting for a resize, this line does nothing.
+            cv.notify_one();
+            cv.wait(lck); // block this function and thread until the render has completed
+        }
     });
 
     window.makeCurrent(false); // release rendering control from this thread
@@ -99,26 +99,26 @@ void main7() {
         window.makeCurrent(); // take rendering control on this thread
         while (window.isActive()) {
             // handle window going fullscreen as well
-			if (goingFullscreen.load()) {
-				cv.notify_one();
-				std::unique_lock<std::mutex> lck(mtx);
-				cv.wait(lck);
-				window.applyResize();
-				window.updateViewport();
-			}
-			bool shouldNotify = needSync.load(); // store value of needSync at start of render step
-			if (shouldNotify) {
-				// If the window event thread wants to sync, we know that a resize has occured and therefore
+            if (goingFullscreen.load()) {
+                cv.notify_one();
+                std::unique_lock<std::mutex> lck(mtx);
+                cv.wait(lck);
+                window.applyResize();
+                window.updateViewport();
+            }
+            bool shouldNotify = needSync.load(); // store value of needSync at start of render step
+            if (shouldNotify) {
+                // If the window event thread wants to sync, we know that a resize has occured and therefore
                 // we must apply the resize and update the viewport. We must explicitly call applyResize when
-				// we set a resize callback or else the window's size won't be kept track of. This is left up
-				// to the application programmer when implementing a resize callback so that they can take
-				// care of thread safety issues, or so they can discard window resizes if they so choose.
-				// In this example, applying the resize here is thread safe because the main window event
-				// thread is currently waiting for this render thread to render, so it cannot be modifying or
-				// reading the window at this point.
-				window.applyResize();
-				window.updateViewport();
-			}
+                // we set a resize callback or else the window's size won't be kept track of. This is left up
+                // to the application programmer when implementing a resize callback so that they can take
+                // care of thread safety issues, or so they can discard window resizes if they so choose.
+                // In this example, applying the resize here is thread safe because the main window event
+                // thread is currently waiting for this render thread to render, so it cannot be modifying or
+                // reading the window at this point.
+                window.applyResize();
+                window.updateViewport();
+            }
 
             x = x + 0.01;
             y = y + 0.01;
@@ -132,12 +132,12 @@ void main7() {
             updateCamera(cam, &window, cX, cY);
             context->render();
 
-			window.update();
-			if (shouldNotify) {
-				needSync.store(false); // reset sync variable
-				cv.notify_one(); // tell window event thread that this thread has rendered with the updated window size
-				std::unique_lock<std::mutex> lck(mtx); // acquire lock
-				cv.wait_for(lck, std::chrono::milliseconds(7)); // try to wait for next resize, timeout if one doesn't come in 7 milliseconds
+            window.update();
+            if (shouldNotify) {
+                needSync.store(false); // reset sync variable
+                cv.notify_one(); // tell window event thread that this thread has rendered with the updated window size
+                std::unique_lock<std::mutex> lck(mtx); // acquire lock
+                cv.wait_for(lck, std::chrono::milliseconds(7)); // try to wait for next resize, timeout if one doesn't come in 7 milliseconds
                 // 7 is the magic number ;)
             }
             // notice we don't poll events here, the main window event thread handles that

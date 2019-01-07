@@ -25,10 +25,10 @@ namespace Render3D {
         std::vector<std::pair<GLuint, BufferObject> > bufferObjects;
         std::vector<std::pair<const Window*, GLuint> > VAOs;
 
-		Math3D::Vector4 vertices[8];
-		Math3D::Vector4 normals[6];
-		GLushort vertexIndices[36];
-		GLushort normalIndices[36];
+        Math3D::Vector4 vertices[8];
+        Math3D::Vector4 normals[6];
+        GLushort vertexIndices[36];
+        GLushort normalIndices[36];
 
         void setNormals();
         void setVertices();

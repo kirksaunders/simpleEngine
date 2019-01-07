@@ -14,7 +14,7 @@ thread_local const Window* Window::currentWindow = nullptr;
 Window::Window(int w, int h, const char* title, Window* parent) {
     SDL_Init(SDL_INIT_VIDEO);
 
-	//SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
+    //SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
 
     // I've noticed that OGL 3.1 performs better and with less bugs than 3.2+ on my high-end rig, so 3.1 it is for now
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
@@ -174,7 +174,7 @@ void Window::getSize(int& w, int& h) const {
 }
 
 float Window::getAspectRatio() const {
-	return static_cast<float>(width) / height;
+    return static_cast<float>(width) / height;
 }
 
 void Window::setWidth(int w) {
@@ -211,25 +211,25 @@ void Window::setVSyncEnabled(bool enabled) {
 
 void Window::setFullscreenEnabled(bool enabled) {
     if (enabled != fullscreenEnabled) {
-		if (enabled) {
-			windowedWidth = width;
-			windowedHeight = height;
+        if (enabled) {
+            windowedWidth = width;
+            windowedHeight = height;
 
-			SDL_DisplayMode mode;
+            SDL_DisplayMode mode;
             SDL_GetCurrentDisplayMode(SDL_GetWindowDisplayIndex(window), &mode);
 
-			SDL_DisplayMode disp;
-			SDL_GetWindowDisplayMode(window, &disp);
-			disp.w = mode.w;
-			disp.h = mode.h;
-			SDL_SetWindowDisplayMode(window, &disp);
+            SDL_DisplayMode disp;
+            SDL_GetWindowDisplayMode(window, &disp);
+            disp.w = mode.w;
+            disp.h = mode.h;
+            SDL_SetWindowDisplayMode(window, &disp);
 
-			SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
-		} else {
-			SDL_SetWindowFullscreen(window, 0);
-			setSize(windowedWidth, windowedHeight);
-		}
-		fullscreenEnabled = enabled;
+            SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
+        } else {
+            SDL_SetWindowFullscreen(window, 0);
+            setSize(windowedWidth, windowedHeight);
+        }
+        fullscreenEnabled = enabled;
     }
 }
 
@@ -356,8 +356,8 @@ int Window::eventWatcher(void* data, SDL_Event* event) {
         if (event->window.windowID == SDL_GetWindowID(window->window)) {
             switch (event->window.event) {
                 case SDL_WINDOWEVENT_SIZE_CHANGED:
-					window->pendingWidth = event->window.data1;
-					window->pendingHeight = event->window.data2;
+                    window->pendingWidth = event->window.data1;
+                    window->pendingHeight = event->window.data2;
                     if (window->windowResizeCallback != nullptr) {
                         window->windowResizeCallback(event->window.data1, event->window.data2);
                     } else {

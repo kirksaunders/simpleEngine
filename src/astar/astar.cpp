@@ -126,13 +126,13 @@ void pathfind() {
             for (int z = -20; z <= 20; z++) {
                 node = grid.getNode(x, y, z);
                 if (node == nullptr) {
-					Cuboid* cube = new Cuboid();
-					cube->setSize(Vector4(GRID_SIZE, GRID_SIZE, GRID_SIZE));
-					cube->setCFrame(Matrix4x4(x * GRID_SIZE, y * GRID_SIZE, z * GRID_SIZE));
-					cube->setColor(Color(0.75, 0.75, 0.75));
-					cube->setShader(&defaultShader);
-					context->addObject(cube);
-					walls.push_back(cube);
+                    Cuboid* cube = new Cuboid();
+                    cube->setSize(Vector4(GRID_SIZE, GRID_SIZE, GRID_SIZE));
+                    cube->setCFrame(Matrix4x4(x * GRID_SIZE, y * GRID_SIZE, z * GRID_SIZE));
+                    cube->setColor(Color(0.75, 0.75, 0.75));
+                    cube->setShader(&defaultShader);
+                    context->addObject(cube);
+                    walls.push_back(cube);
                 }
             }
         }

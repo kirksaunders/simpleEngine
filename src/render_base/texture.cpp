@@ -31,10 +31,10 @@ Texture::Texture(const char *filePath) {
     textureVariable = nullptr;
 
     image = stbi_load(filePath, &width, &height, &depth, 0);
-	if (image == nullptr) {
-		throw Exception(std::string("Unable to load texture from file ") + filePath);
-	}
-	if (depth != 3 && depth != 4) {
+    if (image == nullptr) {
+        throw Exception(std::string("Unable to load texture from file ") + filePath);
+    }
+    if (depth != 3 && depth != 4) {
         throw Exception("Unable to load texture from file, the number of image channels must be either 3 or 4");
     }
     std::cout << filePath << std::endl;
@@ -54,11 +54,11 @@ Texture::Texture(const TextureBuffer& buff) {
         throw Exception("Unable to create texture from texture buffer, the depth of the texture buffer must be either 3 or 4");
     }
 
-	image = static_cast<GLubyte*>(malloc(width * height * depth)); // to be consistent with stb_image, we use malloc and memcpy for the image data
-	if (image == nullptr) {
-		throw Exception("Unable to allocate memory for texture");
-	}
-	memcpy(image, buff.getAddress(), width * height * depth);
+    image = static_cast<GLubyte*>(malloc(width * height * depth)); // to be consistent with stb_image, we use malloc and memcpy for the image data
+    if (image == nullptr) {
+        throw Exception("Unable to allocate memory for texture");
+    }
+    memcpy(image, buff.getAddress(), width * height * depth);
 }
 
 Texture::Texture(const Texture& other) {
@@ -225,40 +225,40 @@ BufferObject Texture::generateBuffers(GLuint clusterID) {
     }
 
     GLfloat data[24];
-	// vertex 1
+    // vertex 1
     data[0] = 1.0;
     data[1] = 1.0;
-	data[2] = 1.0;
-	data[3] = 0.0;
+    data[2] = 1.0;
+    data[3] = 0.0;
     
-	// vertex 2
+    // vertex 2
     data[4] = -1.0;
     data[5] = 1.0;
-	data[6] = 0.0;
+    data[6] = 0.0;
     data[7] = 0.0;
 
-	// vertex 3
+    // vertex 3
     data[8] = -1.0;
     data[9] = -1.0;
-	data[10] = 0.0;
+    data[10] = 0.0;
     data[11] = 1.0;
 
-	// vertex 4
+    // vertex 4
     data[12] = 1.0;
     data[13] = 1.0;
-	data[14] = 1.0;
+    data[14] = 1.0;
     data[15] = 0.0;
 
-	// vertex 5
+    // vertex 5
     data[16] = -1.0;
     data[17] = -1.0;
-	data[18] = 0.0;
+    data[18] = 0.0;
     data[19] = 1.0;
 
-	// vertex 6
+    // vertex 6
     data[20] = 1.0;
     data[21] = -1.0;
-	data[22] = 1.0;
+    data[22] = 1.0;
     data[23] = 1.0;
 
     BufferObject pair;
@@ -425,10 +425,10 @@ void Texture::copy(const Texture& other) {
     IDs = other.IDs;
     if (other.image != nullptr) {
         image = static_cast<GLubyte*>(malloc(width * height * depth)); // to be consistent with stb_image, we use malloc and memcpy for the image data
-		if (image == nullptr) {
-			throw Exception("Unable to allocate memory for texture");
-		}
-		memcpy(image, other.image, width * height * depth);
+        if (image == nullptr) {
+            throw Exception("Unable to allocate memory for texture");
+        }
+        memcpy(image, other.image, width * height * depth);
     } else {
         image = nullptr;
     }

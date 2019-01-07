@@ -43,7 +43,7 @@ Context3D::Context3D(Window* win) {
         GLSL_TYPE::VEC4,
         GLSL_TYPE::VEC4,
         GLSL_TYPE::VEC4,
-		GLSL_TYPE::FLOAT
+        GLSL_TYPE::FLOAT
     };
 
     testBlock.prepareContent(*window);
@@ -154,8 +154,8 @@ void Context3D::render() {
 
     testBlock.getVariable<Vector4>(0)->setValue(lightPosition);
     testBlock.getVariable<Vector4>(1)->setValue(cameraPosition);
-	testBlock.getVariable<Color>(2)->setValue(lightColor);
-	testBlock.getVariable<float>(3)->setValue(ambient);
+    testBlock.getVariable<Color>(2)->setValue(lightColor);
+    testBlock.getVariable<float>(3)->setValue(ambient);
     testBlock.updateContent(*window);
 
     Shader* currentShader = nullptr;
@@ -193,8 +193,8 @@ void Context3D::render() {
     if (currentShader != nullptr) {
         currentShader->unuse(*window);
     }
-	
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 }
 

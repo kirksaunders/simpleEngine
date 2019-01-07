@@ -29,32 +29,32 @@ DoubleBufferObject Mesh::generateBuffers(GLuint clusterID) {
 
     // generate and load buffers
     glGenBuffers(1, &buffers.firstID);
-	glGenBuffers(1, &buffers.secondID);
+    glGenBuffers(1, &buffers.secondID);
 
     GLfloat* data = new GLfloat[8 * numVertices];
 
     for (int i = 0; i < vertices.size(); ++i) {
-        data[i*8] =		vertices[i][0];
-        data[i*8 + 1] =	vertices[i][1];
-        data[i*8 + 2] =	vertices[i][2];
+        data[i*8] =     vertices[i][0];
+        data[i*8 + 1] = vertices[i][1];
+        data[i*8 + 2] = vertices[i][2];
 
-		data[i*8 + 3] =	normals[i][0];
-        data[i*8 + 4] =	normals[i][1];
-        data[i*8 + 5] =	normals[i][2];
+        data[i*8 + 3] = normals[i][0];
+        data[i*8 + 4] = normals[i][1];
+        data[i*8 + 5] = normals[i][2];
 
-		data[i*8 + 6] =	texCoords[i].x;
-        data[i*8 + 7] =	texCoords[i].y;
+        data[i*8 + 6] = texCoords[i].x;
+        data[i*8 + 7] = texCoords[i].y;
     }
 
     glBindBuffer(GL_ARRAY_BUFFER, buffers.firstID);
     glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat) * vertices.size(), data, GL_STATIC_DRAW);
     delete[] data;
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers.secondID);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * indices.size(), &indices[0], GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers.secondID);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * indices.size(), &indices[0], GL_STATIC_DRAW);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     buffers.useCount = 1;
     bufferObjects.push_back(std::pair<GLuint, DoubleBufferObject>(clusterID, buffers));
@@ -92,9 +92,9 @@ void Mesh::generateVertexArrayObject(Window& win) {
 
     // Bind Buffers
     glBindBuffer(GL_ARRAY_BUFFER, buffers.firstID);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers.secondID);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers.secondID);
 
-	// Set Vertex Info
+    // Set Vertex Info
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0);
 
@@ -106,9 +106,9 @@ void Mesh::generateVertexArrayObject(Window& win) {
     glEnableVertexAttribArray(2);
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(6 * sizeof(GLfloat)));
 
-	// Unbind Buffers
+    // Unbind Buffers
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     glBindVertexArray(0);
 
@@ -187,9 +187,9 @@ void Mesh::render(Shader& shader, Window& win, TextureManager& textureManager) {
     bindTextures(shader, win, textureManager);
 
     glBindVertexArray(getVertexArrayObject(win));
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, getElementArrayBuffer(win.getClusterID()));
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, getElementArrayBuffer(win.getClusterID()));
     //glDrawArrays(GL_TRIANGLES, 0, numVertices);
-	glDrawElements(GL_TRIANGLES, numVertices, GL_UNSIGNED_INT, (GLvoid*)0);
+    glDrawElements(GL_TRIANGLES, numVertices, GL_UNSIGNED_INT, (GLvoid*)0);
     
     unbindTextures(shader, win, textureManager);
 }

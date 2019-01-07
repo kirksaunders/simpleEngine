@@ -54,7 +54,7 @@ namespace Render3D {
         int getWidth() const;
         int getHeight() const;
         void getSize(int& w, int& h) const;
-		float getAspectRatio() const;
+        float getAspectRatio() const;
 
         void setWidth(int w);
         void setHeight(int h);
@@ -113,8 +113,8 @@ namespace Render3D {
         int height;
         int windowedWidth;
         int windowedHeight;
-		int pendingWidth;
-		int pendingHeight;
+        int pendingWidth;
+        int pendingHeight;
         bool vsyncEnabled;
         bool fullscreenEnabled;
         bool mouseLockEnabled;
