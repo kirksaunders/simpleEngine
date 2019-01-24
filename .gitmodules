@@ -1,9 +1,12 @@
 [submodule "3rdparty/GLEW"]
 	path = 3rdparty/GLEW
 	url = https://github.com/nigels-com/glew
+    ignore = all
 [submodule "3rdparty/ASSIMP"]
 	path = 3rdparty/ASSIMP
 	url = https://github.com/assimp/assimp
+    ignore = all
 [submodule "3rdparty/SDL2"]
 	path = 3rdparty/SDL2
 	url = https://github.com/spurious/SDL-mirror
+    ignore = all
