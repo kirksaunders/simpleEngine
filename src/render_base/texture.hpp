@@ -5,7 +5,7 @@
 #include <utility>
 #include <vector>
 
-#include <GLEW/glew.h>
+#include <glew.h>
 
 #include "objects/bufferobject.hpp"
 

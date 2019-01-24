@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include <GLEW/glew.h>
+#include <glew.h>
 
 namespace Render3D {
     class Window; // forward declaration

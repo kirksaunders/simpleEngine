@@ -5,8 +5,8 @@
 #include <utility>
 #include <vector>
 
-#include <GLEW/glew.h>
-#include <ASSIMP/scene.h>
+#include <glew.h>
+#include <assimp/scene.h>
 
 #include "objects/mesh.hpp"
 #include "objects/primitive3d.hpp"

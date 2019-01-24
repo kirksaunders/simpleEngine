@@ -1,12 +1,9 @@
-[submodule "include/ASSIMP"]
-	path = include/ASSIMP
-	url = https://github.com/assimp/assimp
-[submodule "include/GLEW"]
-	path = include/GLEW
-	url = https://github.com/nigels-com/glew
-[submodule "include/SDL2"]
-	path = include/SDL2
+[submodule "3rdparty/SDL2"]
+	path = 3rdparty/SDL2
 	url = https://github.com/spurious/SDL-mirror
-[submodule "include/stb_image.h"]
-	path = include/stb_image.h
-	url = https://github.com/nothings/stb/blob/master/stb_image.h
+[submodule "3rdparty/GLEW"]
+	path = 3rdparty/GLEW
+	url = https://github.com/nigels-com/glew
+[submodule "3rdparty/ASSIMP"]
+	path = 3rdparty/ASSIMP
+	url = https://github.com/assimp/assimp

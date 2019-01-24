@@ -1,7 +1,7 @@
 #ifndef BUFFEROBJECT_HPP
 #define BUFFEROBJECT_HPP
 
-#include <GLEW/glew.h>
+#include <glew.h>
 
 namespace Render3D {
     struct BufferObject {

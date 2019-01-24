@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include <ASSIMP/Importer.hpp>
-#include <ASSIMP/postprocess.h>
+#include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
 
 #include "objects/model.hpp"
 
