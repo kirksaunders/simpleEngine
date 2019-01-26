@@ -5,18 +5,18 @@
 #include <utility>
 #include <vector>
 
-#include <GL/glew.h>
+#include "GL/glew.h"
 
 #include "objects/bufferobject.hpp"
 
 #include "render_base/shadervariable.hpp"
+#include "render_base/texturebuffer.hpp"
+#include "render_base/window.hpp"
 
 namespace Render3D {
-    // forward declarations
-    class Shader;
-    class TextureBuffer;
-    class TextureManager;
-    class Window;
+	// Shader and TextureManager must be forward declared because they use Texture's full definition
+	class Shader;
+	class TextureManager;
 
     struct TextureID {
         GLuint id;

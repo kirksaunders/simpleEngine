@@ -1,8 +1,6 @@
-#include <cstring>
-
 #include "render_base/shadervariableblock.hpp"
-#include "render_base/uniformbuffermanager.hpp"
-#include "render_base/window.hpp"
+
+#include <cstring>
 
 using namespace Render3D;
 using namespace Math3D;

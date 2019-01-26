@@ -5,13 +5,15 @@
 #include <utility>
 #include <vector>
 
-#include <GL/glew.h>
-#include <assimp/scene.h>
+#include "assimp/scene.h"
+#include "GL/glew.h"
 
 #include "objects/mesh.hpp"
 #include "objects/primitive3d.hpp"
 
 #include "render_base/texture.hpp"
+#include "render_base/texturemanager.hpp"
+#include "render_base/window.hpp"
 
 namespace Render3D {
     class Model : public Primitive3D {

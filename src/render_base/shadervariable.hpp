@@ -5,12 +5,13 @@
 #include <utility>
 #include <vector>
 
-#include <GL/glew.h>
+#include "GL/glew.h"
 
 #include "math/matrix4x4.hpp"
 #include "math/vector4.hpp"
 
 #include "render_base/color.hpp"
+#include "render_base/window.hpp"
 
 #ifndef ALWAYS_FALSE
 #define ALWAYS_FALSE
@@ -25,9 +26,8 @@ namespace Render3D {
 #endif
 
 namespace Render3D {
-    // forward declarations
-    class Shader;
-    class Window;
+    // Shader must be forward declared because it uses the partial definitions of ShaderVariable
+	class Shader;
 
     class ShaderVariableInterface {
      public:

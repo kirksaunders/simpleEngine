@@ -1,9 +1,11 @@
+#include "render_base/window.hpp"
+
 #include <algorithm>
 #include <iostream>
 
 #include "render_base/context3d.hpp"
 #include "render_base/exception.hpp"
-#include "render_base/window.hpp"
+#include "render_base/shader.hpp"
 
 using namespace Render3D;
 

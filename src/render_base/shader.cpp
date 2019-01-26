@@ -1,13 +1,11 @@
+#include "render_base/shader.hpp"
+
 #include <algorithm>
 #include <cmath>
 #include <fstream>
 #include <sstream>
 
 #include "render_base/exception.hpp"
-#include "render_base/shader.hpp"
-#include "render_base/shadervariableblock.hpp"
-#include "render_base/uniformbuffermanager.hpp"
-#include "render_base/window.hpp"
 
 using namespace Render3D;
 using namespace Math3D;

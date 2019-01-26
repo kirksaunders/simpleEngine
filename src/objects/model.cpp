@@ -1,9 +1,9 @@
+#include "objects/model.hpp"
+
 #include <iostream>
 
-#include <assimp/Importer.hpp>
-#include <assimp/postprocess.h>
-
-#include "objects/model.hpp"
+#include "assimp/Importer.hpp"
+#include "assimp/postprocess.h"
 
 #include "render_base/exception.hpp"
 #include "render_base/shader.hpp"

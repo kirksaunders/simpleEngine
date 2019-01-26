@@ -3,11 +3,11 @@
 
 #include <vector>
 
-#include <GL/glew.h>
+#include "GL/glew.h"
+
+#include "render_base/window.hpp"
 
 namespace Render3D {
-    class Window; // forward declaration
-
     class UniformBufferManager {
     public:
         int getBufferLocation(GLuint bufferID);

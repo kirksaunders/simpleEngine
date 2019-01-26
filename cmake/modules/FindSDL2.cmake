@@ -29,7 +29,7 @@ endif()
     
 if (WIN32)
     find_path(SDL2_INCLUDE_DIR
-        NAMES SDL.h
+        NAMES SDL2/SDL.h
         PATHS
             ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
             $ENV{PROGRAMFILES}
@@ -37,10 +37,8 @@ if (WIN32)
         PATH_SUFFIXES
             SDL2
             SDL2/include
-            SDL2/include/SDL2
             SDL2/build
             SDL2/build/include
-            SDL2/build/include/SDL2
         DOC "The SDL2 include directory"
     )
 
@@ -97,7 +95,7 @@ if (WIN32)
     )
 else()
     find_path(SDL2_INCLUDE_DIR
-        NAMES SDL.h
+        NAMES SDL2/SDL.h
         PATHS
             ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
             /usr/include
@@ -107,10 +105,8 @@ else()
         PATH_SUFFIXES
             SDL2
             SDL2/include
-            SDL2/include/SDL2
             SDL2/build
             SDL2/build/include
-            SDL2/build/include/SDL2
         DOC "The SDL2 include directory"
     )
 

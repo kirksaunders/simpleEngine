@@ -7,13 +7,13 @@
 #include <utility>
 #include <vector>
 
-#include <GL/glew.h>
-#include <sdl.h>
+#include "GL/glew.h"
+#include "SDL2/SDL.h"
 
 #include "render_base/keycodes.hpp"
 
 namespace Render3D {
-    // forward declarations
+    // Context3D and Shader must be forward declared because they use the full definitions of Window
     class Context3D;
     class Shader;
 

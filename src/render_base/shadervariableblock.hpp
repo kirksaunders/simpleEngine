@@ -8,7 +8,7 @@
 #include <utility>
 #include <vector>
 
-#include <GL/glew.h>
+#include "GL/glew.h"
 
 #include "math/matrix4x4.hpp"
 #include "math/vector4.hpp"
@@ -17,6 +17,8 @@
 
 #include "render_base/color.hpp"
 #include "render_base/exception.hpp"
+#include "render_base/uniformbuffermanager.hpp"
+#include "render_base/window.hpp"
 
 #ifndef ALWAYS_FALSE
 #define ALWAYS_FALSE
@@ -31,10 +33,8 @@ namespace Render3D {
 #endif
 
 namespace Render3D {
-    // forward declarations
-    class ShaderVariableBlock;
-    class UniformBufferManager;
-    class Window;
+	// ShaderVariableBlock needs to be forward declared because ShaderBlockVariableInterface references it
+	class ShaderVariableBlock;
 
     enum class GLSL_TYPE {
         BOOL,

@@ -1,7 +1,9 @@
 #ifndef TEXTUREBUFFER_HPP
 #define TEXTUREBUFFER_HPP
 
-#include <GL/glew.h>
+#include "GL/glew.h"
+
+#include "render_base/color.hpp"
 
 namespace Render3D {
     class Color; // forward declaration

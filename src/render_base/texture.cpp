@@ -1,17 +1,15 @@
+#include "render_base/texture.hpp"
+
 #include <algorithm>
 #include <cstdlib>
 #include <iostream>
 #include <utility>
 
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
+#include "stb_image.h"
 
 #include "render_base/exception.hpp"
 #include "render_base/shader.hpp"
-#include "render_base/texture.hpp"
-#include "render_base/texturebuffer.hpp"
 #include "render_base/texturemanager.hpp"
-#include "render_base/window.hpp"
 
 using namespace Render3D;
 

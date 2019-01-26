@@ -1,8 +1,8 @@
+#include "render_base/color.hpp"
+
 #include <cmath>
 
 #include "math/constants.hpp"
-
-#include "render_base/color.hpp"
 
 using namespace Render3D;
 

@@ -4,12 +4,15 @@
 #include <utility>
 #include <vector>
 
-#include <GL/glew.h>
+#include "GL/glew.h"
 
 #include "math/vector4.hpp"
 
 #include "objects/bufferobject.hpp"
 #include "objects/primitive3d.hpp"
+
+#include "render_base/texturemanager.hpp"
+#include "render_base/window.hpp"
 
 namespace Render3D {
     class Cuboid : public Primitive3D {

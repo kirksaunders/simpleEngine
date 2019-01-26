@@ -5,13 +5,12 @@
 #include <utility>
 #include <vector>
 
-#include <GL/glew.h>
+#include "GL/glew.h"
 
 #include "render_base/texture.hpp"
+#include "render_base/window.hpp"
 
 namespace Render3D {
-    class Window; // forward declaration
-
     class TextureManager {
      public:
         static const unsigned int MAX_MATERIAL_TEXTURES = 5;
