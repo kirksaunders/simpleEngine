@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.8)
 
 # Set project name
 project(simpleEngine LANGUAGES CXX)
@@ -9,6 +9,8 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # Find all source files
+# Note: I know that using GLOB to find source files is not a good practice.
+#       I will list the source files manually some other time.
 file(GLOB_RECURSE SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 
 # Add executable target
@@ -18,59 +20,70 @@ add_executable(${CMAKE_PROJECT_NAME} ${SRC_FILES})
 set_property(TARGET ${CMAKE_PROJECT_NAME} PROPERTY CXX_STANDARD 11)
 set_property(TARGET ${CMAKE_PROJECT_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
 
-# Find all library include paths
-find_path(SDL2_INCLUDE SDL.h PATHS ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/SDL2/include ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/SDL2/build/include)
-find_path(GLEW_INCLUDE glew.h PATHS ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/GLEW/include ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/GLEW/build/include ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/GLEW/include/GL ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/GLEW/build/include/GL)
-find_path(ASSIMP_INCLUDE assimp PATHS ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/ASSIMP/include ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/ASSIMP/build/include)
-find_path(STB_IMAGE_INCLUDE stb_image.h PATHS ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/stb)
-
-# Add include directories
 target_include_directories(${CMAKE_PROJECT_NAME}
-    PUBLIC
-        #$<INSTALL_INTERFACE:include>
-        #$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        ${SDL2_INCLUDE}
-        ${GLEW_INCLUDE}
-        ${ASSIMP_INCLUDE}
-        ${STB_IMAGE_INCLUDE}
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
-# Find all of the 3rdparty libraries
-find_library(SDL2_LIB SDL2.dll PATHS ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/SDL2/lib ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/SDL2/build/lib ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/SDL2/build)
-find_library(SDL2_MAIN_LIB SDL2main PATHS ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/SDL2/lib ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/SDL2/build/lib ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/SDL2/build)
-find_library(GLEW_LIB glew32.dll PATHS ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/GLEW/lib ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/GLEW/build/lib ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/GLEW/bin ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/GLEW/build/bin)
-find_library(ASSIMP_LIB libassimp.dll PATHS ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/ASSIMP/lib ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/ASSIMP/build/lib ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/ASSIMP/build)
-find_library(OPENGL_LIB opengl32)
-#find_library(MINGW32_LIB mingw32 PATHS C:/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/x86_64-w64-mingw32/lib)
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
 
-# Link mingw32 library if necessary (required for SDL2)
+find_package(SDL2 REQUIRED)
+find_package(GLEW REQUIRED)
+find_package(ASSIMP REQUIRED)
+find_package(STB_IMAGE REQUIRED)
+
 if (MINGW)
-    target_link_libraries(${CMAKE_PROJECT_NAME} mingw32)
-endif(MINGW)
+    target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE mingw32)
+endif()
 
-# Link all of the libraries to the executable
-target_link_libraries(${CMAKE_PROJECT_NAME} ${GLEW_LIB} ${SDL2_MAIN_LIB} ${SDL2_LIB} ${ASSIMP_LIB} ${OPENGL_LIB})
+target_link_libraries(${CMAKE_PROJECT_NAME}
+    PRIVATE
+        SDL2::SDL2main
+        SDL2::SDL2
+        GLEW::GLEW
+        ASSIMP::ASSIMP
+        STB_IMAGE::STB_IMAGE
+)
 
-# Custom commands to copy the sdl and glew shared libraries over to the binary directory with the final executable
-add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
-    			   COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        		   ${SDL2_LIB}
-				   $<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>)
+# Sometimes it is useful to copy 3rd party dll's into the bin directory so that the program can run
+# successfully, especially on Windows
+if (COPY_3RDPARTY_DLLS)
+    if (TARGET GLEW::GLEW-shared)
+        add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_FILE:GLEW::GLEW-shared>
+            $<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>)
+        
+        get_filename_component(GLEW_SHARED_NAME "${GLEW_SHARED}" NAME)
 
-add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
-				   COMMAND ${CMAKE_COMMAND} -E copy_if_different
-				   ${GLEW_LIB}
-				   $<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>)
+        set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES
+            $<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>/${GLEW_SHARED_NAME}
+        )
+    endif()
 
-add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
-				   COMMAND ${CMAKE_COMMAND} -E copy_if_different
-				   ${ASSIMP_LIB}
-				   $<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>)
+    if (TARGET SDL2::SDL2-shared)
+        add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_FILE:SDL2::SDL2-shared>
+            $<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>)
+        
+        get_filename_component(SDL2_SHARED_NAME "${SDL2_SHARED}" NAME)
 
-# Since we are copying some shared libraries into the binary dir, we must list those as needing to be deleted when make clean is used.
-set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES
-             ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/SDL2.dll
-             ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/glew32.dll
-             ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/libassimp.dll)
+        set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES
+            $<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>/${SDL2_SHARED_NAME}
+        )
+    endif()
+
+    if (TARGET ASSIMP::ASSIMP-shared)
+        add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_FILE:ASSIMP::ASSIMP-shared>
+            $<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>)
+        
+        get_filename_component(ASSIMP_SHARED_NAME "${ASSIMP_SHARED}" NAME)
+
+        set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES
+            $<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>/${ASSIMP_SHARED_NAME}
+        )
+    endif()
+endif()

@@ -4,7 +4,7 @@
 #include <utility>
 #include <vector>
 
-#include <glew.h>
+#include <GL/glew.h>
 
 #include "math/vector4.hpp"
 

@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include <glew.h>
+#include <GL/glew.h>
 
 #include "render_base/shadervariable.hpp"
 #include "render_base/texturemanager.hpp"

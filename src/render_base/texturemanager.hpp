@@ -5,7 +5,7 @@
 #include <utility>
 #include <vector>
 
-#include <glew.h>
+#include <GL/glew.h>
 
 #include "render_base/texture.hpp"
 

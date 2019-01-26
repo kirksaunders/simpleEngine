@@ -1,7 +1,7 @@
 #ifndef SPHERE_HPP
 #define SPHERE_HPP
 
-#include <glew.h>
+#include <GL/glew.h>
 
 #include "objects/model.hpp"
 #include "objects/primitive3d.hpp"

@@ -7,7 +7,7 @@
 #include <utility>
 #include <vector>
 
-#include <glew.h>
+#include <GL/glew.h>
 #include <sdl.h>
 
 #include "render_base/keycodes.hpp"

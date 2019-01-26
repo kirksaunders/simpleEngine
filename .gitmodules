@@ -1,9 +1,9 @@
-[submodule "3rdparty/GLEW"]
-	path = 3rdparty/GLEW
+[submodule "3rdparty/glew"]
+	path = 3rdparty/glew
 	url = https://github.com/nigels-com/glew
     ignore = all
-[submodule "3rdparty/ASSIMP"]
-	path = 3rdparty/ASSIMP
+[submodule "3rdparty/assimp"]
+	path = 3rdparty/assimp
 	url = https://github.com/assimp/assimp
     ignore = all
 [submodule "3rdparty/SDL2"]
