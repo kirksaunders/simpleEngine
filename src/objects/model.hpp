@@ -12,8 +12,6 @@
 #include "objects/primitive3d.hpp"
 
 #include "render_base/texture.hpp"
-#include "render_base/texturemanager.hpp"
-#include "render_base/window.hpp"
 
 namespace Render3D {
     class Model : public Primitive3D {

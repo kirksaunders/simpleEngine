@@ -2,6 +2,8 @@
 
 #include <algorithm>
 
+#include "render_base/color.hpp"
+
 using namespace Render3D;
 
 TextureBuffer::TextureBuffer(size_t w, size_t h, size_t d) {

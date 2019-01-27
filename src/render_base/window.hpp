@@ -13,7 +13,7 @@
 #include "render_base/keycodes.hpp"
 
 namespace Render3D {
-    // Context3D and Shader must be forward declared because they use the full definitions of Window
+    // forward declarations
     class Context3D;
     class Shader;
 

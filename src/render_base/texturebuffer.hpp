@@ -3,8 +3,6 @@
 
 #include "GL/glew.h"
 
-#include "render_base/color.hpp"
-
 namespace Render3D {
     class Color; // forward declaration
 

@@ -1,11 +1,10 @@
-#include "render_base/texturemanager.hpp"
-
 #include <algorithm>
 #include <iostream>
 
 #include "render_base/color.hpp"
 #include "render_base/exception.hpp"
 #include "render_base/texturebuffer.hpp"
+#include "render_base/texturemanager.hpp"
 
 using namespace Render3D;
 

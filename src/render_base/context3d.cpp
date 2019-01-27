@@ -4,8 +4,14 @@
 #include <iostream>
 #include <utility>
 
+#include "objects/primitive3d.hpp"
+
 #include "render_base/exception.hpp"
+#include "render_base/shader.hpp"
+#include "render_base/shadervariableblock.hpp"
+#include "render_base/texture.hpp"
 #include "render_base/texturebuffer.hpp"
+#include "render_base/window.hpp"
 
 using namespace Render3D;
 using namespace Math3D;

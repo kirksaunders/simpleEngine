@@ -3,6 +3,7 @@
 #include <utility>
 
 #include "render_base/shader.hpp"
+#include "render_base/window.hpp"
 
 using namespace Math3D;
 using namespace Render3D;

@@ -1,6 +1,6 @@
-#include <cmath>
-
 #include "astar/grid.hpp"
+
+#include <cmath>
 
 using namespace Math3D;
 

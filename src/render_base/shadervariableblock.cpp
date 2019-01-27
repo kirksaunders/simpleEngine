@@ -2,6 +2,9 @@
 
 #include <cstring>
 
+#include "render_base/uniformbuffermanager.hpp"
+#include "render_base/window.hpp"
+
 using namespace Render3D;
 using namespace Math3D;
 

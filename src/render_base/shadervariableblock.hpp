@@ -17,8 +17,6 @@
 
 #include "render_base/color.hpp"
 #include "render_base/exception.hpp"
-#include "render_base/uniformbuffermanager.hpp"
-#include "render_base/window.hpp"
 
 #ifndef ALWAYS_FALSE
 #define ALWAYS_FALSE
@@ -33,8 +31,10 @@ namespace Render3D {
 #endif
 
 namespace Render3D {
-	// ShaderVariableBlock needs to be forward declared because ShaderBlockVariableInterface references it
-	class ShaderVariableBlock;
+    // forward declarations
+    class ShaderVariableBlock;
+    class UniformBufferManager;
+    class Window;
 
     enum class GLSL_TYPE {
         BOOL,

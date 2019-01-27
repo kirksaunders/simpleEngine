@@ -8,12 +8,14 @@
 #include "math/vector4.hpp"
 
 #include "render_base/color.hpp"
-#include "render_base/shader.hpp"
 #include "render_base/shadervariable.hpp"
-#include "render_base/texturemanager.hpp"
-#include "render_base/window.hpp"
 
 namespace Render3D {
+    // forward declarations
+    class Shader;
+    class TextureManager;
+    class Window;
+
     class Instance {
      public:
         Instance() : cframe(Math3D::Matrix4x4()) {}

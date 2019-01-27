@@ -1,7 +1,8 @@
+#include "math/vector4.hpp"
+
 #include <cmath>
 
 #include "math/constants.hpp"
-#include "math/vector4.hpp"
 
 using namespace Math3D;
 

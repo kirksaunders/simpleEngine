@@ -10,12 +10,14 @@
 #include "GL/glew.h"
 
 #include "render_base/shadervariable.hpp"
-#include "render_base/shadervariableblock.hpp"
 #include "render_base/texturemanager.hpp"
-#include "render_base/uniformbuffermanager.hpp"
-#include "render_base/window.hpp"
 
 namespace Render3D {
+    // forward declarations
+    class ShaderVariableBlock;
+    class UniformBufferManager;
+    class Window;
+
     struct ProgramID {
         GLuint id;
         GLuint useCount;

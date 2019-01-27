@@ -10,13 +10,13 @@
 #include "objects/bufferobject.hpp"
 
 #include "render_base/shadervariable.hpp"
-#include "render_base/texturebuffer.hpp"
-#include "render_base/window.hpp"
 
 namespace Render3D {
-	// Shader and TextureManager must be forward declared because they use Texture's full definition
-	class Shader;
-	class TextureManager;
+    // forward declarations
+    class Shader;
+    class TextureBuffer;
+    class TextureManager;
+    class Window;
 
     struct TextureID {
         GLuint id;

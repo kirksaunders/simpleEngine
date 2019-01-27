@@ -4,17 +4,18 @@
 #include <memory>
 #include <set>
 
-#include "objects/primitive3d.hpp"
-
 #include "render_base/camera.hpp"
-#include "render_base/shader.hpp"
 #include "render_base/shadervariableblock.hpp"
-#include "render_base/texture.hpp"
 #include "render_base/texturemanager.hpp"
 #include "render_base/uniformbuffermanager.hpp"
-#include "render_base/window.hpp"
 
 namespace Render3D {
+    // forward declarations
+    class Primitive3D;
+    class Shader;
+    class Texture;
+    class Window;
+
     class Context3D {
      public:
         Context3D();

@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "astar/node.hpp"
+
 #include "math/vector4.hpp"
 
 class Grid {

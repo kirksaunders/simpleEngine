@@ -1,7 +1,8 @@
+#include "math/matrix4x4.hpp"
+
 #include <cmath>
 
 #include "math/constants.hpp"
-#include "math/matrix4x4.hpp"
 
 using namespace Math3D;
 
