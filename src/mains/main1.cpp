@@ -106,7 +106,12 @@ void main1() {
         }
     });
 
-    window.setVSyncEnabled(true);
+    try {
+        window.setVSyncEnabled(true);
+        std::cout << "Vsync enabled" << std::endl;
+    } catch (Exception ex) {
+        std::cout << ex << std::endl;
+    }
 
     while (window.isActive()) {
         window.updateViewport();

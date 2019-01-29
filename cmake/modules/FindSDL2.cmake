@@ -23,7 +23,7 @@ else()
         set(SDL2_LIBRARY_NAME SDL2.dll)
     else()
         set(CMAKE_FIND_LIBRARY_SUFFIXES .so)
-        set(SDL2_LIBRARY_NAME SDL2.so)
+        set(SDL2_LIBRARY_NAME SDL2)
     endif()
 endif()
     
@@ -78,21 +78,23 @@ if (WIN32)
 
     set(CMAKE_FIND_LIBRARY_SUFFIXES "")
 
-    find_library(SDL2_SHARED
-        NAMES ${SDL2_LIBRARY_NAME}
-        PATHS
-            ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
-            $ENV{PROGRAMFILES}
-            "$ENV{PROGRAMFILES\(x86\)}"
-        PATH_SUFFIXES
-            SDL2
-            SDL2/lib
-            SDL2/bin
-            SDL2/build
-            SDL2/build/lib
-            SDL2/build/bin
-        DOC "The SDL2 shared library path"
-    )
+    if (NOT SDL2_IS_STATIC)
+        find_library(SDL2_SHARED
+            NAMES ${SDL2_LIBRARY_NAME}
+            PATHS
+                ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
+                $ENV{PROGRAMFILES}
+                "$ENV{PROGRAMFILES\(x86\)}"
+            PATH_SUFFIXES
+                SDL2
+                SDL2/lib
+                SDL2/bin
+                SDL2/build
+                SDL2/build/lib
+                SDL2/build/bin
+            DOC "The SDL2 shared library path"
+        )
+    endif()
 else()
     find_path(SDL2_INCLUDE_DIR
         NAMES SDL2/SDL.h
@@ -178,6 +180,13 @@ if (SDL2_FOUND AND NOT TARGET SDL2::SDL2)
     set_target_properties(SDL2::SDL2main PROPERTIES
         INTERFACE_INCLUDE_DIRECTORIES "${SDL2_INCLUDE_DIRS}"
     )
+
+    # When compiling for MINGW, we must also link mingw32.dll for SDL2main to work
+    if (MINGW)
+        set_target_properties(SDL2::SDL2main PROPERTIES
+            INTERFACE_LINK_LIBRARIES "mingw32"
+        )
+    endif()
 
     if (NOT SDL2_IS_STATIC)
         add_library(SDL2::SDL2-shared SHARED IMPORTED)

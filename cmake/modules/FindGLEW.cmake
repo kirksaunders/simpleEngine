@@ -27,7 +27,7 @@ else()
         set(GLEW_LIBRARY_NAME glew32.dll)
     else()
         set(CMAKE_FIND_LIBRARY_SUFFIXES .so)
-        set(GLEW_LIBRARY_NAME glew.so)
+        set(GLEW_LIBRARY_NAME GLEW)
     endif()
 endif()
     
@@ -64,21 +64,23 @@ if (WIN32)
 
     set(CMAKE_FIND_LIBRARY_SUFFIXES "")
 
-    find_library(GLEW_SHARED
-        NAMES ${GLEW_LIBRARY_NAME}
-        PATHS
-            ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
-            $ENV{PROGRAMFILES}
-            "$ENV{PROGRAMFILES\(x86\)}"
-        PATH_SUFFIXES
-            glew
-            glew/lib
-            glew/bin
-            glew/build
-            glew/build/lib
-            glew/build/bin
-        DOC "The glew shared library path"
-    )
+    if (NOT GLEW_IS_STATIC)
+        find_library(GLEW_SHARED
+            NAMES ${GLEW_LIBRARY_NAME}
+            PATHS
+                ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
+                $ENV{PROGRAMFILES}
+                "$ENV{PROGRAMFILES\(x86\)}"
+            PATH_SUFFIXES
+                glew
+                glew/lib
+                glew/bin
+                glew/build
+                glew/build/lib
+                glew/build/bin
+            DOC "The glew shared library path"
+        )
+    endif()
 else()
     find_path(GLEW_INCLUDE_DIR
         NAMES GL/glew.h

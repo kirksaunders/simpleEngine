@@ -23,7 +23,7 @@ else()
         set(ASSIMP_LIBRARY_NAME assimp.dll)
     else()
         set(CMAKE_FIND_LIBRARY_SUFFIXES .so)
-        set(ASSIMP_LIBRARY_NAME assimp.so)
+        set(ASSIMP_LIBRARY_NAME assimp)
     endif()
 endif()
     
@@ -61,22 +61,24 @@ if (WIN32)
 
     set(CMAKE_FIND_LIBRARY_SUFFIXES "")
 
-    find_library(ASSIMP_SHARED
-        NAMES ${ASSIMP_LIBRARY_NAME}
-        PATHS
-            ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
-            $ENV{PROGRAMFILES}
-            "$ENV{PROGRAMFILES\(x86\)}"
-        PATH_SUFFIXES
-            assimp
-            assimp/lib
-            assimp/bin
-            assimp/build
-            assimp/build/lib
-            assimp/build/bin
-            assimp/build/code
-        DOC "The ASSIMP shared library path"
-    )
+    if (NOT ASSIMP_IS_STATIC)
+        find_library(ASSIMP_SHARED
+            NAMES ${ASSIMP_LIBRARY_NAME}
+            PATHS
+                ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
+                $ENV{PROGRAMFILES}
+                "$ENV{PROGRAMFILES\(x86\)}"
+            PATH_SUFFIXES
+                assimp
+                assimp/lib
+                assimp/bin
+                assimp/build
+                assimp/build/lib
+                assimp/build/bin
+                assimp/build/code
+            DOC "The ASSIMP shared library path"
+        )
+    endif()
 else()
     find_path(ASSIMP_INCLUDE_DIR
         NAMES assimp/Importer.hpp

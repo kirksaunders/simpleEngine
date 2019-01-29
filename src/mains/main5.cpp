@@ -6,11 +6,18 @@ using namespace Math3D;
 
 void main5() {
     Window window(WIDTH, HEIGHT, "Render during resize (by callback)");
+    std::cout << "Yay window!" << std::endl;
 
     Context3D* context = window.getContext();
 
     Shader defaultShader = Shader::defaultPerspective();
-    context->addShader(&defaultShader);
+    try {
+        context->addShader(&defaultShader);
+    } catch (Exception ex) {
+        std::cout << ex << std::endl;
+        exit(-1);
+    }
+    std::cout << "Yay shader!" << std::endl;
 
     Cuboid cube;
     cube.setSize(Vector4(1, 1, 1));
@@ -19,8 +26,15 @@ void main5() {
     cube.setShader(&defaultShader);
 
     context->addObject(&cube);
+    std::cout << "Yay cube!" << std::endl;
 
-    window.setVSyncEnabled(true);
+    // trying to activate vsync will fail on many x-server based window managers (no vsync support)
+    try {
+        window.setVSyncEnabled(true);
+        std::cout << "Vsync enabled" << std::endl;
+    } catch (Exception ex) {
+        std::cout << ex << std::endl;
+    }
 
     Camera* cam = context->getCamera();
 

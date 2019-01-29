@@ -57,6 +57,8 @@ Window::Window(int w, int h, const char* title, Window* parent) {
         throw Exception(std::string("Exception occurred with initializing glew: ") + reinterpret_cast<const char*>(glewGetErrorString(glewError)));
     }
 
+    std::cout << "Using OpenGL version: " << glGetString(GL_VERSION) << std::endl;
+
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_MULTISAMPLE);
     glEnable(GL_BLEND);

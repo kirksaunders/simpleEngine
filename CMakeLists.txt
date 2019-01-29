@@ -27,17 +27,15 @@ target_include_directories(${CMAKE_PROJECT_NAME}
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
 
+find_package(Threads)
 find_package(SDL2 REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(ASSIMP REQUIRED)
 find_package(STB_IMAGE REQUIRED)
 
-if (MINGW)
-    target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE mingw32)
-endif()
-
 target_link_libraries(${CMAKE_PROJECT_NAME}
     PRIVATE
+        Threads::Threads
         SDL2::SDL2main
         SDL2::SDL2
         GLEW::GLEW
