@@ -29,7 +29,7 @@ endif()
     
 if (WIN32)
     find_path(SDL2_INCLUDE_DIR
-        NAMES SDL2/SDL.h
+		NAMES SDL2/SDL.h
         PATHS
             ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
             $ENV{PROGRAMFILES}
@@ -43,7 +43,7 @@ if (WIN32)
     )
 
     find_library(SDL2_LIBRARY
-        NAMES ${SDL2_LIBRARY_NAME}
+		NAMES ${SDL2_LIBRARY_NAME}
         PATHS
             ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
             $ENV{PROGRAMFILES}
@@ -61,7 +61,7 @@ if (WIN32)
     set(CMAKE_FIND_LIBRARY_SUFFIXES ${SDL2_ORIG_SUFFIXES})
 
     find_library(SDL2_MAIN_LIBRARY
-        NAMES SDL2main
+		NAMES SDL2main
         PATHS
             ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
             $ENV{PROGRAMFILES}
@@ -80,7 +80,7 @@ if (WIN32)
 
     if (NOT SDL2_IS_STATIC)
         find_library(SDL2_SHARED
-            NAMES ${SDL2_LIBRARY_NAME}
+			NAMES ${SDL2_LIBRARY_NAME}
             PATHS
                 ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
                 $ENV{PROGRAMFILES}
@@ -97,7 +97,7 @@ if (WIN32)
     endif()
 else()
     find_path(SDL2_INCLUDE_DIR
-        NAMES SDL2/SDL.h
+		NAMES SDL2/SDL.h
         PATHS
             ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
             /usr/include
@@ -113,7 +113,7 @@ else()
     )
 
     find_library(SDL2_LIBRARY
-        NAMES ${SDL2_LIBRARY_NAME}
+		NAMES ${SDL2_LIBRARY_NAME}
         PATHS
             ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
             /usr/lib64
@@ -135,7 +135,7 @@ else()
     set(CMAKE_FIND_LIBRARY_SUFFIXES ${SDL2_ORIG_SUFFIXES})
 
     find_library(SDL2_MAIN_LIBRARY
-        NAMES SDL2main
+		NAMES SDL2main
         PATHS
             ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
             /usr/lib64
@@ -162,7 +162,15 @@ endif()
 include(FindPackageHandleStandardArgs)
 # handle the QUIETLY and REQUIRED arguments and set LOGGING_FOUND to TRUE
 # if all listed variables are TRUE
-find_package_handle_standard_args(SDL2 DEFAULT_MSG SDL2_LIBRARY SDL2_MAIN_LIBRARY SDL2_INCLUDE_DIR)
+if (WIN32)
+	if (SDL2_IS_STATIC)
+		find_package_handle_standard_args(SDL2 DEFAULT_MSG SDL2_LIBRARY SDL2_MAIN_LIBRARY SDL2_INCLUDE_DIR)
+	else()
+		find_package_handle_standard_args(SDL2 DEFAULT_MSG SDL2_LIBRARY SDL2_MAIN_LIBRARY SDL2_INCLUDE_DIR SDL2_SHARED)
+	endif()
+else()
+	find_package_handle_standard_args(SDL2 DEFAULT_MSG SDL2_LIBRARY SDL2_MAIN_LIBRARY SDL2_INCLUDE_DIR)
+endif()
 
 if (SDL2_FOUND)
     set(SDL2_LIBRARIES "${SDL2_LIBRARY} ${SDL2_MAIN_LIBRARY}")

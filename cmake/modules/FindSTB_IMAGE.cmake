@@ -5,8 +5,11 @@
     
 if (WIN32)
     find_path(STB_IMAGE_INCLUDE_DIR
-        NAMES stb_image.h
-        PATHS
+		NAMES stb_image.h
+		HINTS
+			${STB_IMAGE_INCLUDE_PATH}
+		PATHS
+			${STB_IMAGE_PATH}
             ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
             $ENV{PROGRAMFILES}
             "$ENV{PROGRAMFILES\(x86\)}"
@@ -14,12 +17,14 @@ if (WIN32)
             stb
             stb/include
         DOC "The stb_image.h directory"
-    )
+	)
 else()
     find_path(STB_IMAGE_INCLUDE_DIR
-        NAMES stb_image.h
+		NAMES stb_image.h
+		HINTS
+			${STB_IMAGE_INCLUDE_PATH}
         PATHS
-            ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
+			${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
             /usr/include
             /usr/local/include
             /sw/include
@@ -28,8 +33,10 @@ else()
             stb
             stb/include
         DOC "The stb_image.h directory"
-    )
+	)
 endif()
+
+set(STB_IMAGE_INCLUDE_PATH, ${STB_IMAGE_INCLUDE_DIR})
 
 include(FindPackageHandleStandardArgs)
 # handle the QUIETLY and REQUIRED arguments and set LOGGING_FOUND to TRUE

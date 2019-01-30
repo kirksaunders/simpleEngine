@@ -29,7 +29,7 @@ endif()
     
 if (WIN32)
     find_path(ASSIMP_INCLUDE_DIR
-        NAMES assimp/Importer.hpp
+		NAMES assimp/Importer.hpp
         PATHS
             ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
             $ENV{PROGRAMFILES}
@@ -43,7 +43,7 @@ if (WIN32)
     )
 
     find_library(ASSIMP_LIBRARY
-        NAMES ${ASSIMP_LIBRARY_NAME}
+		NAMES ${ASSIMP_LIBRARY_NAME}
         PATHS
             ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
             $ENV{PROGRAMFILES}
@@ -63,7 +63,7 @@ if (WIN32)
 
     if (NOT ASSIMP_IS_STATIC)
         find_library(ASSIMP_SHARED
-            NAMES ${ASSIMP_LIBRARY_NAME}
+			NAMES ${ASSIMP_LIBRARY_NAME}
             PATHS
                 ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
                 $ENV{PROGRAMFILES}
@@ -81,7 +81,7 @@ if (WIN32)
     endif()
 else()
     find_path(ASSIMP_INCLUDE_DIR
-        NAMES assimp/Importer.hpp
+		NAMES assimp/Importer.hpp
         PATHS
             ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
             /usr/include
@@ -97,7 +97,7 @@ else()
     )
 
     find_library(ASSIMP_LIBRARY
-        NAMES ${ASSIMP_LIBRARY_NAME}
+		NAMES ${ASSIMP_LIBRARY_NAME}
         PATHS
             ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
             /usr/lib64
@@ -125,7 +125,15 @@ endif()
 include(FindPackageHandleStandardArgs)
 # handle the QUIETLY and REQUIRED arguments and set LOGGING_FOUND to TRUE
 # if all listed variables are TRUE
-find_package_handle_standard_args(ASSIMP DEFAULT_MSG ASSIMP_LIBRARY ASSIMP_INCLUDE_DIR)
+if (WIN32)
+	if (ASSIMP_IS_STATIC)
+		find_package_handle_standard_args(ASSIMP DEFAULT_MSG ASSIMP_LIBRARY ASSIMP_INCLUDE_DIR)
+	else()
+		find_package_handle_standard_args(ASSIMP DEFAULT_MSG ASSIMP_LIBRARY ASSIMP_INCLUDE_DIR ASSIMP_SHARED)
+	endif()
+else()
+	find_package_handle_standard_args(ASSIMP DEFAULT_MSG ASSIMP_LIBRARY ASSIMP_INCLUDE_DIR)
+endif()
 
 if (ASSIMP_FOUND)
     set(ASSIMP_LIBRARIES ${ASSIMP_LIBRARY})

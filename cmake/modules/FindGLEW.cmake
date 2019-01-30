@@ -33,7 +33,7 @@ endif()
     
 if (WIN32)
     find_path(GLEW_INCLUDE_DIR
-        NAMES GL/glew.h
+		NAMES GL/glew.h
         PATHS
             ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
             $ENV{PROGRAMFILES}
@@ -47,7 +47,7 @@ if (WIN32)
     )
 
     find_library(GLEW_LIBRARY
-        NAMES ${GLEW_LIBRARY_NAME}
+		NAMES ${GLEW_LIBRARY_NAME}
         PATHS
             ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
             $ENV{PROGRAMFILES}
@@ -66,7 +66,7 @@ if (WIN32)
 
     if (NOT GLEW_IS_STATIC)
         find_library(GLEW_SHARED
-            NAMES ${GLEW_LIBRARY_NAME}
+			NAMES ${GLEW_LIBRARY_NAME}
             PATHS
                 ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
                 $ENV{PROGRAMFILES}
@@ -83,7 +83,7 @@ if (WIN32)
     endif()
 else()
     find_path(GLEW_INCLUDE_DIR
-        NAMES GL/glew.h
+		NAMES GL/glew.h
         PATHS
             ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
             /usr/include
@@ -99,7 +99,7 @@ else()
     )
 
     find_library(GLEW_LIBRARY
-        NAMES ${GLEW_LIBRARY_NAME}
+		NAMES ${GLEW_LIBRARY_NAME}
         PATHS
             ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
             /usr/lib64
@@ -126,7 +126,15 @@ endif()
 include(FindPackageHandleStandardArgs)
 # handle the QUIETLY and REQUIRED arguments and set LOGGING_FOUND to TRUE
 # if all listed variables are TRUE
-find_package_handle_standard_args(GLEW DEFAULT_MSG GLEW_LIBRARY GLEW_INCLUDE_DIR)
+if (WIN32)
+	if (GLEW_IS_STATIC)
+		find_package_handle_standard_args(GLEW DEFAULT_MSG GLEW_LIBRARY GLEW_INCLUDE_DIR)
+	else()
+		find_package_handle_standard_args(GLEW DEFAULT_MSG GLEW_LIBRARY GLEW_INCLUDE_DIR GLEW_SHARED)
+	endif()
+else()
+	find_package_handle_standard_args(GLEW DEFAULT_MSG GLEW_LIBRARY GLEW_INCLUDE_DIR)
+endif()
 
 if (GLEW_FOUND)
     set(GLEW_LIBRARIES ${GLEW_LIBRARY})
