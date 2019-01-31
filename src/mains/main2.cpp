@@ -15,25 +15,47 @@ void main2() {
     Context3D* context1 = window1.getContext();
     Context3D* context2 = window2.getContext();
 
-    Shader defaultShader = Shader::defaultImage();
-    context1->addShader(&defaultShader);
-    context2->addShader(&defaultShader);
+    Shader defaultImageShader = Shader::defaultImage();
+    context1->addShader(&defaultImageShader);
+    context2->addShader(&defaultImageShader);
+
+    Shader defaultObjectShader = Shader::defaultPerspective();
+    context1->addShader(&defaultObjectShader);
+    context2->addShader(&defaultObjectShader);
 
     Texture tex(imagePath.c_str());
-    tex.setShader(&defaultShader);
+    tex.setShader(&defaultImageShader);
     context1->addTexture(&tex);
     context2->addTexture(&tex);
+
+    Cuboid cube;
+    cube.setShader(&defaultObjectShader);
+    cube.setSize(Vector4(1, 1, 1));
+    cube.setCFrame(Matrix4x4(0, 0, -5));
+    cube.setColor(Color(0, 0, 0.75));
+    context1->addObject(&cube);
+    context2->addObject(&cube);
 
     window1.setVSyncEnabled(true);
     window2.setVSyncEnabled(true);
 
+    float x, y, z;
+    x = y = z = 0;
+
     while (window1.isActive() || window2.isActive()) {
+        x = x + 0.01;
+        y = y + 0.01;
+        z = z + 0.01;
+
+        cube.setCFrame(Matrix4x4(cube.getCFrame().position()) * Matrix4x4::fromEuler(x, y, z));
+        
         if (window1.isActive()) {
             window1.makeCurrent();
             window1.updateViewport();
             window1.clear();
 
             context1->renderTexture(tex);
+            context1->render(); // the cube will render on top of the texture
 
             window1.update();
             window1.pollEvents();
@@ -46,6 +68,7 @@ void main2() {
             window2.clear();
 
             context2->renderTexture(tex);
+            context2->render();
 
             window2.update();
             window2.pollEvents();
