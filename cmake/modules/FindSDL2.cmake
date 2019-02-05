@@ -179,30 +179,36 @@ endif()
 
 # Export SDL2::SDL2 as target if it doesn't already exist
 if (SDL2_FOUND AND NOT TARGET SDL2::SDL2)
-    add_library(SDL2::SDL2 UNKNOWN IMPORTED)
+    add_library(SDL2::SDL2 INTERFACE IMPORTED)
     set_target_properties(SDL2::SDL2 PROPERTIES
         INTERFACE_INCLUDE_DIRECTORIES "${SDL2_INCLUDE_DIRS}"
     )
+    target_link_libraries(SDL2::SDL2
+        INTERFACE
+            ${SDL2_LIBRARY}
+    )
 
-    add_library(SDL2::SDL2main UNKNOWN IMPORTED)
+    add_library(SDL2::SDL2main INTERFACE IMPORTED)
     set_target_properties(SDL2::SDL2main PROPERTIES
         INTERFACE_INCLUDE_DIRECTORIES "${SDL2_INCLUDE_DIRS}"
     )
-
     # When compiling for MINGW, we must also link mingw32.dll for SDL2main to work
     if (MINGW)
-        set_target_properties(SDL2::SDL2main PROPERTIES
-            INTERFACE_LINK_LIBRARIES "mingw32"
+        target_link_libraries(SDL2::SDL2main
+            INTERFACE
+                mingw32
+                ${SDL2_MAIN_LIBRARY}
         )
     endif()
+    target_link_libraries(SDL2::SDL2main
+        INTERFACE
+            ${SDL2_MAIN_LIBRARY}
+    )
 
     if (NOT SDL2_IS_STATIC)
         add_library(SDL2::SDL2-shared SHARED IMPORTED)
         set_property(TARGET SDL2::SDL2-shared APPEND PROPERTY IMPORTED_LOCATION "${SDL2_SHARED}")
     endif()
-
-    set_property(TARGET SDL2::SDL2 APPEND PROPERTY IMPORTED_LOCATION "${SDL2_LIBRARY}")
-    set_property(TARGET SDL2::SDL2main APPEND PROPERTY IMPORTED_LOCATION "${SDL2_MAIN_LIBRARY}")
 endif()
 
 # Restore the original CMAKE_FIND_LIBRARY_SUFFIXES

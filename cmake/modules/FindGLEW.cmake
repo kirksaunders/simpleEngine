@@ -147,10 +147,14 @@ endif()
 
 # Export GLEW::GLEW as target if it doesn't already exist
 if (GLEW_FOUND AND NOT TARGET GLEW::GLEW)
-    add_library(GLEW::GLEW UNKNOWN IMPORTED)
+    add_library(GLEW::GLEW INTERFACE IMPORTED)
     set_target_properties(GLEW::GLEW PROPERTIES
         INTERFACE_INCLUDE_DIRECTORIES "${GLEW_INCLUDE_DIRS}"
         INTERFACE_LINK_LIBRARIES OpenGL::GL
+    )
+    target_link_libraries(GLEW::GLEW
+        INTERFACE
+            ${GLEW_LIBRARY}
     )
 
     if (GLEW_IS_STATIC)
@@ -161,8 +165,6 @@ if (GLEW_FOUND AND NOT TARGET GLEW::GLEW)
         add_library(GLEW::GLEW-shared SHARED IMPORTED)
         set_property(TARGET GLEW::GLEW-shared APPEND PROPERTY IMPORTED_LOCATION "${GLEW_SHARED}")
     endif()
-
-    set_property(TARGET GLEW::GLEW APPEND PROPERTY IMPORTED_LOCATION "${GLEW_LIBRARY}")
 endif()
 
 # Restore the original CMAKE_FIND_LIBRARY_SUFFIXES
