@@ -5,8 +5,9 @@ include(${CMAKE_CURRENT_LIST_DIR}/objects/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/raytracer/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/render_base/CMakeLists.txt)
 
-target_link_libraries(${CMAKE_PROJECT_NAME}
-    PRIVATE
+add_library(SOURCES INTERFACE IMPORTED)
+target_link_libraries(SOURCES
+    INTERFACE
         ASTAR_SRC
         MAINS_SRC
         MATH_SRC

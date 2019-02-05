@@ -28,8 +28,11 @@ find_package(GLEW REQUIRED)
 find_package(ASSIMP REQUIRED)
 find_package(STB_IMAGE REQUIRED)
 
+include(${CMAKE_SOURCE_DIR}/src/CMakeLists.txt)
+
 target_link_libraries(${CMAKE_PROJECT_NAME}
     PRIVATE
+        SOURCES
         Threads::Threads
         SDL2::SDL2main
         SDL2::SDL2
@@ -37,8 +40,6 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
         ASSIMP::ASSIMP
         STB_IMAGE::STB_IMAGE
 )
-
-include(${CMAKE_SOURCE_DIR}/src/CMakeLists.txt)
 
 # Sometimes it is useful to copy 3rd party dll's into the bin directory so that the program can run
 # successfully, especially on Windows
