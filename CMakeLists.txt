@@ -8,13 +8,8 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-# Find all source files
-# Note: I know that using GLOB to find source files is not a good practice.
-#       I will list the source files manually some other time.
-file(GLOB_RECURSE SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
-
 # Add executable target
-add_executable(${CMAKE_PROJECT_NAME} ${SRC_FILES})
+add_executable(${CMAKE_PROJECT_NAME})
 
 # Set C++ standard to 11
 set_property(TARGET ${CMAKE_PROJECT_NAME} PROPERTY CXX_STANDARD 11)
@@ -42,6 +37,8 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
         ASSIMP::ASSIMP
         STB_IMAGE::STB_IMAGE
 )
+
+include(${CMAKE_SOURCE_DIR}/src/CMakeLists.txt)
 
 # Sometimes it is useful to copy 3rd party dll's into the bin directory so that the program can run
 # successfully, especially on Windows
