@@ -10,4 +10,4 @@ The purpose of this project is to provide an easy-to-use, cross-platform library
 - **stb_image**(Sean Barrett's Image Loading Library) - Single file, header-only C library for loading images
 
 ## Build Instructions
-See README in build/ for instructions on building with CMake. I don't recommend using the Makefile.old in the project root to build. It is no longer maintained, so there is no guarantee that it works. Furthermore it was only designed for GNU Make/MSYS Make in the first place, so it doesn't have the same reach as the CMake configs.
+See README in build/ for instructions on building with CMake. I don't recommend using the Makefile.old in the project root to build. It is no longer maintained, so there is no guarantee that it works. Furthermore it was only designed for Unix Make/MSYS Make in the first place, so it doesn't have the same reach as the CMake configs.
