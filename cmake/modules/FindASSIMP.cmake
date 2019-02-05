@@ -142,17 +142,19 @@ endif()
 
 # Export ASSIMP::ASSIMP as target if it doesn't already exist
 if (ASSIMP_FOUND AND NOT TARGET ASSIMP::ASSIMP)
-    add_library(ASSIMP::ASSIMP UNKNOWN IMPORTED)
+    add_library(ASSIMP::ASSIMP INTERFACE IMPORTED)
     set_target_properties(ASSIMP::ASSIMP PROPERTIES
         INTERFACE_INCLUDE_DIRECTORIES "${ASSIMP_INCLUDE_DIRS}"
+    )
+    target_link_libraries(ASSIMP::ASSIMP
+        INTERFACE
+            ${ASSIMP_LIBRARY}
     )
 
     if (NOT ASSIMP_IS_STATIC)
         add_library(ASSIMP::ASSIMP-shared SHARED IMPORTED)
         set_property(TARGET ASSIMP::ASSIMP-shared APPEND PROPERTY IMPORTED_LOCATION "${ASSIMP_SHARED}")
     endif()
-
-    set_property(TARGET ASSIMP::ASSIMP APPEND PROPERTY IMPORTED_LOCATION "${ASSIMP_LIBRARY}")
 endif()
 
 # Restore the original CMAKE_FIND_LIBRARY_SUFFIXES
