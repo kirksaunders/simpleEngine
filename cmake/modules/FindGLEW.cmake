@@ -150,11 +150,11 @@ if (GLEW_FOUND AND NOT TARGET GLEW::GLEW)
     add_library(GLEW::GLEW INTERFACE IMPORTED)
     set_target_properties(GLEW::GLEW PROPERTIES
         INTERFACE_INCLUDE_DIRECTORIES "${GLEW_INCLUDE_DIRS}"
-        INTERFACE_LINK_LIBRARIES OpenGL::GL
     )
     target_link_libraries(GLEW::GLEW
         INTERFACE
             ${GLEW_LIBRARY}
+            OpenGL::GL
     )
 
     if (GLEW_IS_STATIC)

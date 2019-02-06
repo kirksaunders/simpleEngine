@@ -208,6 +208,16 @@ if (SDL2_FOUND AND NOT TARGET SDL2::SDL2)
     if (NOT SDL2_IS_STATIC)
         add_library(SDL2::SDL2-shared SHARED IMPORTED)
         set_property(TARGET SDL2::SDL2-shared APPEND PROPERTY IMPORTED_LOCATION "${SDL2_SHARED}")
+    else()
+        # SDL2 static on windows requires these extra system libraries to be linked manually
+        if (WIN32)
+            target_link_libraries(SDL2::SDL2
+                INTERFACE
+                    winmm
+                    imm32
+                    version
+            )
+        endif()
     endif()
 endif()
 

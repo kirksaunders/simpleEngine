@@ -26,6 +26,17 @@ else()
         set(ASSIMP_LIBRARY_NAME assimp)
     endif()
 endif()
+
+# ASSIMP static depends on zlib
+if (ASSIMP_IS_STATIC)
+    find_package(ZLIB QUIET)
+
+    if (ZLIB_LIBRARY)
+        message(STATUS "Found ZLIB: ${ZLIB_LIBRARY}")
+    else()
+        message(SEND_ERROR "Could NOT find ZLIB (missing: ZLIB_LIRBARY)")
+    endif()
+endif()
     
 if (WIN32)
     find_path(ASSIMP_INCLUDE_DIR
@@ -127,12 +138,16 @@ include(FindPackageHandleStandardArgs)
 # if all listed variables are TRUE
 if (WIN32)
 	if (ASSIMP_IS_STATIC)
-		find_package_handle_standard_args(ASSIMP DEFAULT_MSG ASSIMP_LIBRARY ASSIMP_INCLUDE_DIR)
+		find_package_handle_standard_args(ASSIMP DEFAULT_MSG ASSIMP_LIBRARY ASSIMP_INCLUDE_DIR ZLIB_LIBRARY)
 	else()
 		find_package_handle_standard_args(ASSIMP DEFAULT_MSG ASSIMP_LIBRARY ASSIMP_INCLUDE_DIR ASSIMP_SHARED)
 	endif()
 else()
-	find_package_handle_standard_args(ASSIMP DEFAULT_MSG ASSIMP_LIBRARY ASSIMP_INCLUDE_DIR)
+    if (ASSIMP_IS_STATIC)
+        find_package_handle_standard_args(ASSIMP DEFAULT_MSG ASSIMP_LIBRARY ASSIMP_INCLUDE_DIR ZLIB_LIBRARY)
+    else()
+        find_package_handle_standard_args(ASSIMP DEFAULT_MSG ASSIMP_LIBRARY ASSIMP_INCLUDE_DIR)
+    endif()
 endif()
 
 if (ASSIMP_FOUND)
@@ -154,6 +169,13 @@ if (ASSIMP_FOUND AND NOT TARGET ASSIMP::ASSIMP)
     if (NOT ASSIMP_IS_STATIC)
         add_library(ASSIMP::ASSIMP-shared SHARED IMPORTED)
         set_property(TARGET ASSIMP::ASSIMP-shared APPEND PROPERTY IMPORTED_LOCATION "${ASSIMP_SHARED}")
+    else()
+        # ASSIMP static on windows requires these extra system libraries to be linked manually
+        target_link_libraries(ASSIMP::ASSIMP
+            INTERFACE
+                ${ZLIB_LIBRARY}
+                IrrXML
+        )
     endif()
 endif()
 
