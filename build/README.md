@@ -23,6 +23,8 @@ This list contains CMake options that can be set to control certain properties o
 
 - **[DEPENDENCY_NAME]_USE_STATIC_LIBS (*BOOL*)** - Set this to *TRUE* if you want to link against [DEPENDENCY_NAME]'s static library instead of the shared one. If this is not set, the shared library will be linked. [DEPENDENCY_NAME] = ASSIMP, GLEW, or SDL2 (just replace [DEPENDENCY_NAME] with the library name as listed here)
 
+    **Note:** The CMakeCache file (if you have run the CMake config already) must be deleted if one of these options are changed. This is because CMake likes to cache the locations of the libraries, and they won't be updated by your option change unless you delete the cache.
+
 - **[DEPENDENCY_NAME]_INCLUDE_DIR (*PATH*)** - To manually specify the path to [DEPENDENCY_NAME]'s include files on your system, set this option to the path containing the [DEPENDENCY_NAME] include directory. [DEPENDENCY_NAME] = ASSIMP, GLEW, SDL2, or STB_IMAGE (just replace [DEPENDENCY_NAME] with the library name as listed here)
 
 - **[DEPENDENCY_NAME]_LIBRARY (*FILEPATH*)** - To manually specify the path to [DEPENDENCY_NAME]'s library file on your system, set this option to the path of the [DEPENDENCY_NAME] library file.
