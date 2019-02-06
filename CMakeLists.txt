@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.11)
 
 # Set project name
 project(simpleEngine LANGUAGES CXX)
@@ -8,15 +8,8 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-# CMake <3.11 requires at least one source file in an executable target
-if(${CMAKE_VERSION} VERSION_LESS "3.11.0") 
-    file(WRITE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/null.cpp "")
-    # Add executable target
-    add_executable(${CMAKE_PROJECT_NAME} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/null.cpp)
-else()
-    # Add executable target
-    add_executable(${CMAKE_PROJECT_NAME})
-endif()
+# Add executable target
+add_executable(${CMAKE_PROJECT_NAME})
 
 # Set C++ standard to 11
 set_property(TARGET ${CMAKE_PROJECT_NAME} PROPERTY CXX_STANDARD 11)
