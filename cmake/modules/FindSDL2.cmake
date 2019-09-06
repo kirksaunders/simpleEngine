@@ -5,6 +5,12 @@
 #  SDL2_LIBRARIES - The libraries needed to use SDL2
 #  SDL2_SHARED - The SDL2 shared library (only set if the shared library is the one being used)
 
+# Force cmake to refind the library when user changes any cmake library location options
+unset(SDL2_INCLUDE_DIR CACHE)
+unset(SDL2_LIBRARY CACHE)
+unset(SDL2_SHARED CACHE)
+unset(SDL2_MAIN_LIBRARY CACHE)
+
 # Define additional compiler definitions and handle different libraries
 set(SDL2_ORIG_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES})
 if (SDL2_USE_STATIC_LIBS)
@@ -225,4 +231,4 @@ endif()
 set(CMAKE_FIND_LIBRARY_SUFFIXES ${SDL2_ORIG_SUFFIXES})
 
 # Tell cmake GUIs to ignore the "local" variables.
-mark_as_advanced(SDL2_INCLUDE_DIR SDL2_LIBRARY SDL2_MAIN_LIBRARY SDL2_LIBRARY_NAME SDL2_SHARED SDL2_ORIG_SUFFIXES)
+mark_as_advanced(SDL2_LIBRARY_NAME SDL2_ORIG_SUFFIXES)

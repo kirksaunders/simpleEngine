@@ -2,6 +2,9 @@
 # Once done this will define
 #  STB_IMAGE_FOUND - if system found stb_image.h
 #  STB_IMAGE_INCLUDE_DIRS - The stb_image.h directory
+
+# Force cmake to refind the library when user changes any cmake library location options
+unset(STB_IMAGE_INCLUDE_DIR CACHE)
     
 if (WIN32)
     find_path(STB_IMAGE_INCLUDE_DIR
@@ -56,6 +59,3 @@ if (STB_IMAGE_FOUND AND NOT TARGET STB_IMAGE::STB_IMAGE)
 		INTERFACE_COMPILE_DEFINITIONS "STB_IMAGE_IMPLEMENTATION"
     )
 endif()
-
-# Tell cmake GUIs to ignore the "local" variables.
-mark_as_advanced(STB_IMAGE_INCLUDE_DIR)

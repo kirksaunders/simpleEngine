@@ -6,8 +6,13 @@
 #  GLEW_SHARED - The GLEW shared library (only set if the shared library is the one being used)
 #  GLEW_DEFINITIONS - Compiler switches required for using GLEW
 
-# Glew depends on opengl
+# GLEW depends on opengl
 find_package(OpenGL REQUIRED)
+
+# Force cmake to refind the library when user changes any cmake library location options
+unset(GLEW_INCLUDE_DIR CACHE)
+unset(GLEW_LIBRARY CACHE)
+unset(GLEW_SHARED CACHE)
 
 # Define additional compiler definitions and handle different libraries
 set(GLEW_ORIG_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES})
@@ -171,4 +176,4 @@ endif()
 set(CMAKE_FIND_LIBRARY_SUFFIXES ${GLEW_ORIG_SUFFIXES})
 
 # Tell cmake GUIs to ignore the "local" variables.
-mark_as_advanced(GLEW_INCLUDE_DIR GLEW_LIBRARY GLEW_LIBRARY_NAME GLEW_SHARED GLEW_ORIG_SUFFIXES)
+mark_as_advanced(GLEW_LIBRARY_NAME GLEW_ORIG_SUFFIXES)

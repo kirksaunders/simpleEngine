@@ -36,4 +36,4 @@ This list contains CMake options that can be set to control certain properties o
 ### Windows Specific Options
 - **[DEPENDENCY_NAME]_SHARED (*FILEPATH*)** - To manually specify the path to [DEPENDENCY_NAME]'s *shared* library file (`.dll`) on your system, set this option to the path of the [DEPENDENCY_NAME] *shared* library file.
 	
-	**Note:** This option is only required if [DEPENDENCY_NAME]_USE_STATIC_LIBS is set to *TRUE*. [DEPENDENCY_NAME] = ASSIMP, GLEW, or SDL2 (just replace [DEPENDENCY_NAME] with the library name as listed here)
+	**Note:** This option is only required if [DEPENDENCY_NAME]_USE_STATIC_LIBS is set to *FALSE*. [DEPENDENCY_NAME] = ASSIMP, GLEW, or SDL2 (just replace [DEPENDENCY_NAME] with the library name as listed here)

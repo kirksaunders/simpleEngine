@@ -5,6 +5,13 @@
 #  ASSIMP_LIBRARIES - The libraries needed to use ASSIMP
 #  ASSIMP_SHARED - The ASSIMP shared library (only set if the shared library is the one being used)
 
+# Force cmake to refind the library when user changes any cmake library location options
+unset(ASSIMP_INCLUDE_DIR CACHE)
+unset(ASSIMP_LIBRARY CACHE)
+unset(ASSIMP_SHARED CACHE)
+unset(ZLIB_LIBRARY CACHE)
+unset(ASSIMP_IRRXML_LIBRARY CACHE)
+
 # Define additional compiler definitions and handle different libraries
 set(ASSIMP_ORIG_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES})
 if (ASSIMP_USE_STATIC_LIBS)
@@ -225,4 +232,4 @@ if (ASSIMP_FOUND AND NOT TARGET ASSIMP::ASSIMP)
 endif()
 
 # Tell cmake GUIs to ignore the "local" variables.
-mark_as_advanced(ASSIMP_INCLUDE_DIR ASSIMP_LIBRARY ASSIMP_LIBRARY_NAME ASSIMP_SHARED ASSIMP_ORIG_SUFFIXES)
+mark_as_advanced(ASSIMP_LIBRARY_NAME ASSIMP_ORIG_SUFFIXES)
