@@ -51,8 +51,8 @@ namespace Render3D {
 
         unsigned int numVertices;
 
-        std::vector<std::pair<GLuint, DoubleBufferObject> > bufferObjects;
-        std::vector<std::pair<const Window*, GLuint> > VAOs;
+        std::vector<std::pair<GLuint, DoubleBufferObject>> bufferObjects;
+        std::vector<std::pair<const Window*, GLuint>> VAOs;
 
         DoubleBufferObject generateBuffers(GLuint clusterID);
         void destroyBuffers(GLuint clusterID);

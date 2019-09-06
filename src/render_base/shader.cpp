@@ -5,10 +5,11 @@
 #include <fstream>
 #include <sstream>
 
-#include "render_base/exception.hpp"
 #include "render_base/shadervariableblock.hpp"
 #include "render_base/uniformbuffermanager.hpp"
 #include "render_base/window.hpp"
+
+#include "utilities/exception.hpp"
 
 using namespace Render3D;
 using namespace Math3D;
@@ -194,10 +195,10 @@ void Shader::bindVariableBlock(Window& win, UniformBufferManager& uniformBufferM
     glUniformBlockBinding(shaderID, blockIndex, block.use(win, uniformBufferManager));
 }
 
-Shader Shader::defaultPerspective() {
-    return Shader("res/defaultPerspective.vert", "res/defaultPerspective.frag");
+std::shared_ptr<Shader> Shader::defaultPerspective() {
+    return std::shared_ptr<Shader>(new Shader("res/defaultPerspective.vert", "res/defaultPerspective.frag"));
 }
 
-Shader Shader::defaultImage() {
-    return Shader("res/imageRender.vert", "res/imageRender.frag");
+std::shared_ptr<Shader> Shader::defaultImage() {
+    return std::shared_ptr<Shader>(new Shader("res/imageRender.vert", "res/imageRender.frag"));
 }

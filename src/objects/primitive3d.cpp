@@ -1,8 +1,9 @@
 #include "objects/primitive3d.hpp"
 
-#include "render_base/exception.hpp"
 #include "render_base/shader.hpp"
 #include "render_base/window.hpp"
+
+#include "utilities/exception.hpp"
 
 using namespace Render3D;
 using namespace Math3D;
@@ -31,8 +32,8 @@ Color Primitive3D::getColor() const {
     return color;
 }
 
-void Primitive3D::setShader(Shader* const s) {
-    shader = s;
+void Primitive3D::setShader(std::shared_ptr<Shader> s) {
+    shader = std::move(s);
     if (shader != nullptr) {
         modelCFrameVariable = shader->getVariable<Matrix4x4>("modelCFrame");
         modelRotationVariable = shader->getVariable<Matrix4x4>("modelRotation");
@@ -46,7 +47,7 @@ void Primitive3D::setShader(Shader* const s) {
     }
 }
 
-Shader* const Primitive3D::getShader() const {
+std::shared_ptr<Shader> Primitive3D::getShader() const {
     return shader;
 }
 

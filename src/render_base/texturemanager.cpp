@@ -2,9 +2,10 @@
 #include <iostream>
 
 #include "render_base/color.hpp"
-#include "render_base/exception.hpp"
 #include "render_base/texturebuffer.hpp"
 #include "render_base/texturemanager.hpp"
+
+#include "utilities/exception.hpp"
 
 using namespace Render3D;
 
@@ -38,7 +39,7 @@ void TextureManager::addWindow(Window& win) {
         }
     }
 
-    activeTexturesByWindow.push_back(std::pair<const Window*, std::vector<GLuint> >(&win, std::vector<GLuint>()));
+    activeTexturesByWindow.push_back(std::pair<const Window*, std::vector<GLuint>>(&win, std::vector<GLuint>()));
 }
 
 void TextureManager::removeWindow(Window& win) {

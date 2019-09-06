@@ -1,4 +1,4 @@
-#include "render_base/exception.hpp"
+#include "utilities/exception.hpp"
 
 using namespace Render3D;
 

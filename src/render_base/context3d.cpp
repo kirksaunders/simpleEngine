@@ -6,12 +6,14 @@
 
 #include "objects/primitive3d.hpp"
 
-#include "render_base/exception.hpp"
 #include "render_base/shader.hpp"
 #include "render_base/shadervariableblock.hpp"
 #include "render_base/texture.hpp"
 #include "render_base/texturebuffer.hpp"
 #include "render_base/window.hpp"
+
+#include "utilities/exception.hpp"
+#include "utilities/scopeguard.hpp"
 
 using namespace Render3D;
 using namespace Math3D;
@@ -60,15 +62,15 @@ Context3D::~Context3D() {
     textureManager->removeWindow(*window);
 }
 
-void Context3D::addObject(Primitive3D* object) {
-    std::pair<std::set<Primitive3D*>::iterator, bool> p = objects.insert(object);
+void Context3D::addObject(std::shared_ptr<Primitive3D> object) {
+    auto p = objects.insert(std::move(object)); // pair<set::iterator, bool>
     if (p.second) {
         window->makeCurrent();
-        object->prepareContent(*window, *textureManager);
+        (*p.first)->prepareContent(*window, *textureManager);
     }
 }
 
-void Context3D::removeObject(Primitive3D* object) {
+void Context3D::removeObject(std::shared_ptr<Primitive3D>& object) {
     unsigned int numRemoved = objects.erase(object);
     if (numRemoved > 0) {
         window->makeCurrent();
@@ -78,22 +80,22 @@ void Context3D::removeObject(Primitive3D* object) {
 
 void Context3D::clearObjects() {
     window->makeCurrent();
-    for (std::set<Primitive3D*>::iterator it = objects.begin(); it != objects.end(); it++) {
+    for (auto it = objects.begin(); it != objects.end(); it++) {
         (*it)->destroyContent(*window, *textureManager);
     }
     objects.clear();
 }
 
-void Context3D::addShader(Shader* shader) {
-    std::pair<std::set<Shader*>::iterator, bool> p = shaders.insert(shader);
+void Context3D::addShader(std::shared_ptr<Shader> shader) {
+    auto p = shaders.insert(shader); // pair<set::iterator, bool>
     if (p.second) {
         window->makeCurrent();
-        shader->prepareContent(*window);
-        shader->bindVariableBlock(*window, uniformBufferManager, "TestBlock", testBlock);
+        (*p.first)->prepareContent(*window);
+        (*p.first)->bindVariableBlock(*window, uniformBufferManager, "TestBlock", testBlock);
     }
 }
 
-void Context3D::removeShader(Shader* shader) {
+void Context3D::removeShader(std::shared_ptr<Shader>& shader) {
     unsigned int numRemoved = shaders.erase(shader);
     if (numRemoved > 0) {
         window->makeCurrent();
@@ -103,21 +105,21 @@ void Context3D::removeShader(Shader* shader) {
 
 void Context3D::clearShaders() {
     window->makeCurrent();
-    for (std::set<Shader*>::iterator it = shaders.begin(); it != shaders.end(); it++) {
+    for (auto it = shaders.begin(); it != shaders.end(); it++) {
         (*it)->destroyContent(*window);
     }
     shaders.clear();
 }
 
-void Context3D::addTexture(Texture* texture) {
-    std::pair<std::set<Texture*>::iterator, bool> p = textures.insert(texture);
+void Context3D::addTexture(std::shared_ptr<Texture> texture) {
+    auto p = textures.insert(texture); // pair<set::iterator, bool>
     if (p.second) {
         window->makeCurrent();
-        texture->prepareContent(*window, *textureManager);
+        (*p.first)->prepareContent(*window, *textureManager);
     }
 }
 
-void Context3D::removeTexture(Texture* texture) {
+void Context3D::removeTexture(std::shared_ptr<Texture>& texture) {
     unsigned int numRemoved = textures.erase(texture);
     if (numRemoved > 0) {
         window->makeCurrent();
@@ -127,7 +129,7 @@ void Context3D::removeTexture(Texture* texture) {
 
 void Context3D::clearTextures() {
     window->makeCurrent();
-    for (std::set<Texture*>::iterator it = textures.begin(); it != textures.end(); it++) {
+    for (auto it = textures.begin(); it != textures.end(); it++) {
         (*it)->destroyContent(*window, *textureManager);
     }
     textures.clear();
@@ -159,22 +161,22 @@ void Context3D::render() {
     testBlock.getVariable<float>(3)->setValue(ambient);
     testBlock.updateContent(*window);
 
-    Shader* currentShader = nullptr;
+    std::shared_ptr<Shader> currentShader = nullptr;
 
     Texture& defaultTex = textureManager->getDefaultTexture();
  
-    for (std::set<Primitive3D*>::iterator it = objects.begin(); it != objects.end(); ++it) {
-        Primitive3D* object = *it;
+    for (auto it = objects.begin(); it != objects.end(); ++it) {
+        Primitive3D* object = it->get();
 
         if (object->getShader() == nullptr) {
             throw Exception("Tried to render object with no shader set");
         }
 
         if (object->getShader() != currentShader) {
-            currentShader = object->getShader();
+            currentShader = std::move(object->getShader());
             currentShader->use(*window);
 
-            defaultTex.resetDiffAndSpec(*currentShader, *window, *textureManager); // reset textures
+            defaultTex.resetDiffAndSpec(*currentShader.get(), *window, *textureManager); // reset textures
 
             // Scene Lighting Data
             //currentShader->getVariable<Vector4>("lightPos")->setValue(*window, lightPosition);
@@ -199,23 +201,25 @@ void Context3D::render() {
     glBindVertexArray(0);
 }
 
-void Context3D::renderTexture(Texture& tex) {
+void Context3D::renderTexture(std::shared_ptr<Texture> tex) {
     window->makeCurrent();
 
-    if (tex.getShader() == nullptr) {
+    if (tex->getShader() == nullptr) {
         throw Exception("Tried to render texture with no shader set");
     }
 
-    tex.getShader()->use(*window);
+    tex->getShader()->use(*window);
 
     bool depthTest = window->isDepthTestEnabled();
     window->setDepthTestEnabled(false);
-    // Note: If tex.render throws, then depthTest will be left set to false.
-    //       I need to fix this in the future.
-    tex.render(*window, *textureManager);
-    window->setDepthTestEnabled(depthTest);
 
-    tex.getShader()->unuse(*window);
+    // this guard takes care of returning depth test to the initial value
+    auto guard = makeScopeGuard([this, &depthTest] {
+        window->setDepthTestEnabled(depthTest);
+    });
+
+    tex->render(*window, *textureManager);
+    tex->getShader()->unuse(*window);
     
     glBindVertexArray(0);
 }

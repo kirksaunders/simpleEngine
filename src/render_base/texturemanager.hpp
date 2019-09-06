@@ -35,7 +35,7 @@ namespace Render3D {
         static const std::string specNames[MAX_MATERIAL_TEXTURES];
 
         Texture defaultTexture;
-        std::vector<std::pair<const Window*, std::vector<GLuint> > > activeTexturesByWindow;
+        std::vector<std::pair<const Window*, std::vector<GLuint>>> activeTexturesByWindow;
     };
 }
 

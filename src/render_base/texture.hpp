@@ -67,9 +67,9 @@ namespace Render3D {
         Shader* shader;
         ShaderVariable<int>* textureVariable;
 
-        std::vector<std::pair<GLuint, BufferObject> > bufferObjects;
-        std::vector<std::pair<const Window*, GLuint> > VAOs;
-        std::vector<std::pair<GLuint, TextureID> > IDs;
+        std::vector<std::pair<GLuint, BufferObject>> bufferObjects;
+        std::vector<std::pair<const Window*, GLuint>> VAOs;
+        std::vector<std::pair<GLuint, TextureID>> IDs;
 
         int useNextLocation(GLuint textureID, Window& win, TextureManager& textureManager);
 

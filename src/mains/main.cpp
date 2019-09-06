@@ -24,28 +24,28 @@ int main(int arc, char** arcv) {
         main1();
         break;
      case 2:
-        main2();
+        //main2();
         break;
      case 3:
-        main3();
+        //main3();
         break;
      case 4:
-        main4();
+        //main4();
         break;
      case 5:
-         main5();
+         //main5();
         break;
      case 6:
-         main6();
+         //main6();
         break;
      case 7:
-         main7();
+         //main7();
         break;
      case 8:
-        raytracer();
+        //raytracer();
         break;
      case 9:
-        pathfind();
+        //pathfind();
         break;
      default:
         std::cout << "Invalid choice" << std::endl;

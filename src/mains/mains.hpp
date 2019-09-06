@@ -12,9 +12,10 @@
 #include "objects/sphere.hpp"
 
 #include "render_base/context3d.hpp"
-#include "render_base/exception.hpp"
 #include "render_base/shader.hpp"
 #include "render_base/window.hpp"
+
+#include "utilities/exception.hpp"
 
 const static size_t WIDTH = 600;
 const static size_t HEIGHT = 600;

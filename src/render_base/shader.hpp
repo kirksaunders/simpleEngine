@@ -48,14 +48,14 @@ namespace Render3D {
 
         GLuint getProgramID(GLuint clusterID);
 
-        static Shader defaultPerspective();
-        static Shader defaultImage();
+        static std::shared_ptr<Shader> defaultPerspective();
+        static std::shared_ptr<Shader> defaultImage();
 
      private:
         std::string vertexSource;
         std::string fragmentSource;
-        std::vector<std::pair<GLuint, ProgramID> > programIDs;
-        typedef std::vector<std::unique_ptr<ShaderVariableInterface> > VariablesMap;
+        std::vector<std::pair<GLuint, ProgramID>> programIDs;
+        typedef std::vector<std::unique_ptr<ShaderVariableInterface>> VariablesMap;
         VariablesMap variables;
         std::array<ShaderVariable<int>*, TextureManager::MAX_MATERIAL_TEXTURES> diffTextureVariables;
         std::array<ShaderVariable<int>*, TextureManager::MAX_MATERIAL_TEXTURES> specTextureVariables;

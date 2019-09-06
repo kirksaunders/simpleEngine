@@ -7,11 +7,12 @@
 
 #include "stb_image.h"
 
-#include "render_base/exception.hpp"
 #include "render_base/shader.hpp"
 #include "render_base/texturebuffer.hpp"
 #include "render_base/texturemanager.hpp"
 #include "render_base/window.hpp"
+
+#include "utilities/exception.hpp"
 
 using namespace Render3D;
 

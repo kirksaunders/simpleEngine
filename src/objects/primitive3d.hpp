@@ -1,6 +1,7 @@
 #ifndef PRIMITIVE3D_HPP
 #define PRIMITIVE3D_HPP
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -52,8 +53,8 @@ namespace Render3D {
         virtual void setColor(const Color& value);
         virtual Color getColor() const;
 
-        virtual void setShader(Shader* const s);
-        virtual Shader* const getShader() const;
+        virtual void setShader(std::shared_ptr<Shader> s);
+        virtual std::shared_ptr<Shader> getShader() const;
 
         virtual Instance* newInstance(const Math3D::Matrix4x4& cfr = Math3D::Matrix4x4());
         virtual void deleteInstance(Instance*& instance);
@@ -64,7 +65,7 @@ namespace Render3D {
         virtual void prepareContent(Window& win, TextureManager& textureManager) = 0;
         virtual void destroyContent(Window& win, TextureManager& textureManager) = 0;
      protected:
-        Shader* shader;
+        std::shared_ptr<Shader> shader;
         Math3D::Vector4 size;
         Math3D::Matrix4x4 cframe;
         Color color;

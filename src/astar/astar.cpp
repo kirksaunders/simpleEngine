@@ -7,7 +7,7 @@
 #include "astar/grid.hpp"
 #include "astar/node.hpp"
 
-#include "render_base/exception.hpp"
+#include "utilities/exception.hpp"
 
 using std::size_t;
 using namespace Math3D;

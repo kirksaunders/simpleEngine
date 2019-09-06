@@ -22,8 +22,8 @@ namespace Render3D {
         void destroyContent(Window& win, TextureManager& textureManager);
 
      private:
-        std::vector<std::pair<GLuint, BufferObject> > bufferObjects;
-        std::vector<std::pair<const Window*, GLuint> > VAOs;
+        std::vector<std::pair<GLuint, BufferObject>> bufferObjects;
+        std::vector<std::pair<const Window*, GLuint>> VAOs;
 
         Math3D::Vector4 vertices[8];
         Math3D::Vector4 normals[6];

@@ -22,16 +22,16 @@ namespace Render3D {
         Context3D(Window* win);
         ~Context3D();
 
-        void addObject(Primitive3D* object);
-        void removeObject(Primitive3D* object);
+        void addObject(std::shared_ptr<Primitive3D> object);
+        void removeObject(std::shared_ptr<Primitive3D>& object);
         void clearObjects();
 
-        void addShader(Shader* shader);
-        void removeShader(Shader* Shader);
+        void addShader(std::shared_ptr<Shader> shader);
+        void removeShader(std::shared_ptr<Shader>& Shader);
         void clearShaders();
 
-        void addTexture(Texture* texture);
-        void removeTexture(Texture* texture);
+        void addTexture(std::shared_ptr<Texture> texture);
+        void removeTexture(std::shared_ptr<Texture>& texture);
         void clearTextures();
 
         Camera* const getCamera();
@@ -39,16 +39,16 @@ namespace Render3D {
 
         void render();
 
-        void renderTexture(Texture& tex);
+        void renderTexture(std::shared_ptr<Texture> tex);
 
      private:
         Window* window;
         std::shared_ptr<TextureManager> textureManager;
         UniformBufferManager uniformBufferManager;
 
-        std::set<Primitive3D*> objects;
-        std::set<Shader*> shaders;
-        std::set<Texture*> textures;
+        std::set<std::shared_ptr<Primitive3D>> objects;
+        std::set<std::shared_ptr<Shader>> shaders;
+        std::set<std::shared_ptr<Texture>> textures;
 
         Camera camera;
 

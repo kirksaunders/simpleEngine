@@ -28,7 +28,7 @@ namespace Render3D {
 
      private:
         std::string directory;
-        std::vector<std::pair<std::string, Texture*> > textureCache;
+        std::vector<std::pair<std::string, Texture*>> textureCache;
 
         std::vector<Mesh> meshes;
 

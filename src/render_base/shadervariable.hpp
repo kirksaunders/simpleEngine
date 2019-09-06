@@ -12,17 +12,7 @@
 
 #include "render_base/color.hpp"
 
-#ifndef ALWAYS_FALSE
-#define ALWAYS_FALSE
-
-namespace Render3D {
-    template <class T>
-    struct always_false { 
-        static const bool value = false;
-    };
-};
-
-#endif
+#include "utilities/alwaysfalse.hpp"
 
 namespace Render3D {
     // forward declarations
@@ -57,7 +47,7 @@ namespace Render3D {
         virtual void setValue(Window& win, const T& val);
      private:
         typedef std::pair<GLuint, T> VariablePair;
-        typedef std::vector<std::pair<GLuint, VariablePair> > VariableMap;
+        typedef std::vector<std::pair<GLuint, VariablePair>> VariableMap;
 
         VariableMap variables;
     };

@@ -21,63 +21,58 @@ void main1() {
 
     Context3D* context = window.getContext();
 
-    Shader defaultShader = Shader::defaultPerspective();
-    context->addShader(&defaultShader);
+    std::shared_ptr<Shader> defaultShader = Shader::defaultPerspective();
+    context->addShader(defaultShader);
 
     Camera* cam = context->getCamera();
     cam->setCFrame(Matrix4x4(0, 4, 0));
 
-    Model ground("res/meshes/ground.obj");
-    ground.setSize(Vector4(1, 1, 1));
-    ground.setCFrame(Matrix4x4(0, -1.5, 0));
-    ground.setColor(Color(0, 1, 0));
-    ground.setShader(&defaultShader);
+    auto ground = std::make_shared<Model>("res/meshes/ground.obj");
+    ground->setSize(Vector4(1, 1, 1));
+    ground->setCFrame(Matrix4x4(0, -1.5, 0));
+    ground->setColor(Color(0, 1, 0));
+    ground->setShader(defaultShader);
 
-    context->addObject(&ground);
+    context->addObject(ground);
 
-    Model model(meshPath.c_str());
+    auto model = std::make_shared<Model>(meshPath.c_str());
+    model->setSize(Vector4(sx, sy, sz));
+    model->setCFrame(Matrix4x4(0, 3, -8) * Matrix4x4::fromEuler(0.75, 0.75, 0));
+    model->setColor(Color(r, g, b));
+    model->setShader(defaultShader);
 
-    model.setSize(Vector4(sx, sy, sz));
-    model.setCFrame(Matrix4x4(0, 3, -8) * Matrix4x4::fromEuler(0.75, 0.75, 0));
-    model.setColor(Color(r, g, b));
-    model.setShader(&defaultShader);
+    context->addObject(model);
 
-    context->addObject(&model);
+    auto model2 = std::make_shared<Model>("res/meshes/blade_thinner.obj");
+    model2->setSize(Vector4(0.75, 0.75, 0.75));
+    model2->setCFrame(Matrix4x4(8, 3, 0) * Matrix4x4::fromEuler(0.75, 0.75, 0));
+    model2->setColor(Color(0.2, 0.2, 0.2));
+    model2->setShader(defaultShader);
 
-    Model model2("res/meshes/blade_thinner.obj");
+    context->addObject(model2);
 
-    model2.setSize(Vector4(0.75, 0.75, 0.75));
-    model2.setCFrame(Matrix4x4(8, 3, 0) * Matrix4x4::fromEuler(0.75, 0.75, 0));
-    model2.setColor(Color(0.2, 0.2, 0.2));
-    model2.setShader(&defaultShader);
+    auto cube = std::make_shared<Cuboid>();
+    cube->setSize(Vector4(2, 1, 1));
+    cube->setCFrame(Matrix4x4(-8, 3, 0));
+    cube->setColor(Color(0.2, 0.2, 0.85));
+    cube->setShader(defaultShader);
 
-    context->addObject(&model2);
+    context->addObject(cube);
 
-    Cuboid cube;
+    auto sphere = std::make_shared<Sphere>();
+    sphere->setSize(Vector4(2, 2, 2));
+    sphere->setCFrame(Matrix4x4(0, 3, 8));
+    sphere->setColor(Color(0.2, 0.2, 0.85));
+    sphere->setShader(defaultShader);
 
-    cube.setSize(Vector4(2, 1, 1));
-    cube.setCFrame(Matrix4x4(-8, 3, 0));
-    cube.setColor(Color(0.2, 0.2, 0.85));
-    cube.setShader(&defaultShader);
+    context->addObject(sphere);
 
-    context->addObject(&cube);
+    auto cube2 = std::make_shared<Cuboid>();
+    cube2->setSize(Vector4(0.25, 0.5, 0.25));
+    cube2->setColor(Color(0.85, 0.2, 0.2));
+    cube2->setShader(defaultShader);
 
-    Sphere sphere;
-
-    sphere.setSize(Vector4(2, 2, 2));
-    sphere.setCFrame(Matrix4x4(0, 3, 8));
-    sphere.setColor(Color(0.2, 0.2, 0.85));
-    sphere.setShader(&defaultShader);
-
-    context->addObject(&sphere);
-
-    Cuboid cube2;
-
-    cube2.setSize(Vector4(0.25, 0.5, 0.25));
-    cube2.setColor(Color(0.85, 0.2, 0.2));
-    cube2.setShader(&defaultShader);
-
-    context->addObject(&cube2);
+    context->addObject(cube2);
 
     float x, y, z;
     x = y = z = 0;
@@ -121,11 +116,11 @@ void main1() {
         y = y + 0.01;
         z = z + 0.01;
 
-        cube.setCFrame(Matrix4x4(cube.getCFrame().position()) * Matrix4x4::fromEuler(x, y, z));
-        cube2.setCFrame(cube.getCFrame() * Matrix4x4(0, cube.getSize()[1] / 2 + cube2.getSize()[1] / 2, 0));
-        model.setCFrame(Matrix4x4(model.getCFrame().position()) * Matrix4x4::fromEuler(x, y, z));
-        model2.setCFrame(Matrix4x4(model2.getCFrame().position()) * Matrix4x4::fromEuler(x, y, z));
-        sphere.setCFrame(Matrix4x4(sphere.getCFrame().position()) * Matrix4x4::fromEuler(x, y, z));
+        cube->setCFrame(Matrix4x4(cube->getCFrame().position()) * Matrix4x4::fromEuler(x, y, z));
+        cube2->setCFrame(cube->getCFrame() * Matrix4x4(0, cube->getSize()[1] / 2 + cube2->getSize()[1] / 2, 0));
+        model->setCFrame(Matrix4x4(model->getCFrame().position()) * Matrix4x4::fromEuler(x, y, z));
+        model2->setCFrame(Matrix4x4(model2->getCFrame().position()) * Matrix4x4::fromEuler(x, y, z));
+        sphere->setCFrame(Matrix4x4(sphere->getCFrame().position()) * Matrix4x4::fromEuler(x, y, z));
 
         updateCamera(cam, &window, cX, cY);
 

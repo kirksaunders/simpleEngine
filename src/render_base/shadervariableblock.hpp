@@ -16,19 +16,9 @@
 #include "objects/bufferobject.hpp"
 
 #include "render_base/color.hpp"
-#include "render_base/exception.hpp"
 
-#ifndef ALWAYS_FALSE
-#define ALWAYS_FALSE
-
-namespace Render3D {
-    template <class T>
-    struct always_false { 
-        static const bool value = false;
-    };
-};
-
-#endif
+#include "utilities/alwaysfalse.hpp"
+#include "utilities/exception.hpp"
 
 namespace Render3D {
     // forward declarations
@@ -107,10 +97,10 @@ namespace Render3D {
         void updateContent(Window& win);
         void destroyContent(Window& win);
      private:
-        std::vector<std::unique_ptr<ShaderBlockVariableInterface> > variables;
+        std::vector<std::unique_ptr<ShaderBlockVariableInterface>> variables;
         GLuint size;
 
-        std::vector<std::pair<GLuint, BufferObject> > bufferObjects;
+        std::vector<std::pair<GLuint, BufferObject>> bufferObjects;
 
         int useNextLocation(GLuint bufferID, Window& win, UniformBufferManager& uniformBufferManager);
 
