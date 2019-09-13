@@ -6,7 +6,7 @@
 #  ASSIMP_SHARED - The ASSIMP shared library (only set if the shared library is the one being used)
 
 # Force cmake to refind the library when user changes any cmake library location options
-unset(ASSIMP_INCLUDE_DIR CACHE)
+unset(ASSIMP_INCLUDE CACHE)
 unset(ASSIMP_LIBRARY CACHE)
 unset(ASSIMP_SHARED CACHE)
 unset(ZLIB_LIBRARY CACHE)
@@ -35,42 +35,44 @@ else()
 endif()
     
 if (WIN32)
-    find_path(ASSIMP_INCLUDE_DIR
-		NAMES assimp/Importer.hpp
-        PATHS
-            ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
-            $ENV{PROGRAMFILES}
-            "$ENV{PROGRAMFILES\(x86\)}"
-        PATH_SUFFIXES
-            assimp
-            assimp/include
-            assimp/build
-            assimp/build/include
-        DOC "The ASSIMP include directory"
-    )
+    if (ASSIMP_INCLUDE_DIR)
+        set(ASSIMP_INCLUDE ${ASSIMP_INCLUDE_DIR} CACHE PATH "The ASSIMP include dir")
+    else()
+        find_path(ASSIMP_INCLUDE
+            NAMES assimp/Importer.hpp
+            PATHS
+                ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
+                $ENV{PROGRAMFILES}
+                "$ENV{PROGRAMFILES\(x86\)}"
+            PATH_SUFFIXES
+                assimp
+                assimp/include
+                assimp/build
+                assimp/build/include
+            DOC "The ASSIMP include directory"
+        )
+    endif()
 
-    find_library(ASSIMP_LIBRARY
-		NAMES ${ASSIMP_LIBRARY_NAME}
-        PATHS
-            ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
-            $ENV{PROGRAMFILES}
-            "$ENV{PROGRAMFILES\(x86\)}"
-        PATH_SUFFIXES
-            assimp
-            assimp/lib
-            assimp/bin
-            assimp/build
-            assimp/build/lib
-            assimp/build/bin
-            assimp/build/code
-        DOC "The ASSIMP library path"
-    )
-
-    set(CMAKE_FIND_LIBRARY_SUFFIXES "")
-
-    if (NOT ASSIMP_IS_STATIC)
-        find_library(ASSIMP_SHARED
-			NAMES ${ASSIMP_LIBRARY_NAME}
+    if (ASSIMP_LIBRARY_DIR)
+        find_library(ASSIMP_LIBRARY
+            NAMES ${ASSIMP_LIBRARY_NAME}
+            PATHS
+                ${ASSIMP_LIBRARY_DIR}
+            PATH_SUFFIXES
+                lib
+                bin
+                assimp
+                assimp/lib
+                assimp/bin
+                assimp/build
+                assimp/build/lib
+                assimp/build/bin
+                assimp/build/code
+            DOC "The ASSIMP library path"
+        )
+    else()
+        find_library(ASSIMP_LIBRARY
+            NAMES ${ASSIMP_LIBRARY_NAME}
             PATHS
                 ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
                 $ENV{PROGRAMFILES}
@@ -83,46 +85,111 @@ if (WIN32)
                 assimp/build/lib
                 assimp/build/bin
                 assimp/build/code
-            DOC "The ASSIMP shared library path"
+            DOC "The ASSIMP library path"
         )
     endif()
-else()
-    find_path(ASSIMP_INCLUDE_DIR
-		NAMES assimp/Importer.hpp
-        PATHS
-            ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
-            /usr/include
-            /usr/local/include
-            /sw/include
-            /opt/local/include
-        PATH_SUFFIXES
-            assimp
-            assimp/include
-            assimp/build
-            assimp/build/include
-        DOC "The ASSIMP include directory"
-    )
 
-    find_library(ASSIMP_LIBRARY
-		NAMES ${ASSIMP_LIBRARY_NAME}
-        PATHS
-            ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
-            /usr/lib64
-            /usr/lib
-            /usr/local/lib64
-            /usr/local/lib
-            /sw/lib
-            /opt/local/lib
-        PATH_SUFFIXES
-            assimp
-            assimp/lib
-            assimp/bin
-            assimp/build
-            assimp/build/lib
-            assimp/build/bin
-            assimp/build/code
-        DOC "The ASSIMP library path"
-    )
+    set(CMAKE_FIND_LIBRARY_SUFFIXES "")
+
+    if (NOT ASSIMP_IS_STATIC)
+        if (ASSIMP_SHARED_DIR)
+            find_library(ASSIMP_SHARED
+                NAMES ${ASSIMP_LIBRARY_NAME}
+                PATHS
+                    ${ASSIMP_SHARED_DIR}
+                PATH_SUFFIXES
+                    assimp
+                    assimp/lib
+                    assimp/bin
+                    assimp/build
+                    assimp/build/lib
+                    assimp/build/bin
+                    assimp/build/code
+                DOC "The ASSIMP shared library path"
+            )
+        else()
+            get_filename_component(ASSIMP_LIBRARY_DIR_TEMP ${ASSIMP_LIBRARY} DIRECTORY)
+
+            find_library(ASSIMP_SHARED
+                NAMES ${ASSIMP_LIBRARY_NAME}
+                PATHS
+                    ${ASSIMP_LIBRARY_DIR_TEMP}
+                    ${ASSIMP_LIBRARY_DIR_TEMP}/..
+                    ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
+                    $ENV{PROGRAMFILES}
+                    "$ENV{PROGRAMFILES\(x86\)}"
+                PATH_SUFFIXES
+                    assimp
+                    assimp/lib
+                    assimp/bin
+                    assimp/build
+                    assimp/build/lib
+                    assimp/build/bin
+                    assimp/build/code
+                DOC "The ASSIMP shared library path"
+            )
+        endif()
+    endif()
+else()
+    if (ASSIMP_INCLUDE_DIR)
+        set(ASSIMP_INCLUDE ${ASSIMP_INCLUDE_DIR} CACHE PATH "The ASSIMP include dir")
+    else()
+        find_path(ASSIMP_INCLUDE
+            NAMES assimp/Importer.hpp
+            PATHS
+                ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
+                /usr/include
+                /usr/local/include
+                /sw/include
+                /opt/local/include
+            PATH_SUFFIXES
+                assimp
+                assimp/include
+                assimp/build
+                assimp/build/include
+            DOC "The ASSIMP include directory"
+        )
+    endif()
+
+    if (ASSIMP_LIBRARY_DIR)
+        find_library(ASSIMP_LIBRARY
+            NAMES ${ASSIMP_LIBRARY_NAME}
+            PATHS
+                ${ASSIMP_LIBRARY_DIR}
+            PATH_SUFFIXES
+                lib
+                bin
+                assimp
+                assimp/lib
+                assimp/bin
+                assimp/build
+                assimp/build/lib
+                assimp/build/bin
+                assimp/build/code
+            DOC "The ASSIMP library path"
+        )
+    else()
+        find_library(ASSIMP_LIBRARY
+            NAMES ${ASSIMP_LIBRARY_NAME}
+            PATHS
+                ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
+                /usr/lib64
+                /usr/lib
+                /usr/local/lib64
+                /usr/local/lib
+                /sw/lib
+                /opt/local/lib
+            PATH_SUFFIXES
+                assimp
+                assimp/lib
+                assimp/bin
+                assimp/build
+                assimp/build/lib
+                assimp/build/bin
+                assimp/build/code
+            DOC "The ASSIMP library path"
+        )
+    endif()
 
     if (NOT ASSIMP_IS_STATIC)
         set(ASSIMP_SHARED ${ASSIMP_LIBRARY})
@@ -137,15 +204,15 @@ include(FindPackageHandleStandardArgs)
 # if all listed variables are TRUE
 if (WIN32)
 	if (ASSIMP_IS_STATIC)
-		find_package_handle_standard_args(ASSIMP DEFAULT_MSG ASSIMP_LIBRARY ASSIMP_INCLUDE_DIR)
+		find_package_handle_standard_args(ASSIMP DEFAULT_MSG ASSIMP_LIBRARY ASSIMP_INCLUDE)
 	else()
-		find_package_handle_standard_args(ASSIMP DEFAULT_MSG ASSIMP_LIBRARY ASSIMP_INCLUDE_DIR ASSIMP_SHARED)
+		find_package_handle_standard_args(ASSIMP DEFAULT_MSG ASSIMP_LIBRARY ASSIMP_INCLUDE ASSIMP_SHARED)
 	endif()
 else()
     if (ASSIMP_IS_STATIC)
-        find_package_handle_standard_args(ASSIMP DEFAULT_MSG ASSIMP_LIBRARY ASSIMP_INCLUDE_DIR)
+        find_package_handle_standard_args(ASSIMP DEFAULT_MSG ASSIMP_LIBRARY ASSIMP_INCLUDE)
     else()
-        find_package_handle_standard_args(ASSIMP DEFAULT_MSG ASSIMP_LIBRARY ASSIMP_INCLUDE_DIR)
+        find_package_handle_standard_args(ASSIMP DEFAULT_MSG ASSIMP_LIBRARY ASSIMP_INCLUDE)
     endif()
 endif()
 
@@ -204,7 +271,7 @@ endif()
 
 if (ASSIMP_FOUND)
     set(ASSIMP_LIBRARIES ${ASSIMP_LIBRARY})
-    set(ASSIMP_INCLUDE_DIRS ${ASSIMP_INCLUDE_DIR})
+    set(ASSIMP_INCLUDE_DIRS ${ASSIMP_INCLUDE})
 endif()
 
 # Export ASSIMP::ASSIMP as target if it doesn't already exist
