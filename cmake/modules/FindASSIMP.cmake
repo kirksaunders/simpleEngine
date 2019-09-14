@@ -36,7 +36,7 @@ endif()
     
 if (WIN32)
     if (ASSIMP_INCLUDE_DIR)
-        set(ASSIMP_INCLUDE ${ASSIMP_INCLUDE_DIR} CACHE PATH "The ASSIMP include dir")
+        set(ASSIMP_INCLUDE ${ASSIMP_INCLUDE_DIR} CACHE PATH "The ASSIMP include directory")
     else()
         find_path(ASSIMP_INCLUDE
             NAMES assimp/Importer.hpp
@@ -98,6 +98,8 @@ if (WIN32)
                 PATHS
                     ${ASSIMP_SHARED_DIR}
                 PATH_SUFFIXES
+                    lib
+                    bin
                     assimp
                     assimp/lib
                     assimp/bin
@@ -132,7 +134,7 @@ if (WIN32)
     endif()
 else()
     if (ASSIMP_INCLUDE_DIR)
-        set(ASSIMP_INCLUDE ${ASSIMP_INCLUDE_DIR} CACHE PATH "The ASSIMP include dir")
+        set(ASSIMP_INCLUDE ${ASSIMP_INCLUDE_DIR} CACHE PATH "The ASSIMP include directory")
     else()
         find_path(ASSIMP_INCLUDE
             NAMES assimp/Importer.hpp
@@ -220,53 +222,76 @@ endif()
 if (ASSIMP_IS_STATIC)
 	get_filename_component(ASSIMP_LIBRARY_PATH ${ASSIMP_LIBRARY} DIRECTORY)
 
-	find_library(ZLIB_LIBRARY
-		NAMES zlibstatic
-		HINTS
-			${ASSIMP_LIBRARY_PATH}
-		PATHS
-            ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
-        PATH_SUFFIXES
-            zlib
-            zlib/lib
-            zlib/build
-            zlib/build/lib
-            zlib/build/code
-        DOC "The zlib library path"
-	)
+    if (ZLIB_LIBRARY_DIR)
+        find_library(ZLIB_LIBRARY
+            NAMES zlibstatic
+            PATHS
+                ${ZLIB_LIBRARY_DIR}
+            PATH_SUFFIXES
+                lib
+                zlib
+                zlib/lib
+                zlib/build
+                zlib/build/lib
+                zlib/build/code
+            DOC "The zlib library path"
+        )
+    else()
+        find_library(ZLIB_LIBRARY
+            NAMES zlibstatic
+            HINTS
+                ${ASSIMP_LIBRARY_PATH}
+            PATHS
+                ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
+            PATH_SUFFIXES
+                zlib
+                zlib/lib
+                zlib/build
+                zlib/build/lib
+                zlib/build/code
+            DOC "The zlib library path"
+        )
+    endif()
 
-	if (ZLIB_LIBRARY)
-		message(STATUS "Found ZLIB: ${ZLIB_LIBRARY}")
+    if (ZLIB_LIBRARY)
+        find_package_handle_standard_args(ZLIB DEFAULT_MSG ZLIB_LIBRARY)
 	else()
 		find_package(ZLIB QUIET)
-
-		if (ZLIB_LIBRARY)
-			message(STATUS "Found ZLIB: ${ZLIB_LIBRARY}")
-		else()
-        	message(FATAL_ERROR "Could NOT find ZLIB (missing: ZLIB_LIRBARY)")
-		endif()
+        find_package_handle_standard_args(ZLIB DEFAULT_MSG ZLIB_LIBRARY)
 	endif()
-	
-	find_library(ASSIMP_IRRXML_LIBRARY
-		NAMES IrrXML
-		HINTS
-			${ASSIMP_LIBRARY_PATH}
-		PATHS
-            ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
-        PATH_SUFFIXES
-            IrrXML
-            IrrXML/lib
-            IrrXML/build
-            IrrXML/build/lib
-            IrrXML/build/code
-        DOC "The IrrXML library path"
-	)
-	
-	if (ASSIMP_IRRXML_LIBRARY)
-        message(STATUS "Found IrrXML: ${ASSIMP_IRRXML_LIBRARY}")
+    
+    if (ASSIMP_IRRXML_LIBRARY_DIR)
+        find_library(ASSIMP_IRRXML_LIBRARY
+            NAMES IrrXML
+            PATHS
+                ${ASSIMP_IRRXML_LIBRARY_DIR}
+            PATH_SUFFIXES
+                lib
+                IrrXML
+                IrrXML/lib
+                IrrXML/build
+                IrrXML/build/lib
+                IrrXML/build/code
+            DOC "The IrrXML library path"
+        )
     else()
-        message(FATAL_ERROR "Could NOT find IrrXML (missing: ASSIMP_IRRXML_LIRBARY)")
-	endif()
+        find_library(ASSIMP_IRRXML_LIBRARY
+            NAMES IrrXML
+            HINTS
+                ${ASSIMP_LIBRARY_PATH}
+            PATHS
+                ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
+            PATH_SUFFIXES
+                IrrXML
+                IrrXML/lib
+                IrrXML/build
+                IrrXML/build/lib
+                IrrXML/build/code
+            DOC "The IrrXML library path"
+        )
+    endif()
+	
+    find_package_handle_standard_args(ASSIMP_IRRXML DEFAULT_MSG ASSIMP_IRRXML_LIBRARY)
 endif()
 
 if (ASSIMP_FOUND)
@@ -299,4 +324,4 @@ if (ASSIMP_FOUND AND NOT TARGET ASSIMP::ASSIMP)
 endif()
 
 # Tell cmake GUIs to ignore the "local" variables.
-mark_as_advanced(ASSIMP_LIBRARY_NAME ASSIMP_ORIG_SUFFIXES)
+mark_as_advanced(ASSIMP_LIBRARY_NAME ASSIMP_LIBRARY ASSIMP_INCLUDE ASSIMP_SHARED ASSIMP_IRRXML_LIBRARY ZLIB_LIBRARY ASSIMP_ORIG_SUFFIXES)

@@ -6,7 +6,7 @@
 #  SDL2_SHARED - The SDL2 shared library (only set if the shared library is the one being used)
 
 # Force cmake to refind the library when user changes any cmake library location options
-unset(SDL2_INCLUDE_DIR CACHE)
+unset(SDL2_INCLUDE CACHE)
 unset(SDL2_LIBRARY CACHE)
 unset(SDL2_SHARED CACHE)
 unset(SDL2_MAIN_LIBRARY CACHE)
@@ -34,59 +34,43 @@ else()
 endif()
     
 if (WIN32)
-    find_path(SDL2_INCLUDE_DIR
-		NAMES SDL2/SDL.h
-        PATHS
-            ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
-            $ENV{PROGRAMFILES}
-            "$ENV{PROGRAMFILES\(x86\)}"
-        PATH_SUFFIXES
-            SDL2
-            SDL2/include
-            SDL2/build
-            SDL2/build/include
-        DOC "The SDL2 include directory"
-    )
+    if (SDL2_INCLUDE_DIR)
+        set(SDL2_INCLUDE ${SDL2_INCLUDE_DIR} CACHE PATH "The SDL2 include directory")
+    else()
+        find_path(SDL2_INCLUDE
+            NAMES SDL2/SDL.h
+            PATHS
+                ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
+                $ENV{PROGRAMFILES}
+                "$ENV{PROGRAMFILES\(x86\)}"
+            PATH_SUFFIXES
+                SDL2
+                SDL2/include
+                SDL2/build
+                SDL2/build/include
+            DOC "The SDL2 include directory"
+        )
+    endif()
 
-    find_library(SDL2_LIBRARY
-		NAMES ${SDL2_LIBRARY_NAME}
-        PATHS
-            ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
-            $ENV{PROGRAMFILES}
-            "$ENV{PROGRAMFILES\(x86\)}"
-        PATH_SUFFIXES
-            SDL2
-            SDL2/lib
-            SDL2/bin
-            SDL2/build
-            SDL2/build/lib
-            SDL2/build/bin
-        DOC "The SDL2 library path"
-    )
-
-    set(CMAKE_FIND_LIBRARY_SUFFIXES ${SDL2_ORIG_SUFFIXES})
-
-    find_library(SDL2_MAIN_LIBRARY
-		NAMES SDL2main
-        PATHS
-            ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
-            $ENV{PROGRAMFILES}
-            "$ENV{PROGRAMFILES\(x86\)}"
-        PATH_SUFFIXES
-            SDL2
-            SDL2/lib
-            SDL2/bin
-            SDL2/build
-            SDL2/build/lib
-            SDL2/build/bin
-        DOC "The SDL2main library path"
-    )
-
-    set(CMAKE_FIND_LIBRARY_SUFFIXES "")
-
-    if (NOT SDL2_IS_STATIC)
-        find_library(SDL2_SHARED
-			NAMES ${SDL2_LIBRARY_NAME}
+    if (SDL2_LIBRARY_DIR)
+        find_library(SDL2_LIBRARY
+            NAMES ${SDL2_LIBRARY_NAME}
+            PATHS
+                ${SDL2_LIBRARY_DIR}
+            PATH_SUFFIXES
+                lib
+                bin
+                SDL2
+                SDL2/lib
+                SDL2/bin
+                SDL2/build
+                SDL2/build/lib
+                SDL2/build/bin
+            DOC "The SDL2 library path"
+        )
+    else()
+        find_library(SDL2_LIBRARY
+            NAMES ${SDL2_LIBRARY_NAME}
             PATHS
                 ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
                 $ENV{PROGRAMFILES}
@@ -98,67 +82,189 @@ if (WIN32)
                 SDL2/build
                 SDL2/build/lib
                 SDL2/build/bin
-            DOC "The SDL2 shared library path"
+            DOC "The SDL2 library path"
         )
     endif()
-else()
-    find_path(SDL2_INCLUDE_DIR
-		NAMES SDL2/SDL.h
-        PATHS
-            ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
-            /usr/include
-            /usr/local/include
-            /sw/include
-            /opt/local/include
-        PATH_SUFFIXES
-            SDL2
-            SDL2/include
-            SDL2/build
-            SDL2/build/include
-        DOC "The SDL2 include directory"
-    )
 
-    find_library(SDL2_LIBRARY
-		NAMES ${SDL2_LIBRARY_NAME}
-        PATHS
-            ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
-            /usr/lib64
-            /usr/lib
-            /usr/local/lib64
-            /usr/local/lib
-            /sw/lib
-            /opt/local/lib
-        PATH_SUFFIXES
-            SDL2
-            SDL2/lib
-            SDL2/bin
-            SDL2/build
-            SDL2/build/lib
-            SDL2/build/bin
-        DOC "The SDL2 library path"
-    )
+    get_filename_component(SDL2_LIBRARY_DIR_TEMP ${SDL2_LIBRARY} DIRECTORY)
 
     set(CMAKE_FIND_LIBRARY_SUFFIXES ${SDL2_ORIG_SUFFIXES})
 
-    find_library(SDL2_MAIN_LIBRARY
-		NAMES SDL2main
-        PATHS
-            ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
-            /usr/lib64
-            /usr/lib
-            /usr/local/lib64
-            /usr/local/lib
-            /sw/lib
-            /opt/local/lib
-        PATH_SUFFIXES
-            SDL2
-            SDL2/lib
-            SDL2/bin
-            SDL2/build
-            SDL2/build/lib
-            SDL2/build/bin
-        DOC "The SDL2main library path"
-    )
+    if (SDL2_MAIN_LIBRARY_DIR)
+        find_library(SDL2_MAIN_LIBRARY
+            NAMES SDL2main
+            PATHS
+                ${SDL2_MAIN_LIBRARY_DIR}
+            PATH_SUFFIXES
+                lib
+                bin
+                SDL2
+                SDL2/lib
+                SDL2/bin
+                SDL2/build
+                SDL2/build/lib
+                SDL2/build/bin
+            DOC "The SDL2main library path"
+        )
+    else()
+        find_library(SDL2_MAIN_LIBRARY
+            NAMES SDL2main
+            PATHS
+                ${SDL2_LIBRARY_DIR_TEMP}
+                ${SDL2_LIBRARY_DIR_TEMP}/..
+                ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
+                $ENV{PROGRAMFILES}
+                "$ENV{PROGRAMFILES\(x86\)}"
+            PATH_SUFFIXES
+                SDL2
+                SDL2/lib
+                SDL2/bin
+                SDL2/build
+                SDL2/build/lib
+                SDL2/build/bin
+            DOC "The SDL2main library path"
+        )
+    endif()
+
+    set(CMAKE_FIND_LIBRARY_SUFFIXES "")
+
+    if (NOT SDL2_IS_STATIC)
+        if (SDL2_SHARED_DIR)
+            find_library(SDL2_SHARED
+                NAMES ${SDL2_LIBRARY_NAME}
+                PATHS
+                    ${SDL2_SHARED_DIR}
+                PATH_SUFFIXES
+                    SDL2
+                    SDL2/lib
+                    SDL2/bin
+                    SDL2/build
+                    SDL2/build/lib
+                    SDL2/build/bin
+                DOC "The SDL2 shared library path"
+            )
+        else()
+            find_library(SDL2_SHARED
+                NAMES ${SDL2_LIBRARY_NAME}
+                PATHS
+                    ${SDL2_LIBRARY_DIR_TEMP}
+                    ${SDL2_LIBRARY_DIR_TEMP}/..
+                    ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
+                    $ENV{PROGRAMFILES}
+                    "$ENV{PROGRAMFILES\(x86\)}"
+                PATH_SUFFIXES
+                    SDL2
+                    SDL2/lib
+                    SDL2/bin
+                    SDL2/build
+                    SDL2/build/lib
+                    SDL2/build/bin
+                DOC "The SDL2 shared library path"
+            )
+        endif()
+    endif()
+else()
+    if (SDL2_INCLUDE_DIR)
+        set(SDL2_INCLUDE ${SDL2_INCLUDE_DIR} CACHE PATH "The SDL2 include directory")
+    else()
+        find_path(SDL2_INCLUDE
+            NAMES SDL2/SDL.h
+            PATHS
+                ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
+                /usr/include
+                /usr/local/include
+                /sw/include
+                /opt/local/include
+            PATH_SUFFIXES
+                SDL2
+                SDL2/include
+                SDL2/build
+                SDL2/build/include
+            DOC "The SDL2 include directory"
+        )
+    endif()
+
+    if (SDL2_LIBRARY_DIR)
+        find_library(SDL2_LIBRARY
+            NAMES ${SDL2_LIBRARY_NAME}
+            PATHS
+                ${SDL2_LIBRARY_DIR}
+            PATH_SUFFIXES
+                lib
+                bin
+                SDL2
+                SDL2/lib
+                SDL2/bin
+                SDL2/build
+                SDL2/build/lib
+                SDL2/build/bin
+            DOC "The SDL2 library path"
+        )
+    else()
+        find_library(SDL2_LIBRARY
+            NAMES ${SDL2_LIBRARY_NAME}
+            PATHS
+                ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
+                /usr/lib64
+                /usr/lib
+                /usr/local/lib64
+                /usr/local/lib
+                /sw/lib
+                /opt/local/lib
+            PATH_SUFFIXES
+                SDL2
+                SDL2/lib
+                SDL2/bin
+                SDL2/build
+                SDL2/build/lib
+                SDL2/build/bin
+            DOC "The SDL2 library path"
+        )
+    endif()
+
+    get_filename_component(SDL2_LIBRARY_DIR_TEMP ${SDL2_LIBRARY} DIRECTORY)
+
+    set(CMAKE_FIND_LIBRARY_SUFFIXES ${SDL2_ORIG_SUFFIXES})
+
+    if (SDL2_MAIN_LIBRARY_DIR)
+        find_library(SDL2_MAIN_LIBRARY
+            NAMES SDL2main
+            PATHS
+                ${SDL2_MAIN_LIBRARY_DIR}
+            PATH_SUFFIXES
+                lib
+                bin
+                SDL2
+                SDL2/lib
+                SDL2/bin
+                SDL2/build
+                SDL2/build/lib
+                SDL2/build/bin
+            DOC "The SDL2main library path"
+        )
+    else()
+        find_library(SDL2_MAIN_LIBRARY
+            NAMES SDL2main
+            PATHS
+                ${SDL2_LIBRARY_DIR_TEMP}
+                ${SDL2_LIBRARY_DIR_TEMP}/..
+                ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
+                /usr/lib64
+                /usr/lib
+                /usr/local/lib64
+                /usr/local/lib
+                /sw/lib
+                /opt/local/lib
+            PATH_SUFFIXES
+                SDL2
+                SDL2/lib
+                SDL2/bin
+                SDL2/build
+                SDL2/build/lib
+                SDL2/build/bin
+            DOC "The SDL2main library path"
+        )
+    endif()
 
     if (NOT SDL2_IS_STATIC)
         set(SDL2_SHARED ${GLEW_LIBRARY})
@@ -170,17 +276,17 @@ include(FindPackageHandleStandardArgs)
 # if all listed variables are TRUE
 if (WIN32)
 	if (SDL2_IS_STATIC)
-		find_package_handle_standard_args(SDL2 DEFAULT_MSG SDL2_LIBRARY SDL2_MAIN_LIBRARY SDL2_INCLUDE_DIR)
+		find_package_handle_standard_args(SDL2 DEFAULT_MSG SDL2_LIBRARY SDL2_MAIN_LIBRARY SDL2_INCLUDE)
 	else()
-		find_package_handle_standard_args(SDL2 DEFAULT_MSG SDL2_LIBRARY SDL2_MAIN_LIBRARY SDL2_INCLUDE_DIR SDL2_SHARED)
+		find_package_handle_standard_args(SDL2 DEFAULT_MSG SDL2_LIBRARY SDL2_MAIN_LIBRARY SDL2_INCLUDE SDL2_SHARED)
 	endif()
 else()
-	find_package_handle_standard_args(SDL2 DEFAULT_MSG SDL2_LIBRARY SDL2_MAIN_LIBRARY SDL2_INCLUDE_DIR)
+	find_package_handle_standard_args(SDL2 DEFAULT_MSG SDL2_LIBRARY SDL2_MAIN_LIBRARY SDL2_INCLUDE)
 endif()
 
 if (SDL2_FOUND)
     set(SDL2_LIBRARIES "${SDL2_LIBRARY} ${SDL2_MAIN_LIBRARY}")
-    set(SDL2_INCLUDE_DIRS ${SDL2_INCLUDE_DIR})
+    set(SDL2_INCLUDE_DIRS ${SDL2_INCLUDE})
 endif()
 
 # Export SDL2::SDL2 as target if it doesn't already exist
@@ -231,4 +337,4 @@ endif()
 set(CMAKE_FIND_LIBRARY_SUFFIXES ${SDL2_ORIG_SUFFIXES})
 
 # Tell cmake GUIs to ignore the "local" variables.
-mark_as_advanced(SDL2_LIBRARY_NAME SDL2_ORIG_SUFFIXES)
+mark_as_advanced(SDL2_LIBRARY_NAME SDL2_LIBRARY SDL2_INCLUDE SDL2_SHARED SDL2_ORIG_SUFFIXES)

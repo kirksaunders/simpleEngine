@@ -37,41 +37,43 @@ else()
 endif()
     
 if (WIN32)
-    find_path(GLEW_INCLUDE_DIR
-		NAMES GL/glew.h
-        PATHS
-            ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
-            $ENV{PROGRAMFILES}
-            "$ENV{PROGRAMFILES\(x86\)}"
-        PATH_SUFFIXES
-            glew
-            glew/include
-            glew/build
-            glew/build/include
-        DOC "The glew include directory"
-    )
+    if (GLEW_INCLUDE_DIR)
+        set(GLEW_INCLUDE ${GLEW_INCLUDE_DIR} CACHE PATH "The GLEW include directory")
+    else()
+        find_path(GLEW_INCLUDE
+            NAMES GL/glew.h
+            PATHS
+                ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
+                $ENV{PROGRAMFILES}
+                "$ENV{PROGRAMFILES\(x86\)}"
+            PATH_SUFFIXES
+                glew
+                glew/include
+                glew/build
+                glew/build/include
+            DOC "The glew include directory"
+        )
+    endif()
 
-    find_library(GLEW_LIBRARY
-		NAMES ${GLEW_LIBRARY_NAME}
-        PATHS
-            ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
-            $ENV{PROGRAMFILES}
-            "$ENV{PROGRAMFILES\(x86\)}"
-        PATH_SUFFIXES
-            glew
-            glew/lib
-            glew/bin
-            glew/build
-            glew/build/lib
-            glew/build/bin
-        DOC "The glew library path"
-    )
-
-    set(CMAKE_FIND_LIBRARY_SUFFIXES "")
-
-    if (NOT GLEW_IS_STATIC)
-        find_library(GLEW_SHARED
-			NAMES ${GLEW_LIBRARY_NAME}
+    if (GLEW_LIBRARY_DIR)
+        find_library(GLEW_LIBRARY
+            NAMES ${GLEW_LIBRARY_NAME}
+            PATHS
+                ${GLEW_LIBRARY_DIR}
+            PATH_SUFFIXES
+                lib
+                bin
+                glew
+                glew/lib
+                glew/bin
+                glew/build
+                glew/build/lib
+                glew/build/bin
+            DOC "The glew library path"
+        )
+    else()
+        find_library(GLEW_LIBRARY
+            NAMES ${GLEW_LIBRARY_NAME}
             PATHS
                 ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
                 $ENV{PROGRAMFILES}
@@ -83,45 +85,109 @@ if (WIN32)
                 glew/build
                 glew/build/lib
                 glew/build/bin
-            DOC "The glew shared library path"
+            DOC "The glew library path"
         )
     endif()
-else()
-    find_path(GLEW_INCLUDE_DIR
-		NAMES GL/glew.h
-        PATHS
-            ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
-            /usr/include
-            /usr/local/include
-            /sw/include
-            /opt/local/include
-        PATH_SUFFIXES
-            glew
-            glew/include
-            glew/build
-            glew/build/include
-        DOC "The glew include directory"
-    )
 
-    find_library(GLEW_LIBRARY
-		NAMES ${GLEW_LIBRARY_NAME}
-        PATHS
-            ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
-            /usr/lib64
-            /usr/lib
-            /usr/local/lib64
-            /usr/local/lib
-            /sw/lib
-            /opt/local/lib
-        PATH_SUFFIXES
-            glew
-            glew/lib
-            glew/bin
-            glew/build
-            glew/build/lib
-            glew/build/bin
-        DOC "The glew library path"
-    )
+    set(CMAKE_FIND_LIBRARY_SUFFIXES "")
+
+    if (NOT GLEW_IS_STATIC)
+        if (GLEW_SHARED_DIR)
+            find_library(GLEW_SHARED
+                NAMES ${GLEW_LIBRARY_NAME}
+                PATHS
+                    ${GLEW_SHARED_DIR}
+                PATH_SUFFIXES
+                    lib
+                    bin
+                    glew
+                    glew/lib
+                    glew/bin
+                    glew/build
+                    glew/build/lib
+                    glew/build/bin
+                DOC "The glew shared library path"
+            )
+        else()
+            get_filename_component(GLEW_LIBRARY_DIR_TEMP ${GLEW_LIBRARY} DIRECTORY)
+            
+            find_library(GLEW_SHARED
+                NAMES ${GLEW_LIBRARY_NAME}
+                PATHS
+                    ${GLEW_LIBRARY_DIR_TEMP}
+                    ${GLEW_LIBRARY_DIR_TEMP}/..
+                    ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
+                    $ENV{PROGRAMFILES}
+                    "$ENV{PROGRAMFILES\(x86\)}"
+                PATH_SUFFIXES
+                    glew
+                    glew/lib
+                    glew/bin
+                    glew/build
+                    glew/build/lib
+                    glew/build/bin
+                DOC "The glew shared library path"
+            )
+        endif()
+    endif()
+else()
+    if (GLEW_INCLUDE_DIR)
+        set(GLEW_INCLUDE ${GLEW_INCLUDE_DIR} CACHE PATH "The GLEW include directory")
+    else()
+        find_path(GLEW_INCLUDE
+            NAMES GL/glew.h
+            PATHS
+                ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
+                /usr/include
+                /usr/local/include
+                /sw/include
+                /opt/local/include
+            PATH_SUFFIXES
+                glew
+                glew/include
+                glew/build
+                glew/build/include
+            DOC "The glew include directory"
+        )
+    endif()
+
+    if (GLEW_LIBRARY_DIR)
+        find_library(GLEW_LIBRARY
+            NAMES ${GLEW_LIBRARY_NAME}
+            PATHS
+                ${GLEW_LIBRARY_DIR}
+            PATH_SUFFIXES
+                lib
+                bin
+                glew
+                glew/lib
+                glew/bin
+                glew/build
+                glew/build/lib
+                glew/build/bin
+            DOC "The glew library path"
+        )
+    else()
+        find_library(GLEW_LIBRARY
+            NAMES ${GLEW_LIBRARY_NAME}
+            PATHS
+                ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
+                /usr/lib64
+                /usr/lib
+                /usr/local/lib64
+                /usr/local/lib
+                /sw/lib
+                /opt/local/lib
+            PATH_SUFFIXES
+                glew
+                glew/lib
+                glew/bin
+                glew/build
+                glew/build/lib
+                glew/build/bin
+            DOC "The glew library path"
+        )
+    endif()
 
     if (NOT GLEW_IS_STATIC)
         set(GLEW_SHARED ${GLEW_LIBRARY})
@@ -133,17 +199,17 @@ include(FindPackageHandleStandardArgs)
 # if all listed variables are TRUE
 if (WIN32)
 	if (GLEW_IS_STATIC)
-		find_package_handle_standard_args(GLEW DEFAULT_MSG GLEW_LIBRARY GLEW_INCLUDE_DIR)
+		find_package_handle_standard_args(GLEW DEFAULT_MSG GLEW_LIBRARY GLEW_INCLUDE)
 	else()
-		find_package_handle_standard_args(GLEW DEFAULT_MSG GLEW_LIBRARY GLEW_INCLUDE_DIR GLEW_SHARED)
+		find_package_handle_standard_args(GLEW DEFAULT_MSG GLEW_LIBRARY GLEW_INCLUDE GLEW_SHARED)
 	endif()
 else()
-	find_package_handle_standard_args(GLEW DEFAULT_MSG GLEW_LIBRARY GLEW_INCLUDE_DIR)
+	find_package_handle_standard_args(GLEW DEFAULT_MSG GLEW_LIBRARY GLEW_INCLUDE)
 endif()
 
 if (GLEW_FOUND)
     set(GLEW_LIBRARIES ${GLEW_LIBRARY})
-    set(GLEW_INCLUDE_DIRS ${GLEW_INCLUDE_DIR})
+    set(GLEW_INCLUDE_DIRS ${GLEW_INCLUDE})
 
     if (GLEW_IS_STATIC)
         set(GLEW_DEFINITIONS "-DGLEW_STATIC")
@@ -176,4 +242,4 @@ endif()
 set(CMAKE_FIND_LIBRARY_SUFFIXES ${GLEW_ORIG_SUFFIXES})
 
 # Tell cmake GUIs to ignore the "local" variables.
-mark_as_advanced(GLEW_LIBRARY_NAME GLEW_ORIG_SUFFIXES)
+mark_as_advanced(GLEW_LIBRARY_NAME GLEW_LIBRARY GLEW_INCLUDE GLEW_SHARED GLEW_ORIG_SUFFIXES)
