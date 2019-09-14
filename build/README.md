@@ -27,13 +27,17 @@ This list contains CMake options that can be set to control certain properties o
 
 - **[DEPENDENCY_NAME]_INCLUDE_DIR (*PATH*)** - To manually specify the path to [DEPENDENCY_NAME]'s include files on your system, set this option to the path containing the [DEPENDENCY_NAME] include directory. [DEPENDENCY_NAME] = ASSIMP, GLEW, SDL2, or STB_IMAGE (just replace [DEPENDENCY_NAME] with the library name as listed here)
 
-- **[DEPENDENCY_NAME]_LIBRARY (*FILEPATH*)** - To manually specify the path to [DEPENDENCY_NAME]'s library file on your system, set this option to the path of the [DEPENDENCY_NAME] library file.
+- **[DEPENDENCY_NAME]_LIBRARY_DIR (*PATH*)** - To manually specify the path to the directory containing [DEPENDENCY_NAME]'s library file on your system, set this option to the path of the [DEPENDENCY_NAME] library file.
 
-	**Note:** If you are on Windows and linking this library as shared, this should be set to the `.dll.a` or .`dll.lib` library file, not the `.dll` file. See below for the `.dll` file. [DEPENDENCY_NAME] = ASSIMP, GLEW, or SDL2 (just replace [DEPENDENCY_NAME] with the library name as listed here)
+	**Note:** If you are on Windows and linking this library as shared, this should correspond to the `.dll.a` or .`dll.lib` library file, not the `.dll` file. See below for the `.dll` file. [DEPENDENCY_NAME] = ASSIMP, ASSIMP_IRRXML, GLEW, SDL2, or ZLIB (just replace [DEPENDENCY_NAME] with the library name as listed here)
 
-- **SDL2_MAIN_LIBRARY (*FILEPATH*)** - SDL2 requires an additional *static* library in order to link properly. This is the SDL2-main library and this option should be set as the path of that static library file (should be SDL2-main.a or SDL2-main.lib).
+	**Note:** SDL2 requires an additional *static* library in order to link properly. This is the SDL2-main library. If you do not specify the SDL2_MAIN_LIBRARY_DIR option, cmake will try to find this library in the same directory that the primary SDL2 library was found in (plus standard locations).
+
+	**Note:** ASSIMP requires a couple additional *static* libraries when linked statically. They are the zlib library and the IrrXML library. If you do not specify the ZLIB_LIBRARY_DIR or ASSIMP_IRRXML_LIBRARY_DIR options, cmake will try to find them in the same directory that the primary ASSIMP library was found in (plus standard locations).
+
+- **SDL2_MAIN_LIBRARY_DIR (*PATH*)** - SDL2 requires an additional *static* library in order to link properly. This is the SDL2-main library and this option should be set as the directory containing that static library file (should be SDL2-main.a or SDL2-main.lib).
 
 ### Windows Specific Options
-- **[DEPENDENCY_NAME]_SHARED (*FILEPATH*)** - To manually specify the path to [DEPENDENCY_NAME]'s *shared* library file (`.dll`) on your system, set this option to the path of the [DEPENDENCY_NAME] *shared* library file.
+- **[DEPENDENCY_NAME]_SHARED_DIR (*PATH*)** - To manually specify the path to [DEPENDENCY_NAME]'s *shared* library file (`.dll`) on your system, set this option to the path of the [DEPENDENCY_NAME] *shared* library file.
 	
 	**Note:** This option is only required if [DEPENDENCY_NAME]_USE_STATIC_LIBS is set to *FALSE*. [DEPENDENCY_NAME] = ASSIMP, GLEW, or SDL2 (just replace [DEPENDENCY_NAME] with the library name as listed here)
