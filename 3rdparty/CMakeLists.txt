@@ -15,8 +15,8 @@ option(SDL2_USE_STATIC_LIBS
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
 
 find_package(Threads REQUIRED)
-find_package(SDL2 REQUIRED)
 find_package(GLEW REQUIRED)
+find_package(SDL2 REQUIRED)
 find_package(ASSIMP REQUIRED)
 find_package(STB_IMAGE REQUIRED)
 
