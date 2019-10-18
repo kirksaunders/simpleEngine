@@ -55,6 +55,7 @@ else()
 endif()
 
 # set find library suffixes
+set(ORIG_PREFIXES ${CMAKE_FIND_LIBRARY_PREFIXES})
 set(ORIG_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES})
 if (MSVC)
     set(CMAKE_FIND_LIBRARY_SUFFIXES .lib)
@@ -132,6 +133,9 @@ else()
     )
 endif()
 
+# empty library prefixes
+set(CMAKE_FIND_LIBRARY_PREFIXES "")
+
 if (GLEW_LIBRARY_DIR)
     find_library(LIBRARY
         NAMES ${LIBRARY_NAME}
@@ -178,7 +182,8 @@ if (NOT GLEW_USE_STATIC_LIBS)
     endif()
 endif()
 
-# Restore the original CMAKE_FIND_LIBRARY_SUFFIXES
+# Restore the original CMAKE_FIND_LIBRARY_(PRE/SUF)FIXES
+set(CMAKE_FIND_LIBRARY_PREFIXES ${ORIG_PREFIXES})
 set(CMAKE_FIND_LIBRARY_SUFFIXES ${ORIG_SUFFIXES})
 
 include(FindPackageHandleStandardArgs)

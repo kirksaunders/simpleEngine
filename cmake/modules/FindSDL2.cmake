@@ -43,6 +43,7 @@ else()
 endif()
 
 # set find library suffixes
+set(ORIG_PREFIXES ${CMAKE_FIND_LIBRARY_PREFIXES})
 set(ORIG_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES})
 if (MSVC)
     set(CMAKE_FIND_LIBRARY_SUFFIXES .lib)
@@ -123,6 +124,9 @@ else()
     )
 endif()
 
+# empty library prefixes
+set(CMAKE_FIND_LIBRARY_PREFIXES "")
+
 # find library
 if (SDL2_LIBRARY_DIR)
     find_library(LIBRARY
@@ -195,6 +199,9 @@ else()
         DOC "The SDL2main library path"
     )
 endif()
+
+# Restore the original CMAKE_FIND_LIBRARY_PREFIXES
+set(CMAKE_FIND_LIBRARY_PREFIXES ${ORIG_PREFIXES})
 
 include(FindPackageHandleStandardArgs)
 # let cmake handle erroring if the library components weren't found

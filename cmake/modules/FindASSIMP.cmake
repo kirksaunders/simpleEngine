@@ -49,6 +49,7 @@ else()
 endif()
 
 # set find library suffixes
+set(ORIG_PREFIXES ${CMAKE_FIND_LIBRARY_PREFIXES})
 set(ORIG_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES})
 if (MSVC)
     set(CMAKE_FIND_LIBRARY_SUFFIXES .lib)
@@ -134,6 +135,9 @@ else()
         DOC "The ASSIMP include directory"
     )
 endif()
+
+# empty library prefixes
+set(CMAKE_FIND_LIBRARY_PREFIXES "")
 
 # find library
 if (ASSIMP_LIBRARY_DIR)
@@ -250,6 +254,9 @@ if (ASSIMP_USE_STATIC_LIBS)
     # let cmake handle erroring if zlib wasn't found
     find_package_handle_standard_args(ZLIB DEFAULT_MSG ZLIB_LIBRARY)
 endif()
+
+# Restore the original CMAKE_FIND_LIBRARY_PREFIXES
+set(CMAKE_FIND_LIBRARY_PREFIXES ${ORIG_PREFIXES})
 
 if (ASSIMP_FOUND)
     set(ASSIMP_INCLUDE_DIRS ${INCLUDE_DIR})

@@ -105,9 +105,16 @@ void pathfind() {
     grid.save(ofs);
     ofs.close();
 
-    Window window(WIDTH, HEIGHT, "A* Pathfinding");
+    Window* window;
 
-    Context3D* context = window.getContext();
+    try {
+        window = new Window(WIDTH, HEIGHT, "A* Pathfinding");
+    } catch (Exception& ex) {
+        std::cout << ex << std::endl;
+        exit(-1);
+    }
+
+    Context3D* context = window->getContext();
 
     Shader defaultShader = Shader::defaultPerspective();
     try {
@@ -153,43 +160,47 @@ void pathfind() {
 
     float cX, cY;
     cX = cY = 0;
-    window.setMouseDownCallback([&window](MOUSE_BUTTON button, int x, int y) {
+    window->setMouseDownCallback([&window](MOUSE_BUTTON button, int x, int y) {
         if (button == MOUSE_BUTTON::RIGHT) { // right mouse button
-            window.setMouseLockEnabled(true);
+            window->setMouseLockEnabled(true);
         }
     });
-    window.setMouseUpCallback([&window](MOUSE_BUTTON button, int x, int y) {
+    window->setMouseUpCallback([&window](MOUSE_BUTTON button, int x, int y) {
         if (button == MOUSE_BUTTON::RIGHT) { // right mouse button
-            window.setMouseLockEnabled(false);
+            window->setMouseLockEnabled(false);
         }
     });
-    window.setMouseMoveCallback([&window, &cX, &cY](int x, int y, int dx, int dy) {
-        if (window.isMouseDown(MOUSE_BUTTON::RIGHT)) {
+    window->setMouseMoveCallback([&window, &cX, &cY](int x, int y, int dx, int dy) {
+        if (window->isMouseDown(MOUSE_BUTTON::RIGHT)) {
             cX -= dx * MOUSE_SENS;
             cY = std::max(std::min(cY - dy * MOUSE_SENS, 90.0f), -90.0f);
         }
     });
-    window.setKeyUpCallback([&window](KEYCODE key) {
+    window->setKeyUpCallback([&window](KEYCODE key) {
         if (key == KEYCODE::F11) {
-            window.toggleFullscreen();
+            window->toggleFullscreen();
         }
     });
 
-    window.setVSyncEnabled(false);
-
-    while (window.isActive()) {
-        window.updateViewport();
-        window.clear();
-
-        updateCamera(cam, &window, cX, cY);
-
-        context->render();
-
-        window.update();
-        window.pollEvents();
+    try {
+        window->setVSyncEnabled(false);
+    } catch (Exception& ex) {
+        std::cout << ex << std::endl;
     }
 
-    window.close(); // window must be closed to clean up resources it uses
+    while (window->isActive()) {
+        window->updateViewport();
+        window->clear();
+
+        updateCamera(cam, window, cX, cY);
+
+        context->render();
+        
+        window->update();
+        window->pollEvents();
+    }
+
+    window->close(); // window must be closed to clean up resources it uses
     /* WARNING: closing a window requires the objects it currently uses to still exist,
                 so do NOT delete an object or let it go out of scope until it has been removed
                 from all contexts or all windows that use it have been closed. in the future I will
@@ -201,4 +212,6 @@ void pathfind() {
     for (int i = 0; i < paths.size(); ++i) {
         delete paths[i];
     }
+
+    delete window;
 }
