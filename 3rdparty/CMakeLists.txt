@@ -24,7 +24,6 @@ add_library(3RDPARTY INTERFACE IMPORTED)
 target_link_libraries(3RDPARTY
     INTERFACE
         Threads::Threads
-        SDL2::SDL2main
         SDL2::SDL2
         GLEW::GLEW
         ASSIMP::ASSIMP

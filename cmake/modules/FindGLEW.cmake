@@ -18,7 +18,7 @@ unset(SHARED_LIBRARY CACHE)
 if (WIN32)
     set(LIBRARY_NAME_BASE glew32)
 else()
-    if (USE_STATIC_LIBS)
+    if (GLEW_USE_STATIC_LIBS)
         set(LIBRARY_NAME_BASE glew)
     else()
         set(LIBRARY_NAME_BASE GLEW)
@@ -32,26 +32,29 @@ else()
     set(LIBRARY_NAME_PREFIX "lib")
 endif()
 
-# set library name suffix
-if (WIN32)
-    if (MSVC)
-        if (GLEW_USE_DEBUG)
-            # debug version of glew has a d suffix
-            set(LIBRARY_NAME_SUFFIX "d")
-        endif()
-    endif()
+# set library name suffix2
+if (MSVC AND GLEW_USE_STATIC_LIBS)
+    set(LIBRARY_NAME_SUFFIX1 "s")
+else()
+    set(LIBRARY_NAME_SUFFIX1 "")
+endif()
+
+# set library name suffix2
+if (WIN32 AND MSVC AND GLEW_USE_DEBUG)
+    # debug version has a d suffix
+    set(LIBRARY_NAME_SUFFIX2 "d")
+else()
+    set(LIBRARY_NAME_SUFFIX2 "")
 endif()
 
 # set library extra extension
-if (WIN32)
-    if (NOT MSVC)
-        if (NOT GLEW_USE_STATIC_LIBS)
-            set(LIBRARY_EXTENSION ".dll")
-        endif()
-    endif()
+if (WIN32 AND (NOT MSVC) AND (NOT GLEW_USE_STATIC_LIBS))
+    set(LIBRARY_EXTENSION ".dll")
+else()
+    set(LIBRARY_EXTENSION "")
 endif()
 
-# set library suffixes
+# set find library suffixes
 set(ORIG_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES})
 if (MSVC)
     set(CMAKE_FIND_LIBRARY_SUFFIXES .lib)
@@ -68,11 +71,13 @@ else()
 endif()
 
 # append all of the above into one library name, and set shared library name
-set(LIBRARY_NAME ${LIBRARY_NAME_PREFIX}${LIBRARY_NAME_BASE}${LIBRARY_NAME_SUFFIX}${LIBRARY_EXTENSION})
-if (WIN32)
-    set(SHARED_LIBRARY_NAME ${LIBRARY_NAME_BASE}${LIBRARY_NAME_SUFFIX}.dll)
-else()
-    set(SHARED_LIBRARY_NAME ${LIBRARY_NAME_PREFIX}${LIBRARY_NAME_BASE}${LIBRARY_NAME_SUFFIX}.so)
+set(LIBRARY_NAME ${LIBRARY_NAME_PREFIX}${LIBRARY_NAME_BASE}${LIBRARY_NAME_SUFFIX1}${LIBRARY_NAME_SUFFIX2}${LIBRARY_EXTENSION})
+if (NOT GLEW_USE_STATIC_LIBS)
+    if (WIN32)
+        set(SHARED_LIBRARY_NAME ${LIBRARY_NAME_BASE}${LIBRARY_NAME_SUFFIX2}.dll)
+    else()
+        set(SHARED_LIBRARY_NAME ${LIBRARY_NAME_PREFIX}${LIBRARY_NAME_BASE}${LIBRARY_NAME_SUFFIX2}.so)
+    endif()
 endif()
 
 # set search locations
@@ -164,8 +169,8 @@ if (NOT GLEW_USE_STATIC_LIBS)
         find_library(SHARED_LIBRARY
             NAMES ${SHARED_LIBRARY_NAME}
             PATHS
-                ${GLEW_LIBRARY_DIR_TEMP}
-                ${GLEW_LIBRARY_DIR_TEMP}/..
+                ${LIBRARY_DIR_TEMP}
+                ${LIBRARY_DIR_TEMP}/..
                 ${SEARCH_LIBRARY_LOCATIONS}
             PATH_SUFFIXES ${SEARCH_LIBRARY_SUBLOCATIONS}
             DOC "The GLEW shared library path"

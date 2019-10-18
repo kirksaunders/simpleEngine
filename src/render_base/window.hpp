@@ -3,6 +3,7 @@
 
 #include <atomic>
 #include <functional>
+#include <string>
 #include <thread>
 #include <utility>
 #include <vector>
